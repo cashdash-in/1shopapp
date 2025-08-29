@@ -93,6 +93,33 @@ const DUMMY_PRODUCTS: Product[] = [
       { retailer: 'Apple Store', price: '99,900', url: 'https://www.apple.com/in/search/macbook-air-m2?ref=1shopapp' },
     ],
   },
+  {
+    id: 8,
+    name: 'Nike Air Max 270 Shoes',
+    imageUrl: 'https://picsum.photos/seed/nike/600/400',
+    prices: [
+      { retailer: 'Nike Store', price: '12,995', url: 'https://www.nike.com/in/w?q=Air%20Max%20270&v1=Air%20Max%20270' },
+      { retailer: 'Myntra', price: '11,695', url: 'https://www.myntra.com/nike+air+max+270' },
+    ],
+  },
+  {
+    id: 9,
+    name: 'The Psychology of Money Book',
+    imageUrl: 'https://picsum.photos/seed/book/600/400',
+    prices: [
+      { retailer: 'Amazon', price: '350', url: 'https://www.amazon.in/s?k=The+Psychology+of+Money' },
+      { retailer: 'Flipkart', price: '380', url: 'https://www.flipkart.com/search?q=The+Psychology+of+Money' },
+    ],
+  },
+  {
+    id: 10,
+    name: 'Fitbit Charge 6',
+    imageUrl: 'https://picsum.photos/seed/fitbit/600/400',
+    prices: [
+      { retailer: 'Amazon', price: '14,999', url: 'https://www.amazon.in/s?k=Fitbit+Charge+6' },
+      { retailer: 'Flipkart', price: '14,990', url: 'https://www.flipkart.com/search?q=Fitbit+Charge+6' },
+    ],
+  },
 ];
 
 export async function compareProducts(query: string): Promise<Product[]> {
