@@ -49,9 +49,11 @@ function CompareResults() {
     router.push(`/compare?q=${encodeURIComponent(newQuery)}`);
   };
 
-  // For now, we just show all dummy products if a search is made.
-  // Later, this would be a real API call.
-  const filteredProducts = query ? DUMMY_PRODUCTS : [];
+  const filteredProducts = query
+    ? DUMMY_PRODUCTS.filter((product) =>
+        product.name.toLowerCase().includes(query.toLowerCase())
+      )
+    : [];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -90,7 +92,7 @@ function CompareResults() {
             ) : query ? (
               <div className="text-center py-12">
                 <h2 className="text-xl font-semibold">No Results Found</h2>
-                <p className="text-muted-foreground mt-2">Try searching for something else.</p>
+                <p className="text-muted-foreground mt-2">Try searching for something else, like &quot;iPhone&quot; or &quot;Headphones&quot;.</p>
               </div>
             ) : (
                <div className="text-center py-12">
