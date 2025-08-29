@@ -26,12 +26,13 @@ export function ProductComparisonCard({ product }: ProductComparisonCardProps) {
   return (
     <Card className="overflow-hidden">
       <div className="md:flex">
-        <div className="md:w-1/3 relative h-48 md:h-auto">
-          <Image
+        <div className="md:w-1/3 relative h-60 md:h-auto">
+           <Image
             src={product.imageUrl}
             alt={product.name}
-            fill
-            className="object-cover"
+            width={600}
+            height={400}
+            className="object-cover w-full h-full"
             data-ai-hint={product.hint}
           />
         </div>
