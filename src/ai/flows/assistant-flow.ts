@@ -6,21 +6,37 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'zod';
 
-export const shoppingAssistant = ai.defineFlow(
-  {
-    name: 'shoppingAssistant',
-    inputSchema: z.string(),
-    outputSchema: z.string(),
-  },
-  async (prompt) => {
-    const llmResponse = await ai.generate({
-      model: googleAI('gemini-1.5-flash-latest'),
-      prompt: `You are a helpful assistant. User query: ${prompt}`,
-    });
+const ShoppingAssistantInputSchema = z.string();
+export type ShoppingAssistantInput = z.infer<typeof ShoppingAssistantInputSchema>;
 
-    return llmResponse.text;
+const ShoppingAssistantOutputSchema = z.string();
+export type ShoppingAssistantOutput = z.infer<
+  typeof ShoppingAssistantOutputSchema
+>;
+
+export async function shoppingAssistant(
+  input: ShoppingAssistantInput
+): Promise<ShoppingAssistantOutput> {
+  return shoppingAssistantFlow(input);
+}
+
+const prompt = ai.definePrompt({
+  name: 'shoppingAssistantPrompt',
+  input: { schema: ShoppingAssistantInputSchema },
+  output: { schema: ShoppingAssistantOutputSchema },
+  prompt: `You are a helpful shopping assistant. Provide a helpful response to the following user query: {{{input}}}`,
+});
+
+const shoppingAssistantFlow = ai.defineFlow(
+  {
+    name: 'shoppingAssistantFlow',
+    inputSchema: ShoppingAssistantInputSchema,
+    outputSchema: ShoppingAssistantOutputSchema,
+  },
+  async (input) => {
+    const { output } = await prompt(input);
+    return output || "I'm sorry, I couldn't generate a response.";
   }
 );
