@@ -28,14 +28,7 @@ const shoppingAssistantFlow = ai.defineFlow(
   },
   async ({ prompt }) => {
     const llmResponse = await ai.generate({
-      prompt: `You are an expert shopping assistant for an app called 1ShopApp. 
-  Your goal is to help users make informed decisions about what to buy and where to buy it.
-  The user has access to services like Flipkart, Amazon, Meesho, Swiggy, and Zomato through the app.
-  
-  When a user asks a question, provide a helpful and concise response. 
-  You can recommend products, compare items, suggest where to eat, or give general shopping advice.
-  
-  User query: ${prompt}`,
+      prompt: `You are a helpful assistant. User query: ${prompt}`,
     });
     return llmResponse.text;
   }
