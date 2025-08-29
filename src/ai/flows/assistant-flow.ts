@@ -6,27 +6,64 @@
  */
 
 import {ai} from '@/ai/genkit';
-import { z } from 'zod';
+import {z} from 'zod';
 
-// Define and export the flow.
-export const shoppingAssistant = ai.defineFlow(
-  {
-    name: 'shoppingAssistant',
-    inputSchema: z.string(),
-    outputSchema: z.string(),
-  },
-  async (input: string) => {
-    // WORKAROUND: Bypassing the AI call to avoid connection errors.
-    // We can revisit fixing the underlying environment variable issue later.
-    const staticResponse = `I'm ready to find you the best deals! 
+const DealSchema = z.object({
+  title: z.string().describe('The title of the deal or promotion.'),
+  description: z.string().describe('A brief description of the deal.'),
+  retailer: z.string().describe('The retailer offering the deal.'),
+  url: z.string().url().optional().describe('A URL to the deal.'),
+});
 
-For example, you could ask me:
-- "Are there any discounts on Nike running shoes?"
-- "Find coupons for pizza delivery."
-- "What's the best price for a 65-inch 4K TV?"
+const DealsResponseSchema = z.object({
+  deals: z
+    .array(DealSchema)
+    .describe('A list of deals and promotions found.'),
+  summary: z
+    .string()
+    .describe('A friendly summary of the deals found for the user.'),
+});
 
-Our full AI capabilities are coming soon. For now, feel free to explore our partner sites like Amazon and Flipkart directly from the home page!`;
+const shoppingPrompt = ai.definePrompt({
+  name: 'shoppingPrompt',
+  input: {schema: z.string()},
+  output: {schema: DealsResponseSchema},
+  prompt: `You are a shopping assistant for an app called 1ShopApp. Your goal is to help users find the best deals and promotions based on their requests.
 
-    return staticResponse;
+You should search for real, current deals if you can. If you cannot find real deals, you should create realistic example deals based on the user's query.
+
+For each deal, provide a title, a brief description, the retailer, and a URL if available.
+
+In addition to the list of deals, provide a friendly, conversational summary of what you found.
+
+User query: {{{prompt}}}
+`,
+});
+
+async function shoppingAssistant(query: string): Promise<string> {
+  const llmResponse = await shoppingPrompt(query);
+  const dealsData = llmResponse.output;
+
+  if (!dealsData || !dealsData.deals || dealsData.deals.length === 0) {
+    return (
+      dealsData?.summary ||
+      "I couldn't find any specific deals for that right now, but I'm always looking! Try asking about something else, like 'discounts on laptops' or 'coupons for shoes'."
+    );
   }
-);
+
+  let responseText = dealsData.summary + '\n\n';
+  dealsData.deals.forEach(deal => {
+    responseText += `**${deal.title}** at ${deal.retailer}\n`;
+    responseText += `${deal.description}\n`;
+    if (deal.url) {
+      responseText += `[View Deal](${deal.url})\n`;
+    }
+    responseText += '\n';
+  });
+
+  return responseText;
+}
+
+// We are exporting the async function directly to be used in the UI.
+// The ai.defineFlow is implicitly created by the prompt.
+export {shoppingAssistant};
