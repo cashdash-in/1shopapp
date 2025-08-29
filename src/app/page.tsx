@@ -20,7 +20,7 @@ const services: Service[] = [
       { name: 'Meesho', href: 'https://www.meesho.com?ref=1shopapp' },
       { name: 'DMart', href: 'https://www.dmart.in?ref=1shopapp' },
       { name: 'Blinkit', href: 'https://www.blinkit.com?ref=1shopapp' },
-      { name: 'Kisan Connect', href: 'https://www.kisanconnect.in?ref=1shopapp' },
+      { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
     ] 
   },
   { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com?ref=1shopapp' },
