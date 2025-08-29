@@ -191,7 +191,7 @@ export default function Home() {
           </div>
         </div>
         <p className="text-xs text-muted-foreground text-center mt-8 max-w-2xl">
-          To help keep 1ShopApp running and free to use, some of the services listed include affiliate links. This means we may earn a small commission when you make a purchase, at no extra cost to you. We appreciate your support!
+          Some of the links we share are part of affiliate programs. When you make a purchase, we may receive a small thank-you from the brand—without affecting your cost. It’s a quiet way you help keep 1ShopApp free for all.
         </p>
       </main>
       <Link href="/assistant" passHref>
