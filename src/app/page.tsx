@@ -7,16 +7,16 @@ import { Bot, Search } from 'lucide-react';
 import { ShoppingCart, UtensilsCrossed, Utensils, Receipt, Plane, Shield, Landmark } from 'lucide-react';
 
 const services = [
-  { name: 'Flipkart', icon: ShoppingCart, color: '#2874F0', href: 'https://www.flipkart.com' },
-  { name: 'Amazon', icon: ShoppingCart, color: '#FF9900', href: 'https://www.amazon.in' },
-  { name: 'Meesho', icon: ShoppingCart, color: '#FF4F81', href: 'https://www.meesho.com' },
-  { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com' },
-  { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com' },
+  { name: 'Flipkart', icon: ShoppingCart, color: '#2874F0', href: 'https://www.flipkart.com?ref=1shopapp' },
+  { name: 'Amazon', icon: ShoppingCart, color: '#FF9900', href: 'https://www.amazon.in?ref=1shopapp' },
+  { name: 'Meesho', icon: ShoppingCart, color: '#FF4F81', href: 'https://www.meesho.com?ref=1shopapp' },
+  { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com?ref=1shopapp' },
+  { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com?ref=1shopapp' },
   { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
-  { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: '#' },
-  { name: 'Travel', icon: Plane, color: '#00B9F1', href: '#' },
-  { name: 'Insurance', icon: Shield, color: '#6A1B9A', href: '#' },
-  { name: 'Banking', icon: Landmark, color: '#2E7D32', href: '#' },
+  { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: '#?ref=1shopapp' },
+  { name: 'Travel', icon: Plane, color: '#00B9F1', href: '#?ref=1shopapp' },
+  { name: 'Insurance', icon: Shield, color: '#6A1B9A', href: '#?ref=1shopapp' },
+  { name: 'Banking', icon: Landmark, color: '#2E7D32', href: '#?ref=1shopapp' },
 ];
 
 export default function Home() {
@@ -27,7 +27,7 @@ export default function Home() {
           1ShopApp
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-          One app for all your needs. Seamlessly access your favorite services for shopping, food, payments, and more.
+          Declutter your phone. Access all your essential apps in one place and save storage space.
         </p>
       </div>
 
