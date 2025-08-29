@@ -23,7 +23,7 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-background">
+      <DialogContent className="sm:max-w-[425px] bg-slate-800">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-4">
              <Icon className="w-8 h-8" style={{ color: service.color }}/>
