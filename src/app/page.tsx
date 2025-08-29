@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,6 @@ const services: Service[] = [
       { name: 'Zomato', href: 'https://www.zomato.com?ref=1shopapp' },
     ] 
   },
-  { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
   { 
     name: 'Bill Pay', 
     icon: Receipt, 
@@ -98,42 +98,53 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-8">
-      <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-2">
-          1ShopApp
-        </h1>
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-          Declutter your phone. Access all your essential apps in one place and save storage space.
-        </p>
-      </div>
-
-      <div className="w-full max-w-xl mb-8">
-        <form onSubmit={handleSearch} className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Compare prices across stores..."
-            className="w-full pl-10 pr-20 h-12 text-base"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-9">
-            Compare
-          </Button>
-        </form>
-      </div>
-
-      <div className="w-full max-w-4xl">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {services.map((service) => (
-            <ServiceTile
-              key={service.name}
-              service={service}
-            />
-          ))}
+    <>
+      <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-8">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-2">
+            1ShopApp
+          </h1>
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+            Declutter your phone. Access all your essential apps in one place and save storage space.
+          </p>
         </div>
-      </div>
-    </main>
+
+        <div className="w-full max-w-xl mb-8">
+          <form onSubmit={handleSearch} className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Compare prices across stores..."
+              className="w-full pl-10 pr-20 h-12 text-base"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-9">
+              Compare
+            </Button>
+          </form>
+        </div>
+
+        <div className="w-full max-w-4xl">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+            {services.map((service) => (
+              <ServiceTile
+                key={service.name}
+                service={service}
+              />
+            ))}
+          </div>
+        </div>
+      </main>
+      <Link href="/assistant" passHref>
+        <Button
+          variant="default"
+          className="fixed bottom-8 left-8 h-16 w-16 rounded-full shadow-lg hover:scale-110 transition-transform"
+        >
+          <Bot className="h-8 w-8" />
+          <span className="sr-only">Open AI Assistant</span>
+        </Button>
+      </Link>
+    </>
   );
 }
