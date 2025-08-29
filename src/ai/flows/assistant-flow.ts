@@ -7,6 +7,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
+import { findProducts } from '@/ai/tools/product-finder';
 
 const DealSchema = z.object({
   title: z.string().describe('The title of the deal or promotion.'),
@@ -28,37 +29,40 @@ const shoppingPrompt = ai.definePrompt({
   name: 'shoppingPrompt',
   input: {schema: z.string()},
   output: {schema: DealsResponseSchema},
+  tools: [findProducts],
   prompt: `You are a shopping assistant for an app called 1ShopApp. Your goal is to help users find the best deals and promotions based on their requests.
 
-You should search for real, current deals if you can. If you cannot find real deals, you should create realistic example deals based on the user's query.
+Use the findProducts tool to search for products related to the user's query.
 
-For each deal, provide a title, a brief description, the retailer, and a URL if available.
+Based on the tool's output, create a friendly, conversational summary of what you found.
 
-In addition to the list of deals, provide a friendly, conversational summary of what you found.
+If the tool returns relevant products, create a list of deals. For each deal, provide a title, a brief description, the retailer, and a URL if available.
+
+If you cannot find relevant deals, inform the user in a friendly way.
 
 User query: {{{prompt}}}
 `,
 });
 
 export async function shoppingAssistant(query: string): Promise<string> {
-  const {output} = await shoppingPrompt(query);
+    const {output} = await shoppingPrompt(query);
 
-  if (!output || !output.deals || output.deals.length === 0) {
-    return (
-      output?.summary ||
-      "I couldn't find any specific deals for that right now, but I'm always looking! Try asking about something else, like 'discounts on laptops' or 'coupons for shoes'."
-    );
-  }
-
-  let responseText = output.summary + '\n\n';
-  output.deals.forEach(deal => {
-    responseText += `**${deal.title}** at ${deal.retailer}\n`;
-    responseText += `${deal.description}\n`;
-    if (deal.url) {
-      responseText += `Find it here: ${deal.url}\n`;
+    if (!output || !output.deals || output.deals.length === 0) {
+        return (
+        output?.summary ||
+        "I couldn't find any specific deals for that right now, but I'm always looking! Try asking about something else, like 'discounts on laptops' or 'coupons for shoes'."
+        );
     }
-    responseText += '\n';
-  });
 
-  return responseText;
+    let responseText = output.summary + '\n\n';
+    output.deals.forEach(deal => {
+        responseText += `**${deal.title}** at ${deal.retailer}\n`;
+        responseText += `${deal.description}\n`;
+        if (deal.url) {
+        responseText += `Find it here: ${deal.url}\n`;
+        }
+        responseText += '\n';
+    });
+
+    return responseText;
 }
