@@ -40,23 +40,21 @@ User query: {{{prompt}}}
 `,
 });
 
-async function shoppingAssistant(query: string): Promise<string> {
-  const llmResponse = await shoppingPrompt(query);
-  const dealsData = llmResponse.output;
+export async function shoppingAssistant(query: string): Promise<string> {
+  const {output} = await shoppingPrompt(query);
 
-  if (!dealsData || !dealsData.deals || dealsData.deals.length === 0) {
+  if (!output || !output.deals || output.deals.length === 0) {
     return (
-      dealsData?.summary ||
+      output?.summary ||
       "I couldn't find any specific deals for that right now, but I'm always looking! Try asking about something else, like 'discounts on laptops' or 'coupons for shoes'."
     );
   }
 
-  let responseText = dealsData.summary + '\n\n';
-  dealsData.deals.forEach(deal => {
+  let responseText = output.summary + '\n\n';
+  output.deals.forEach(deal => {
     responseText += `**${deal.title}** at ${deal.retailer}\n`;
     responseText += `${deal.description}\n`;
     if (deal.url) {
-      // Note: The UI doesn't render markdown links, but this is a good practice.
       responseText += `Find it here: ${deal.url}\n`;
     }
     responseText += '\n';
@@ -64,7 +62,3 @@ async function shoppingAssistant(query: string): Promise<string> {
 
   return responseText;
 }
-
-// We are exporting the async function directly to be used in the UI.
-// The ai.defineFlow is implicitly created by the prompt.
-export {shoppingAssistant};
