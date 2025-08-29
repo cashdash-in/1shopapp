@@ -41,7 +41,8 @@ If you cannot find relevant deals, inform the user in a friendly way.
 });
 
 export async function shoppingAssistant(query: string): Promise<string> {
-  const {output} = await shoppingPrompt(query);
+  const result = await shoppingPrompt(query);
+  const output = result.output;
 
   if (!output || !output.deals || output.deals.length === 0) {
     return (
