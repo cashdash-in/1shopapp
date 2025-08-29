@@ -7,7 +7,7 @@ import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bot, Search } from 'lucide-react';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
 const services: Service[] = [
@@ -93,6 +93,39 @@ const services: Service[] = [
       { name: 'Nykaa', href: 'https://www.nykaa.com/' },
       { name: 'Purplle', href: 'https://www.purplle.com/' },
       { name: 'Sephora', href: 'https://www.sephora.com/' },
+    ]
+  },
+  {
+    name: 'Social Media',
+    icon: Users,
+    color: '#1DA1F2',
+    links: [
+      { name: 'Facebook', href: 'https://www.facebook.com/' },
+      { name: 'Instagram', href: 'https://www.instagram.com/' },
+      { name: 'X (Twitter)', href: 'https://www.twitter.com/' },
+      { name: 'LinkedIn', href: 'https://www.linkedin.com/' },
+    ]
+  },
+  {
+    name: 'News',
+    icon: Newspaper,
+    color: '#B91C1C',
+    links: [
+      { name: 'Times of India', href: 'https://timesofindia.indiatimes.com/' },
+      { name: 'Hindustan Times', href: 'https://www.hindustantimes.com/' },
+      { name: 'The Hindu', href: 'https://www.thehindu.com/' },
+      { name: 'NDTV', href: 'https://www.ndtv.com/' },
+    ]
+  },
+  {
+    name: 'Financials',
+    icon: LineChart,
+    color: '#0288D1',
+    links: [
+      { name: 'Moneycontrol', href: 'https://www.moneycontrol.com/' },
+      { name: 'ET Markets', href: 'https://economictimes.indiatimes.com/markets' },
+      { name: 'Zerodha', href: 'https://zerodha.com/' },
+      { name: 'Groww', href: 'https://groww.in/' },
     ]
   }
 ];
