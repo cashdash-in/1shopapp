@@ -8,11 +8,13 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const ShoppingAssistantInputSchema = z.string();
+const ShoppingAssistantInputSchema = z.object({
+  prompt: z.string(),
+});
 const ShoppingAssistantOutputSchema = z.string();
 
 export async function shoppingAssistant(prompt: string): Promise<z.infer<typeof ShoppingAssistantOutputSchema>> {
-  return shoppingAssistantFlow(prompt);
+  return shoppingAssistantFlow({ prompt });
 }
 
 const assistantPrompt = ai.definePrompt({
@@ -35,8 +37,8 @@ const shoppingAssistantFlow = ai.defineFlow(
     inputSchema: ShoppingAssistantInputSchema,
     outputSchema: ShoppingAssistantOutputSchema,
   },
-  async (prompt) => {
-    const { output } = await assistantPrompt(prompt);
+  async (input) => {
+    const { output } = await assistantPrompt(input);
     return output!;
   }
 );
