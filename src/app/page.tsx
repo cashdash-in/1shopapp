@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,6 +22,16 @@ const services = [
 ];
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/compare?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-8">
       <div className="text-center mb-8 sm:mb-12">
@@ -32,17 +44,19 @@ export default function Home() {
       </div>
 
       <div className="w-full max-w-xl mb-8">
-        <div className="relative">
+        <form onSubmit={handleSearch} className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search for products, brands, and more"
+            placeholder="Compare prices across stores..."
             className="w-full pl-10 pr-20 h-12 text-base"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-9">
-            Search
+            Compare
           </Button>
-        </div>
+        </form>
       </div>
 
       <div className="w-full max-w-4xl">
