@@ -6,7 +6,7 @@ import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bot, Search } from 'lucide-react';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
 const services: Service[] = [
@@ -73,6 +73,17 @@ const services: Service[] = [
         { name: 'State Bank of India', href: 'https://www.onlinesbi.sbi/?ref=1shopapp'},
     ]
   },
+  {
+    name: 'Logistics',
+    icon: Truck,
+    color: '#FFC300',
+    links: [
+      { name: 'Delhivery', href: 'https://www.delhivery.com/' },
+      { name: 'Blue Dart', href: 'https://www.bluedart.com/' },
+      { name: 'DTDC', href: 'https://www.dtdc.in/' },
+      { name: 'Shiprocket', href: 'https://www.shiprocket.in/' },
+    ]
+  }
 ];
 
 export default function Home() {
