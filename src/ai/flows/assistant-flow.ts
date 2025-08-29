@@ -6,20 +6,15 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {defineFlow} from 'genkit';
-import {z} from 'zod';
-
-// Define the input schema for the flow.
-const ShoppingAssistantInputSchema = z.string();
 
 // Define and export the flow.
-export const shoppingAssistant = defineFlow(
+export const shoppingAssistant = ai.defineFlow(
   {
     name: 'shoppingAssistant',
-    inputSchema: ShoppingAssistantInputSchema,
-    outputSchema: z.string(),
+    inputSchema: undefined,
+    outputSchema: undefined,
   },
-  async (input) => {
+  async (input: string) => {
     try {
       const { output } = await ai.generate({
         model: 'googleai/gemini-pro',
