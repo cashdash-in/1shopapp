@@ -7,16 +7,26 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bot, Search } from 'lucide-react';
 import { ShoppingCart, UtensilsCrossed, Utensils, Receipt, Plane, Shield, Landmark } from 'lucide-react';
+import type { Service } from '@/components/service-tile';
 
-const services = [
+const services: Service[] = [
   { name: 'Flipkart', icon: ShoppingCart, color: '#2874F0', href: 'https://www.flipkart.com?ref=1shopapp' },
   { name: 'Amazon', icon: ShoppingCart, color: '#FF9900', href: 'https://www.amazon.in?ref=1shopapp' },
   { name: 'Meesho', icon: ShoppingCart, color: '#FF4F81', href: 'https://www.meesho.com?ref=1shopapp' },
   { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com?ref=1shopapp' },
   { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com?ref=1shopapp' },
   { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
-  { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: 'https://paytm.com/?ref=1shopapp' },
-  { name: 'Travel', icon: Plane, color: '#00B9F1', href: 'https://www.makemytrip.com/?ref=1shopapp' },
+  { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: 'https://paytm.com/recharge?ref=1shopapp' },
+  { 
+    name: 'Travel', 
+    icon: Plane, 
+    color: '#00B9F1', 
+    links: [
+      { name: 'MakeMyTrip', href: 'https://www.makemytrip.com/?ref=1shopapp'},
+      { name: 'Goibibo', href: 'https://www.goibibo.com/?ref=1shopapp'},
+      { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
+    ] 
+  },
   { name: 'Insurance', icon: Shield, color: '#6A1B9A', href: 'https://www.policybazaar.com/?ref=1shopapp' },
   { name: 'Banking', icon: Landmark, color: '#2E7D32', href: 'https://www.hdfcbank.com/?ref=1shopapp' },
 ];
@@ -64,10 +74,7 @@ export default function Home() {
           {services.map((service) => (
             <ServiceTile
               key={service.name}
-              name={service.name}
-              icon={service.icon}
-              color={service.color}
-              href={service.href}
+              service={service}
             />
           ))}
         </div>
