@@ -7,7 +7,7 @@ import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bot, Search } from 'lucide-react';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Car } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
 const services: Service[] = [
@@ -53,6 +53,16 @@ const services: Service[] = [
       { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
       { name: 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
     ] 
+  },
+  {
+    name: 'Cabs',
+    icon: Car,
+    color: '#FFD700',
+    links: [
+      { name: 'Uber', href: 'https://www.uber.com/in/en/' },
+      { name: 'Ola', href: 'https://www.olacabs.com/' },
+      { name: 'inDrive', href: 'https://www.indrive.com/en/home/' },
+    ]
   },
   { 
     name: 'Insurance', 
