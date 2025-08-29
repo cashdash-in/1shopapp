@@ -191,7 +191,7 @@ export default function Home() {
           </div>
         </div>
         <p className="text-xs text-muted-foreground text-center mt-8 max-w-2xl">
-          To help keep 1ShopApp running and free to use, we partner with some of the services listed. This means we may earn a small commission when you make a purchase, at no extra cost to you. We appreciate your support!
+          To help keep 1ShopApp running and free to use, some of the services listed include affiliate links. This means we may earn a small commission when you make a purchase, at no extra cost to you. We appreciate your support!
         </p>
       </main>
       <Link href="/assistant" passHref>
