@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverRuntimeConfig: {
+    geminiApiKey: process.env.GEMINI_API_KEY,
+  },
 };
 
 export default nextConfig;
