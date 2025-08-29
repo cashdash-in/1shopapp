@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "1ShopApp",
@@ -23,6 +24,11 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-body antialiased">
+        <Link href="/" passHref>
+            <div className="fixed top-4 right-4 h-12 w-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold cursor-pointer z-50">
+                1
+            </div>
+        </Link>
         {children}
         <Toaster />
       </body>
