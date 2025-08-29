@@ -6,7 +6,7 @@ import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bot, Search } from 'lucide-react';
-import { ShoppingCart, UtensilsCrossed, Utensils, Receipt, Plane, Shield, Landmark } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
 const services: Service[] = [
@@ -23,8 +23,15 @@ const services: Service[] = [
       { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
     ] 
   },
-  { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com?ref=1shopapp' },
-  { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com?ref=1shopapp' },
+  { 
+    name: 'Food Delivery', 
+    icon: UtensilsCrossed, 
+    color: '#FC8019', 
+    links: [
+      { name: 'Swiggy', href: 'https://www.swiggy.com?ref=1shopapp' },
+      { name: 'Zomato', href: 'https://www.zomato.com?ref=1shopapp' },
+    ] 
+  },
   { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
   { 
     name: 'Bill Pay', 
