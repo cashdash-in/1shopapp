@@ -12,27 +12,27 @@ const DUMMY_PRODUCTS = [
     id: 1,
     name: 'Sony WH-1000XM5 Wireless Headphones',
     prices: [
-      { retailer: 'Amazon', price: '28,990', url: '#' },
-      { retailer: 'Flipkart', price: '29,990', url: '#' },
-      { retailer: 'Chroma', price: '29,490', url: '#' },
+      { retailer: 'Amazon', price: '28,990', url: 'https://www.amazon.in/s?k=Sony+WH-1000XM5+Wireless+Headphones&ref=1shopapp' },
+      { retailer: 'Flipkart', price: '29,990', url: 'https://www.flipkart.com/search?q=Sony+WH-1000XM5+Wireless+Headphones&ref=1shopapp' },
+      { retailer: 'Croma', price: '29,490', url: 'https://www.croma.com/search/?q=Sony%20WH-1000XM5%20Wireless%20Headphones&ref=1shopapp' },
     ],
   },
   {
     id: 2,
     name: 'Apple iPhone 15 Pro',
     prices: [
-      { retailer: 'Amazon', price: '1,34,900', url: '#' },
-      { retailer: 'Flipkart', price: '1,34,900', url: '#' },
-      { retailer: 'Apple Store', price: '1,34,900', url: '#' },
+      { retailer: 'Amazon', price: '1,34,900', url: 'https://www.amazon.in/s?k=Apple+iPhone+15+Pro&ref=1shopapp' },
+      { retailer: 'Flipkart', price: '1,34,900', url: 'https://www.flipkart.com/search?q=Apple+iPhone+15+Pro&ref=1shopapp' },
+      { retailer: 'Apple Store', price: '1,34,900', url: 'https://www.apple.com/in/search/iphone-15-pro?ref=1shopapp' },
     ],
   },
    {
     id: 3,
     name: 'Samsung Galaxy S24 Ultra',
     prices: [
-      { retailer: 'Amazon', price: '1,29,999', url: '#' },
-      { retailer: 'Flipkart', price: '1,31,999', url: '#' },
-      { retailer: 'Samsung.com', price: '1,29,999', url: '#' },
+      { retailer: 'Amazon', price: '1,29,999', url: 'https://www.amazon.in/s?k=Samsung+Galaxy+S24+Ultra&ref=1shopapp' },
+      { retailer: 'Flipkart', price: '1,31,999', url: 'https://www.flipkart.com/search?q=Samsung+Galaxy+S24+Ultra&ref=1shopapp' },
+      { retailer: 'Samsung.com', price: '1,29,999', url: 'https://www.samsung.com/in/search/?q=Galaxy%20S24%20Ultra&ref=1shopapp' },
     ],
   },
 ];
