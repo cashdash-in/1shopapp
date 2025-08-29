@@ -7,7 +7,7 @@
 
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/googleai';
-import {NextConfig} from 'next';
+import type {NextConfig} from 'next';
 import getConfig from 'next/config';
 
 // Initialize Genkit and the Google AI plugin directly within the flow file.

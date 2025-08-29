@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
-    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
+    "genkit:dev": "echo 'Genkit dev server is not needed for this configuration.'",
+    "genkit:watch": "echo 'Genkit watch server is not needed for this configuration.'",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
