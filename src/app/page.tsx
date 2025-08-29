@@ -1,3 +1,4 @@
+'use client';
 
 import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
