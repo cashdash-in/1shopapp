@@ -7,7 +7,7 @@ import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bot, Search } from 'lucide-react';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
 const services: Service[] = [
@@ -82,6 +82,16 @@ const services: Service[] = [
       { name: 'Blue Dart', href: 'https://www.bluedart.com/' },
       { name: 'DTDC', href: 'https://www.dtdc.in/' },
       { name: 'Shiprocket', href: 'https://www.shiprocket.in/' },
+    ]
+  },
+  {
+    name: 'Beauty',
+    icon: Sparkles,
+    color: '#E5398D',
+    links: [
+      { name: 'Nykaa', href: 'https://www.nykaa.com/' },
+      { name: 'Purplle', href: 'https://www.purplle.com/' },
+      { name: 'Sephora', href: 'https://www.sephora.com/' },
     ]
   }
 ];
