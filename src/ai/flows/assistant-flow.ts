@@ -14,7 +14,10 @@ const ShoppingAssistantInputSchema = z.object({
 
 export async function shoppingAssistant(prompt: string): Promise<string> {
   const { output } = await shoppingAssistantFlow({ prompt });
-  return output!;
+  if (!output) {
+    return "I'm sorry, I couldn't generate a response.";
+  }
+  return output;
 }
 
 const shoppingAssistantFlow = ai.defineFlow(
@@ -34,6 +37,6 @@ const shoppingAssistantFlow = ai.defineFlow(
   
   User query: ${prompt}`,
     });
-    return llmResponse.text();
+    return llmResponse.text;
   }
 );
