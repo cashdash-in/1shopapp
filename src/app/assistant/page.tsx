@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Bot, User } from 'lucide-react';
+import { ArrowRight, Bot, User, Sparkles } from 'lucide-react';
 import { shoppingAssistant } from '@/ai/flows/assistant-flow';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -47,8 +47,8 @@ export default function AssistantPage() {
   return (
     <div className="flex flex-col h-screen bg-background">
       <header className="p-4 border-b flex items-center gap-4">
-        <Bot className="h-8 w-8 text-primary" />
-        <h1 className="text-2xl font-bold tracking-tight">AI Shopping Assistant</h1>
+        <Sparkles className="h-8 w-8 text-primary" />
+        <h1 className="text-2xl font-bold tracking-tight">AI Deal Finder</h1>
       </header>
 
       <main className="flex-1 overflow-y-auto p-4 md:p-6">
@@ -57,7 +57,7 @@ export default function AssistantPage() {
             <div key={index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
               {message.role === 'assistant' && (
                 <Avatar>
-                  <AvatarFallback><Bot /></AvatarFallback>
+                  <AvatarFallback><Sparkles /></AvatarFallback>
                 </Avatar>
               )}
               <div className={`rounded-lg p-4 max-w-[80%] ${
@@ -77,7 +77,7 @@ export default function AssistantPage() {
            {isLoading && (
             <div className="flex items-start gap-4">
               <Avatar>
-                  <AvatarFallback><Bot /></AvatarFallback>
+                  <AvatarFallback><Sparkles /></AvatarFallback>
               </Avatar>
               <div className="rounded-lg p-4 bg-muted">
                 <div className="flex items-center gap-2">
@@ -97,7 +97,7 @@ export default function AssistantPage() {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask for shopping advice, comparisons, or anything else..."
+              placeholder="e.g., 'Find me a deal on noise-cancelling headphones...'"
               className="flex-1 h-12 text-base"
               disabled={isLoading}
             />
