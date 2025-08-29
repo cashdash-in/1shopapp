@@ -17,7 +17,7 @@ export async function shoppingAssistant(prompt: string): Promise<z.infer<typeof 
   return shoppingAssistantFlow({ prompt });
 }
 
-const prompt = ai.definePrompt({
+const assistantPrompt = ai.definePrompt({
   name: 'shoppingAssistantPrompt',
   input: { schema: ShoppingAssistantInputSchema },
   output: { schema: ShoppingAssistantOutputSchema },
@@ -38,7 +38,7 @@ const shoppingAssistantFlow = ai.defineFlow(
     outputSchema: ShoppingAssistantOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    const { output } = await assistantPrompt(input);
     return output!;
   }
 );
