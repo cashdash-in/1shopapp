@@ -14,6 +14,7 @@ const ShoppingAssistantInputSchema = z.object({
 const ShoppingAssistantOutputSchema = z.string();
 
 export async function shoppingAssistant(prompt: string): Promise<z.infer<typeof ShoppingAssistantOutputSchema>> {
+  // This was the source of the error. We need to call the flow with the correct input shape.
   return shoppingAssistantFlow({ prompt });
 }
 
