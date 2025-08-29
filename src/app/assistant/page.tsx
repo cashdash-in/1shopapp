@@ -48,7 +48,7 @@ export default function AssistantPage() {
     <div className="flex flex-col h-screen bg-background">
       <header className="p-4 border-b flex items-center gap-4">
         <Sparkles className="h-8 w-8 text-primary" />
-        <h1 className="text-2xl font-bold tracking-tight">AI Deal Finder</h1>
+        <h1 className="text-2xl font-bold tracking-tight">1Shop Genie</h1>
       </header>
 
       <main className="flex-1 overflow-y-auto p-4 md:p-6">
