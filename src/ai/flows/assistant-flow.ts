@@ -56,7 +56,8 @@ async function shoppingAssistant(query: string): Promise<string> {
     responseText += `**${deal.title}** at ${deal.retailer}\n`;
     responseText += `${deal.description}\n`;
     if (deal.url) {
-      responseText += `[View Deal](${deal.url})\n`;
+      // Note: The UI doesn't render markdown links, but this is a good practice.
+      responseText += `Find it here: ${deal.url}\n`;
     }
     responseText += '\n';
   });
