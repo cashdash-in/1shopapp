@@ -24,11 +24,12 @@ export default function AssistantPage() {
 
     const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
     setIsLoading(true);
 
     try {
-      const assistantResponse = await shoppingAssistant(input);
+      const assistantResponse = await shoppingAssistant(currentInput);
       const assistantMessage: Message = { role: 'assistant', content: assistantResponse };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
