@@ -114,6 +114,7 @@ const services: Service[] = [
       { name: 'Instagram', href: 'https://www.instagram.com/' },
       { name: 'X (Twitter)', href: 'https://www.twitter.com/' },
       { name: 'LinkedIn', href: 'https://www.linkedin.com/' },
+      { name: 'WhatsApp', href: 'https://www.whatsapp.com/' },
     ]
   },
   {
