@@ -6,6 +6,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import { z } from 'zod';
 
 export const shoppingAssistant = ai.defineFlow(
@@ -16,6 +17,7 @@ export const shoppingAssistant = ai.defineFlow(
   },
   async (prompt) => {
     const llmResponse = await ai.generate({
+      model: googleAI('gemini-1.5-flash-latest'),
       prompt: `You are a helpful assistant. User query: ${prompt}`,
     });
 
