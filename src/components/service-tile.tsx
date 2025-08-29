@@ -30,12 +30,12 @@ export function ServiceTile({ service }: ServiceTileProps) {
       <MultiLinkDialog service={service}>
         <div className="block group cursor-pointer">
           <Card
-            className="h-full transition-all duration-300 ease-in-out group-hover:transform group-hover:-translate-y-2 group-hover:shadow-2xl border-transparent"
+            className="h-full transition-all duration-300 ease-in-out group-hover:transform group-hover:-translate-y-1 group-hover:shadow-xl border-transparent"
             style={{ backgroundColor: color }}
           >
-            <CardContent className="flex flex-col items-center justify-center p-6 h-full text-white aspect-square">
-              <Icon className="w-10 h-10 sm:w-12 sm:h-12 mb-4" />
-              <p className="text-base sm:text-lg font-semibold text-center">{name}</p>
+            <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
+              <Icon className="w-8 h-8 mb-2" />
+              <p className="text-sm font-semibold text-center">{name}</p>
             </CardContent>
           </Card>
         </div>
@@ -49,12 +49,12 @@ export function ServiceTile({ service }: ServiceTileProps) {
   return (
     <Link href={href || '#'} {...linkProps} className="block group">
       <Card
-        className="h-full transition-all duration-300 ease-in-out group-hover:transform group-hover:-translate-y-2 group-hover:shadow-2xl border-transparent"
+        className="h-full transition-all duration-300 ease-in-out group-hover:transform group-hover:-translate-y-1 group-hover:shadow-xl border-transparent"
         style={{ backgroundColor: color }}
       >
-        <CardContent className="flex flex-col items-center justify-center p-6 h-full text-white aspect-square">
-          <Icon className="w-10 h-10 sm:w-12 sm:h-12 mb-4" />
-          <p className="text-base sm:text-lg font-semibold text-center">{name}</p>
+        <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
+           <Icon className="w-8 h-8 mb-2" />
+           <p className="text-sm font-semibold text-center">{name}</p>
         </CardContent>
       </Card>
     </Link>

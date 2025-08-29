@@ -154,12 +154,12 @@ export default function Home() {
 
   return (
     <>
-      <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4 sm:p-8">
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-2">
+      <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Declutter your phone. Access all your essential apps in one place and save storage space.
           </p>
         </div>
@@ -180,8 +180,8 @@ export default function Home() {
           </form>
         </div>
 
-        <div className="w-full max-w-4xl">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+        <div className="w-full max-w-5xl">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
             {services.map((service) => (
               <ServiceTile
                 key={service.name}
