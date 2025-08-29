@@ -1,81 +1,43 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import { ProductComparisonCard } from '@/components/product-comparison-card';
-
-const DUMMY_PRODUCTS = [
-  {
-    id: 1,
-    name: 'Sony WH-1000XM5 Wireless Headphones',
-    prices: [
-      { retailer: 'Amazon', price: '28,990', url: 'https://www.amazon.in/s?k=Sony+WH-1000XM5+Wireless+Headphones&ref=1shopapp' },
-      { retailer: 'Flipkart', price: '29,990', url: 'https://www.flipkart.com/search?q=Sony+WH-1000XM5+Wireless+Headphones&ref=1shopapp' },
-      { retailer: 'Croma', price: '29,490', url: 'https://www.croma.com/search/?q=Sony%20WH-1000XM5%20Wireless%20Headphones&ref=1shopapp' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Apple iPhone 15 Pro',
-    prices: [
-      { retailer: 'Amazon', price: '1,34,900', url: 'https://www.amazon.in/s?k=Apple+iPhone+15+Pro&ref=1shopapp' },
-      { retailer: 'Flipkart', price: '1,34,900', url: 'https://www.flipkart.com/search?q=Apple+iPhone+15+Pro&ref=1shopapp' },
-      { retailer: 'Apple Store', price: '1,34,900', url: 'https://www.apple.com/in/search/iphone-15-pro?ref=1shopapp' },
-    ],
-  },
-   {
-    id: 3,
-    name: 'Samsung Galaxy S24 Ultra',
-    prices: [
-      { retailer: 'Amazon', price: '1,29,999', url: 'https://www.amazon.in/s?k=Samsung+Galaxy+S24+Ultra&ref=1shopapp' },
-      { retailer: 'Flipkart', price: '1,31,999', url: 'https://www.flipkart.com/search?q=Samsung+Galaxy+S24+Ultra&ref=1shopapp' },
-      { retailer: 'Samsung.com', price: '1,29,999', url: 'https://www.samsung.com/in/search/?q=Galaxy%20S24%20Ultra&ref=1shopapp' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Dell XPS 15 Laptop',
-    prices: [
-      { retailer: 'Amazon', price: '1,89,990', url: 'https://www.amazon.in/s?k=Dell+XPS+15+Laptop&ref=1shopapp' },
-      { retailer: 'Dell India', price: '1,92,490', url: 'https://www.dell.com/en-in/search/xps%2015&ref=1shopapp' },
-      { retailer: 'Croma', price: '1,90,990', url: 'https://www.croma.com/search/?q=Dell%20XPS%2015&ref=1shopapp' },
-    ],
-  },
-  {
-    id: 5,
-    name: 'LG C3 55-inch OLED TV',
-    prices: [
-      { retailer: 'Amazon', price: '1,39,990', url: 'https://www.amazon.in/s?k=LG+C3+55-inch+OLED+TV&ref=1shopapp' },
-      { retailer: 'Flipkart', price: '1,41,990', url: 'https://www.flipkart.com/search?q=LG+C3+55-inch+OLED+TV&ref=1shopapp' },
-      { retailer: 'LG India', price: '1,44,990', url: 'https://www.lg.com/in/search?q=LG%20C3%2055-inch%20OLED&ref=1shopapp' },
-    ],
-  },
-  {
-    id: 6,
-    name: 'Bose QuietComfort Ultra Headphones',
-    prices: [
-      { retailer: 'Amazon', price: '32,900', url: 'https://www.amazon.in/s?k=Bose+QuietComfort+Ultra+Headphones&ref=1shopapp' },
-      { retailer: 'Bose India', price: '32,900', url: 'https://www.boseindia.com/en_in/search.html?q=quietcomfort%20ultra&ref=1shopapp' },
-    ],
-  },
-    {
-    id: 7,
-    name: 'Apple MacBook Air M2',
-    prices: [
-      { retailer: 'Amazon', price: '99,900', url: 'https://www.amazon.in/s?k=Apple+MacBook+Air+M2&ref=1shopapp' },
-      { retailer: 'Flipkart', price: '99,900', url: 'https://www.flipkart.com/search?q=Apple+MacBook+Air+M2&ref=1shopapp' },
-      { retailer: 'Apple Store', price: '99,900', url: 'https://www.apple.com/in/search/macbook-air-m2?ref=1shopapp' },
-    ],
-  },
-];
+import type { Product } from '@/ai/flows/compare-products-flow';
+import { compareProducts } from '@/ai/flows/compare-products-flow';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function CompareResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const router = useRouter();
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      if (!query) {
+        setProducts([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        const results = await compareProducts(query);
+        setProducts(results);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, [query]);
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,12 +45,6 @@ function CompareResults() {
     const newQuery = formData.get('query') as string;
     router.push(`/compare?q=${encodeURIComponent(newQuery)}`);
   };
-
-  const filteredProducts = query
-    ? DUMMY_PRODUCTS.filter((product) =>
-        product.name.toLowerCase().includes(query.toLowerCase())
-      )
-    : [];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -113,15 +69,19 @@ function CompareResults() {
 
       <main className="flex-1 p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          {query && (
+          {query && !loading && (
             <p className="text-muted-foreground mb-6">
               Showing results for: <span className="font-semibold text-foreground">&quot;{query}&quot;</span>
             </p>
           )}
 
           <div className="grid gap-6 md:gap-8">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
+            {loading ? (
+              Array.from({ length: 3 }).map((_, index) => (
+                <CardSkeleton key={index} />
+              ))
+            ) : products.length > 0 ? (
+              products.map((product) => (
                 <ProductComparisonCard key={product.id} product={product} />
               ))
             ) : query ? (
@@ -141,6 +101,31 @@ function CompareResults() {
     </div>
   );
 }
+
+function CardSkeleton() {
+    return (
+      <div className="border bg-card text-card-foreground shadow-sm rounded-lg p-6">
+        <div className="md:flex">
+          <div className="md:w-1/3">
+            <Skeleton className="w-full h-48 rounded-md" />
+          </div>
+          <div className="md:w-2/3 md:pl-6 mt-4 md:mt-0">
+             <Skeleton className="h-8 w-3/4 mb-4" />
+             <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <Skeleton className="h-6 w-1/4" />
+                    <Skeleton className="h-10 w-24" />
+                </div>
+                 <div className="flex justify-between items-center">
+                    <Skeleton className="h-6 w-1/4" />
+                    <Skeleton className="h-10 w-24" />
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
 
 export default function ComparePage() {
