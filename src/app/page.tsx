@@ -16,7 +16,16 @@ const services: Service[] = [
   { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com?ref=1shopapp' },
   { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com?ref=1shopapp' },
   { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
-  { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: 'https://paytm.com/recharge?ref=1shopapp' },
+  { 
+    name: 'Bill Pay', 
+    icon: Receipt, 
+    color: '#4CAF50', 
+    links: [
+      { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
+      { name: 'PhonePe', href: 'https://www.phonepe.com/en/bill-payments/?ref=1shopapp'},
+      { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
+    ] 
+  },
   { 
     name: 'Travel', 
     icon: Plane, 
@@ -27,8 +36,26 @@ const services: Service[] = [
       { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
     ] 
   },
-  { name: 'Insurance', icon: Shield, color: '#6A1B9A', href: 'https://www.policybazaar.com/?ref=1shopapp' },
-  { name: 'Banking', icon: Landmark, color: '#2E7D32', href: 'https://www.hdfcbank.com/?ref=1shopapp' },
+  { 
+    name: 'Insurance', 
+    icon: Shield, 
+    color: '#6A1B9A', 
+    links: [
+        { name: 'Policybazaar', href: 'https://www.policybazaar.com/?ref=1shopapp'},
+        { name: 'Acko', href: 'https://www.acko.com/?ref=1shopapp'},
+        { name: 'Digit', href: 'https://www.godigit.com/?ref=1shopapp'},
+    ]
+  },
+  { 
+    name: 'Banking', 
+    icon: Landmark, 
+    color: '#2E7D32',
+    links: [
+        { name: 'HDFC Bank', href: 'https://www.hdfcbank.com/?ref=1shopapp'},
+        { name: 'ICICI Bank', href: 'https://www.icicibank.com/?ref=1shopapp'},
+        { name: 'State Bank of India', href: 'https://www.onlinesbi.sbi/?ref=1shopapp'},
+    ]
+  },
 ];
 
 export default function Home() {
