@@ -10,12 +10,19 @@ import { ShoppingCart, UtensilsCrossed, Utensils, Receipt, Plane, Shield, Landma
 import type { Service } from '@/components/service-tile';
 
 const services: Service[] = [
-  { name: 'Flipkart', icon: ShoppingCart, color: '#2874F0', href: 'https://www.flipkart.com?ref=1shopapp' },
-  { name: 'Amazon', icon: ShoppingCart, color: '#FF9900', href: 'https://www.amazon.in?ref=1shopapp' },
-  { name: 'Meesho', icon: ShoppingCart, color: '#FF4F81', href: 'https://www.meesho.com?ref=1shopapp' },
-  { name: 'DMart', icon: ShoppingCart, color: '#008340', href: 'https://www.dmart.in?ref=1shopapp' },
-  { name: 'Blinkit', icon: ShoppingCart, color: '#FFC83B', href: 'https://www.blinkit.com?ref=1shopapp' },
-  { name: 'Kisan Connect', icon: ShoppingCart, color: '#8BC34A', href: 'https://www.kisanconnect.in?ref=1shopapp' },
+  { 
+    name: 'Shopping', 
+    icon: ShoppingCart, 
+    color: '#8A2BE2', 
+    links: [
+      { name: 'Flipkart', href: 'https://www.flipkart.com?ref=1shopapp' },
+      { name: 'Amazon', href: 'https://www.amazon.in?ref=1shopapp' },
+      { name: 'Meesho', href: 'https://www.meesho.com?ref=1shopapp' },
+      { name: 'DMart', href: 'https://www.dmart.in?ref=1shopapp' },
+      { name: 'Blinkit', href: 'https://www.blinkit.com?ref=1shopapp' },
+      { name: 'Kisan Connect', href: 'https://www.kisanconnect.in?ref=1shopapp' },
+    ] 
+  },
   { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com?ref=1shopapp' },
   { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com?ref=1shopapp' },
   { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
