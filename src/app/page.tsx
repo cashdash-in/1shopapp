@@ -15,10 +15,10 @@ const services = [
   { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com?ref=1shopapp' },
   { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com?ref=1shopapp' },
   { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
-  { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: '#?ref=1shopapp' },
-  { name: 'Travel', icon: Plane, color: '#00B9F1', href: '#?ref=1shopapp' },
-  { name: 'Insurance', icon: Shield, color: '#6A1B9A', href: '#?ref=1shopapp' },
-  { name: 'Banking', icon: Landmark, color: '#2E7D32', href: '#?ref=1shopapp' },
+  { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: 'https://paytm.com/?ref=1shopapp' },
+  { name: 'Travel', icon: Plane, color: '#00B9F1', href: 'https://www.makemytrip.com/?ref=1shopapp' },
+  { name: 'Insurance', icon: Shield, color: '#6A1B9A', href: 'https://www.policybazaar.com/?ref=1shopapp' },
+  { name: 'Banking', icon: Landmark, color: '#2E7D32', href: 'https://www.hdfcbank.com/?ref=1shopapp' },
 ];
 
 export default function Home() {
