@@ -1,4 +1,8 @@
+
 import { ServiceTile } from '@/components/service-tile';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 import { ShoppingCart, UtensilsCrossed, Utensils, Receipt, Plane, Shield, Landmark } from 'lucide-react';
 
 const services = [
@@ -24,6 +28,21 @@ export default function Home() {
           One app for all your needs. Seamlessly access your favorite services for shopping, food, payments, and more.
         </p>
       </div>
+
+      <div className="w-full max-w-xl mb-8">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search for products, brands, and more"
+            className="w-full pl-10 pr-20 h-12 text-base"
+          />
+          <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-9">
+            Search
+          </Button>
+        </div>
+      </div>
+
       <div className="w-full max-w-4xl">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
           {services.map((service) => (
