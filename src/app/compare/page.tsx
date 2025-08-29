@@ -11,8 +11,6 @@ const DUMMY_PRODUCTS = [
   {
     id: 1,
     name: 'Sony WH-1000XM5 Wireless Headphones',
-    imageUrl: 'https://picsum.photos/600/400',
-    hint: 'headphones',
     prices: [
       { retailer: 'Amazon', price: '28,990', url: '#' },
       { retailer: 'Flipkart', price: '29,990', url: '#' },
@@ -22,8 +20,6 @@ const DUMMY_PRODUCTS = [
   {
     id: 2,
     name: 'Apple iPhone 15 Pro',
-    imageUrl: 'https://picsum.photos/600/400',
-    hint: 'phone',
     prices: [
       { retailer: 'Amazon', price: '1,34,900', url: '#' },
       { retailer: 'Flipkart', price: '1,34,900', url: '#' },
@@ -33,8 +29,6 @@ const DUMMY_PRODUCTS = [
    {
     id: 3,
     name: 'Samsung Galaxy S24 Ultra',
-    imageUrl: 'https://picsum.photos/600/400',
-    hint: 'smartphone galaxy',
     prices: [
       { retailer: 'Amazon', price: '1,29,999', url: '#' },
       { retailer: 'Flipkart', price: '1,31,999', url: '#' },
