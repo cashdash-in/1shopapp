@@ -32,15 +32,13 @@ const shoppingPrompt = ai.definePrompt({
   tools: [findProducts],
   prompt: `You are a shopping assistant for an app called 1ShopApp. Your goal is to help users find the best deals and promotions based on their requests.
 
-Use the findProducts tool to search for products related to the user's query.
+Use the findProducts tool to search for products related to the user's query. The user's query is: {{{prompt}}}
 
 Based on the tool's output, create a friendly, conversational summary of what you found.
 
 If the tool returns relevant products, create a list of deals. For each deal, provide a title, a brief description, the retailer, and a URL if available.
 
 If you cannot find relevant deals, inform the user in a friendly way.
-
-User query: {{{prompt}}}
 `,
 });
 
