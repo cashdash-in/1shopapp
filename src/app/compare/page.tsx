@@ -16,12 +16,13 @@ function CompareResults() {
   const router = useRouter();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!!query);
 
   useEffect(() => {
     async function fetchProducts() {
       if (!query) {
         setProducts([]);
+        setLoading(false);
         return;
       }
       setLoading(true);
