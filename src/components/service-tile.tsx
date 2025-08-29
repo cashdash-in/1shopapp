@@ -10,8 +10,11 @@ interface ServiceTileProps {
 }
 
 export function ServiceTile({ name, icon: Icon, color, href }: ServiceTileProps) {
+  const isExternal = href.startsWith('http');
+  const linkProps = isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+
   return (
-    <Link href={href} target="_blank" rel="noopener noreferrer" className="block group">
+    <Link href={href} {...linkProps} className="block group">
       <Card
         className="h-full transition-all duration-300 ease-in-out group-hover:transform group-hover:-translate-y-2 group-hover:shadow-2xl border-transparent"
         style={{ backgroundColor: color }}

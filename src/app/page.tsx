@@ -2,7 +2,7 @@
 import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Bot, Search } from 'lucide-react';
 import { ShoppingCart, UtensilsCrossed, Utensils, Receipt, Plane, Shield, Landmark } from 'lucide-react';
 
 const services = [
@@ -11,6 +11,7 @@ const services = [
   { name: 'Meesho', icon: ShoppingCart, color: '#FF4F81', href: 'https://www.meesho.com' },
   { name: 'Swiggy', icon: UtensilsCrossed, color: '#FC8019', href: 'https://www.swiggy.com' },
   { name: 'Zomato', icon: Utensils, color: '#E23744', href: 'https://www.zomato.com' },
+  { name: 'Smart Assistant', icon: Bot, color: '#3c82f6', href: '/assistant' },
   { name: 'Bill Pay', icon: Receipt, color: '#4CAF50', href: '#' },
   { name: 'Travel', icon: Plane, color: '#00B9F1', href: '#' },
   { name: 'Insurance', icon: Shield, color: '#6A1B9A', href: '#' },
@@ -44,7 +45,7 @@ export default function Home() {
       </div>
 
       <div className="w-full max-w-4xl">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {services.map((service) => (
             <ServiceTile
               key={service.name}
