@@ -35,6 +35,41 @@ const DUMMY_PRODUCTS = [
       { retailer: 'Samsung.com', price: '1,29,999', url: 'https://www.samsung.com/in/search/?q=Galaxy%20S24%20Ultra&ref=1shopapp' },
     ],
   },
+  {
+    id: 4,
+    name: 'Dell XPS 15 Laptop',
+    prices: [
+      { retailer: 'Amazon', price: '1,89,990', url: 'https://www.amazon.in/s?k=Dell+XPS+15+Laptop&ref=1shopapp' },
+      { retailer: 'Dell India', price: '1,92,490', url: 'https://www.dell.com/en-in/search/xps%2015&ref=1shopapp' },
+      { retailer: 'Croma', price: '1,90,990', url: 'https://www.croma.com/search/?q=Dell%20XPS%2015&ref=1shopapp' },
+    ],
+  },
+  {
+    id: 5,
+    name: 'LG C3 55-inch OLED TV',
+    prices: [
+      { retailer: 'Amazon', price: '1,39,990', url: 'https://www.amazon.in/s?k=LG+C3+55-inch+OLED+TV&ref=1shopapp' },
+      { retailer: 'Flipkart', price: '1,41,990', url: 'https://www.flipkart.com/search?q=LG+C3+55-inch+OLED+TV&ref=1shopapp' },
+      { retailer: 'LG India', price: '1,44,990', url: 'https://www.lg.com/in/search?q=LG%20C3%2055-inch%20OLED&ref=1shopapp' },
+    ],
+  },
+  {
+    id: 6,
+    name: 'Bose QuietComfort Ultra Headphones',
+    prices: [
+      { retailer: 'Amazon', price: '32,900', url: 'https://www.amazon.in/s?k=Bose+QuietComfort+Ultra+Headphones&ref=1shopapp' },
+      { retailer: 'Bose India', price: '32,900', url: 'https://www.boseindia.com/en_in/search.html?q=quietcomfort%20ultra&ref=1shopapp' },
+    ],
+  },
+    {
+    id: 7,
+    name: 'Apple MacBook Air M2',
+    prices: [
+      { retailer: 'Amazon', price: '99,900', url: 'https://www.amazon.in/s?k=Apple+MacBook+Air+M2&ref=1shopapp' },
+      { retailer: 'Flipkart', price: '99,900', url: 'https://www.flipkart.com/search?q=Apple+MacBook+Air+M2&ref=1shopapp' },
+      { retailer: 'Apple Store', price: '99,900', url: 'https://www.apple.com/in/search/macbook-air-m2?ref=1shopapp' },
+    ],
+  },
 ];
 
 function CompareResults() {
