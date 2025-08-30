@@ -69,7 +69,7 @@ const partnerSignupFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // Check for duplicate partners based on email
+    // Check for duplicate partners based on email (case-insensitive)
     const existingPartner = FAKE_PARTNER_DB.find(
         (partner) => partner.email.toLowerCase() === input.email.toLowerCase()
     );
@@ -86,11 +86,12 @@ const partnerSignupFlow = ai.defineFlow(
     const partnerName = input.partnerType === 'business' ? input.shopName : input.fullName;
 
     // Generate a simple referral code.
-    const referralCode = (partnerName || 'PARTNER')
+    const referralCode = ((partnerName || 'PARTNER')
+      .slice(0, 10)
       .toUpperCase()
-      .replace(/\s+/g, '-') // Replace spaces with a dash
-      .replace(/[^A-Z0-9-]/g, '') // Remove non-alphanumeric characters except dashes
-      .trim() || 'PARTNER'; // Fallback in case the name is empty after cleaning
+      .replace(/\s+/g, '') // Remove spaces
+      .replace(/[^A-Z0-9]/g, '') // Remove non-alphanumeric characters
+      .trim() || 'PARTNER') + Math.floor(1000 + Math.random() * 9000); // Add 4 random digits
 
     return {
       message: 'Thank you for registering!',

@@ -28,27 +28,16 @@ async function handlePartnerSignupAction(
 
   const rawInput: PartnerSignupInput = {
     partnerType,
-    shopName: formData.get('shop-name') as string || undefined,
-    ownerName: formData.get('owner-name') as string || undefined,
-    gstNumber: formData.get('gst-number') as string || undefined,
-    fullName: formData.get('full-name') as string || undefined,
-    panNumber: formData.get('pan-number') as string || undefined,
+    shopName: formData.get('shop-name') as string,
+    ownerName: formData.get('owner-name') as string,
+    gstNumber: formData.get('gst-number') as string,
+    fullName: formData.get('full-name') as string,
+    panNumber: formData.get('pan-number') as string,
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
   };
 
   const inputForState: Partial<PartnerSignupInput> = { ...rawInput };
-
-  // Basic validation
-  if (!rawInput.phone || !rawInput.email) {
-    return { result: null, error: "Please fill out all required fields.", input: inputForState };
-  }
-   if (partnerType === 'business' && (!rawInput.shopName || !rawInput.ownerName)) {
-      return { result: null, error: "Please fill out all business fields.", input: inputForState };
-   }
-    if (partnerType === 'individual' && !rawInput.fullName) {
-       return { result: null, error: "Please fill out all individual fields.", input: inputForState };
-    }
   
   if (!formData.get('terms')) {
     return { result: null, error: "You must agree to the terms and conditions.", input: inputForState };
