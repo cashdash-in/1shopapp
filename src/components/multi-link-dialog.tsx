@@ -11,6 +11,8 @@ import {
 import { Button } from './ui/button';
 import type { Service } from './service-tile';
 import { ArrowUpRight } from 'lucide-react';
+import { trackLinkClick } from '@/lib/analytics';
+
 
 interface MultiLinkDialogProps {
   service: Service;
@@ -19,6 +21,10 @@ interface MultiLinkDialogProps {
 
 export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
   const { name, links, icon: Icon } = service;
+
+  const handleLinkClick = (linkName: string) => {
+    trackLinkClick(name, linkName);
+  }
 
   return (
     <Dialog>
@@ -37,6 +43,7 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
               asChild
               variant="secondary"
               className="justify-between h-12 text-base"
+              onClick={() => handleLinkClick(link.name)}
             >
               <Link
                 href={link.href}

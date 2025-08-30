@@ -1,22 +1,44 @@
-import type { Metadata } from "next";
+
+'use client';
+
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "1ShopApp",
-  description: "All your favorite apps in one place.",
-  manifest: "/manifest.json",
-};
+import React, { useEffect } from "react";
+import { trackPWAInstall } from "@/lib/analytics";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  useEffect(() => {
+    const handleInstallPrompt = (e: Event) => {
+      // This event is fired when the browser detects the app is installable.
+      // We can use this to track if the user sees the install prompt.
+    };
+
+    window.addEventListener('beforeinstallprompt', handleInstallPrompt);
+
+    const handleAppInstalled = () => {
+        trackPWAInstall();
+    };
+
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
   return (
     <html lang="en" className="dark">
       <head>
+        <title>1ShopApp</title>
+        <meta name="description" content="All your favorite apps in one place." />
+        <meta name="manifest" content="/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

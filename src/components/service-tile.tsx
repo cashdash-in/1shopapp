@@ -4,6 +4,7 @@ import type { ElementType } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { MultiLinkDialog } from './multi-link-dialog';
+import { trackLinkClick } from '@/lib/analytics';
 
 interface ServiceLink {
   name: string;
@@ -24,6 +25,10 @@ interface ServiceTileProps {
 
 export function ServiceTile({ service }: ServiceTileProps) {
   const { name, icon: Icon, color, href, links } = service;
+
+  const handleLinkClick = () => {
+    trackLinkClick(name, name); // For single links, service name is the link name
+  }
 
   if (links && links.length > 0) {
     return (
@@ -47,7 +52,7 @@ export function ServiceTile({ service }: ServiceTileProps) {
   const linkProps = isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
   return (
-    <Link href={href || '#'} {...linkProps} className="block group">
+    <Link href={href || '#'} {...linkProps} className="block group" onClick={handleLinkClick}>
       <Card
         className="h-full transition-all duration-300 ease-in-out group-hover:transform group-hover:-translate-y-1 group-hover:shadow-xl border-transparent"
         style={{ backgroundColor: color }}
