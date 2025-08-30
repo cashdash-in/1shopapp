@@ -71,7 +71,7 @@ const services: Service[] = [
     ]
   },
   { 
-    name: 'Banking', 
+    name: 'Finance', 
     icon: Landmark, 
     color: '#2E7D32',
     links: [
