@@ -6,6 +6,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "1ShopApp",
   description: "All your favorite apps in one place.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -25,7 +26,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <Link href="/" passHref>
-            <div className="fixed top-4 right-4 h-12 w-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold cursor-pointer z-50">
+            <div className="fixed top-8 right-4 h-12 w-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold cursor-pointer z-50">
                 1
             </div>
         </Link>
