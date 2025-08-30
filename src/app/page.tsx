@@ -162,8 +162,8 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <footer className="text-center mt-8 max-w-2xl mx-auto px-4 space-y-4">
-            <p className="text-xs text-muted-foreground">
+        <footer className="text-center mt-8 max-w-4xl mx-auto px-4 space-y-4">
+            <p className="text-[11px] text-muted-foreground/90">
               <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform. We are not affiliated with, sponsored by, or endorsed by the brands featured. We may earn a commission from affiliate links, at no extra cost to you. Use of this service is at your own discretion.
             </p>
             <div className="flex justify-center items-center gap-4">
