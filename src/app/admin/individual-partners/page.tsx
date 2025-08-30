@@ -1,5 +1,6 @@
 
 'use client'
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -25,35 +26,31 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
+import { getPartners, type PartnerSignupInput } from '@/ai/flows/partner-signup-flow';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const individualPartners = [
-    {
-        name: "Anjali Gupta",
-        phone: "9876512345",
-        email: "anjali.g@example.com",
-        status: "Approved",
-        revenue: "₹5,500",
-        commission: "₹550",
-    },
-    {
-        name: "Suresh Reddy",
-        phone: "9123498765",
-        email: "suresh.r@example.com",
-        status: "Pending",
-        revenue: "₹0",
-        commission: "₹0",
-    },
-    {
-        name: "Deepak Kumar",
-        phone: "9988771122",
-        email: "deepak.k@example.com",
-        status: "Approved",
-        revenue: "₹3,100",
-        commission: "₹310",
-    },
-]
 
 export default function IndividualPartnersPage() {
+    const [partners, setPartners] = useState<PartnerSignupInput[]>([]);
+    const [loading, setLoading] = useState(true);
+
+     useEffect(() => {
+        async function loadPartners() {
+            try {
+                setLoading(true);
+                const allPartners = await getPartners();
+                const individualPartners = allPartners.filter(p => p.partnerType === 'individual');
+                setPartners(individualPartners);
+            } catch (error) {
+                console.error("Failed to fetch partners:", error);
+                // Handle error appropriately
+            } finally {
+                setLoading(false);
+            }
+        }
+        loadPartners();
+    }, []);
+
     return (
         <Card>
         <CardHeader>
@@ -77,17 +74,28 @@ export default function IndividualPartnersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-                {individualPartners.map(partner => (
+                {loading ? (
+                    Array.from({length: 3}).map((_, i) => (
+                         <TableRow key={i}>
+                            <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-32" /></TableCell>
+                            <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
+                            <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                        </TableRow>
+                    ))
+                ) : partners.map(partner => (
                     <TableRow key={partner.email}>
-                        <TableCell className="font-medium">{partner.name}</TableCell>
+                        <TableCell className="font-medium">{partner.fullName}</TableCell>
                         <TableCell className="hidden md:table-cell">{partner.email}<br/>{partner.phone}</TableCell>
                         <TableCell>
-                            <Badge variant={partner.status === 'Approved' ? 'default' : 'secondary'}>
-                                {partner.status}
+                            <Badge variant={'secondary'}>
+                                Pending
                             </Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">{partner.revenue}</TableCell>
-                        <TableCell className="hidden md:table-cell">{partner.commission}</TableCell>
+                        <TableCell className="hidden md:table-cell">₹0</TableCell>
+                        <TableCell className="hidden md:table-cell">₹0</TableCell>
                         <TableCell>
                             <DropdownMenu>
                             <DropdownMenuTrigger asChild>

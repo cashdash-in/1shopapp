@@ -1,5 +1,6 @@
 
 'use client'
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -25,56 +26,30 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
-
-const partners = [
-    {
-        shopName: "Raju Mobile Shop",
-        ownerName: "Raju Kumar",
-        phone: "9876543210",
-        email: "raju.kumar@example.com",
-        status: "Approved",
-        revenue: "₹12,500",
-        commission: "₹1,250",
-    },
-    {
-        shopName: "Sangeetha Mobiles",
-        ownerName: "Priya Singh",
-        phone: "9123456789",
-        email: "priya.s@example.com",
-        status: "Pending",
-        revenue: "₹0",
-        commission: "₹0",
-    },
-    {
-        shopName: "The Mobile Store",
-        ownerName: "Amit Patel",
-        phone: "9988776655",
-        email: "amit.p@example.com",
-        status: "Approved",
-        revenue: "₹8,200",
-        commission: "₹820",
-    },
-    {
-        shopName: "Quick Fix Mobiles",
-        ownerName: "Sunita Devi",
-        phone: "9765432109",
-        email: "sunita.d@example.com",
-        status: "Approved",
-        revenue: "₹21,000",
-        commission: "₹2,100",
-    },
-     {
-        shopName: "Future Gadgets",
-        ownerName: "Vikram Sharma",
-        phone: "9654321098",
-        email: "vikram.s@example.com",
-        status: "Pending",
-        revenue: "₹0",
-        commission: "₹0",
-    },
-]
+import { getPartners, type PartnerSignupInput } from '@/ai/flows/partner-signup-flow';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function PartnersPage() {
+    const [partners, setPartners] = useState<PartnerSignupInput[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadPartners() {
+            try {
+                setLoading(true);
+                const allPartners = await getPartners();
+                const businessPartners = allPartners.filter(p => p.partnerType === 'business');
+                setPartners(businessPartners);
+            } catch (error) {
+                console.error("Failed to fetch partners:", error);
+                // Handle error appropriately
+            } finally {
+                setLoading(false);
+            }
+        }
+        loadPartners();
+    }, []);
+
     return (
         <Card>
         <CardHeader>
@@ -99,18 +74,30 @@ export default function PartnersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-                {partners.map(partner => (
+                {loading ? (
+                    Array.from({length: 3}).map((_, i) => (
+                        <TableRow key={i}>
+                            <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-32" /></TableCell>
+                            <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
+                            <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                        </TableRow>
+                    ))
+                ) : partners.map(partner => (
                     <TableRow key={partner.email}>
                         <TableCell className="font-medium">{partner.shopName}</TableCell>
                         <TableCell className="hidden md:table-cell">{partner.ownerName}</TableCell>
                         <TableCell className="hidden md:table-cell">{partner.email}<br/>{partner.phone}</TableCell>
                         <TableCell>
-                            <Badge variant={partner.status === 'Approved' ? 'default' : 'secondary'}>
-                                {partner.status}
+                            <Badge variant={'secondary'}>
+                                Pending
                             </Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">{partner.revenue}</TableCell>
-                        <TableCell className="hidden md:table-cell">{partner.commission}</TableCell>
+                        <TableCell className="hidden md:table-cell">₹0</TableCell>
+                        <TableCell className="hidden md:table-cell">₹0</TableCell>
                         <TableCell>
                             <DropdownMenu>
                             <DropdownMenuTrigger asChild>

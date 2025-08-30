@@ -4,12 +4,29 @@
  * @fileOverview A flow for handling partner sign-ups.
  *
  * - partnerSignup - A function that handles the partner signup process.
+ * - getPartners - A function to retrieve all partners.
  * - PartnerSignupInput - The input type for the partnerSignup function.
  * - PartnerSignupOutput - The return type for the partnerSignup function.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+
+const PartnerSignupInputSchema = z.object({
+  partnerType: z.enum(['business', 'individual']),
+  // Business fields
+  shopName: z.string().optional().describe("The name of the partner's shop."),
+  ownerName: z.string().optional().describe("The name of the business owner."),
+  gstNumber: z.string().optional().describe("The GST Number for the business."),
+  // Individual fields
+  fullName: z.string().optional().describe("The full name of the individual partner."),
+  panNumber: z.string().optional().describe("The PAN number of the individual partner."),
+  // Common fields
+  phone: z.string().describe("The partner's phone number."),
+  email: z.string().email().describe("The partner's email address."),
+});
+export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
+
 
 // In a real app, this would be a database like Firestore.
 // For this prototype, we'll use an in-memory array to simulate a user database.
@@ -29,26 +46,16 @@ const FAKE_PARTNER_DB: PartnerSignupInput[] = [
     }
 ];
 
-const PartnerSignupInputSchema = z.object({
-  partnerType: z.enum(['business', 'individual']),
-  // Business fields
-  shopName: z.string().optional().describe("The name of the partner's shop."),
-  ownerName: z.string().optional().describe("The name of the business owner."),
-  gstNumber: z.string().optional().describe("The GST Number for the business."),
-  // Individual fields
-  fullName: z.string().optional().describe("The full name of the individual partner."),
-  panNumber: z.string().optional().describe("The PAN number of the individual partner."),
-  // Common fields
-  phone: z.string().describe("The partner's phone number."),
-  email: z.string().email().describe("The partner's email address."),
-});
-export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
-
 const PartnerSignupOutputSchema = z.object({
   message: z.string().describe('A success message for the user.'),
   referralCode: z.string().describe('The unique referral code generated for the partner.'),
 });
 export type PartnerSignupOutput = z.infer<typeof PartnerSignupOutputSchema>;
+
+export async function getPartners(): Promise<PartnerSignupInput[]> {
+    // In a real app, you'd fetch this from your database.
+    return Promise.resolve(FAKE_PARTNER_DB);
+}
 
 export async function partnerSignup(input: PartnerSignupInput): Promise<PartnerSignupOutput> {
   return partnerSignupFlow(input);
@@ -91,5 +98,3 @@ const partnerSignupFlow = ai.defineFlow(
     };
   }
 );
-
-    
