@@ -1,0 +1,21 @@
+
+import type { PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
+
+// In a real app, this would be a database like Firestore.
+// For this prototype, we'll use an in-memory array to simulate a user database.
+// By defining it in a separate file, we ensure it's a singleton and persists across requests.
+export const FAKE_PARTNER_DB: PartnerSignupInput[] = [
+    {
+        partnerType: "business",
+        shopName: "Sangeetha Mobiles",
+        ownerName: "Priya Singh",
+        phone: "9123456789",
+        email: "priya.s@example.com",
+    },
+    {
+        partnerType: "individual",
+        fullName: "Amit Patel",
+        phone: "9988776655",
+        email: "amit.p@example.com",
+    }
+];

@@ -86,14 +86,14 @@ export default function PartnersPage() {
                             <TableCell><Skeleton className="h-8 w-8" /></TableCell>
                         </TableRow>
                     ))
-                ) : partners.map(partner => (
-                    <TableRow key={partner.email}>
+                ) : partners.map((partner, index) => (
+                    <TableRow key={partner.email || index}>
                         <TableCell className="font-medium">{partner.shopName}</TableCell>
                         <TableCell className="hidden md:table-cell">{partner.ownerName}</TableCell>
                         <TableCell className="hidden md:table-cell">{partner.email}<br/>{partner.phone}</TableCell>
                         <TableCell>
                             <Badge variant={'secondary'}>
-                                Pending
+                                Approved
                             </Badge>
                         </TableCell>
                         <TableCell className="hidden md:table-cell">₹0</TableCell>
@@ -112,10 +112,9 @@ export default function PartnersPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>Approve</DropdownMenuItem>
                                 <DropdownMenuItem>View Details</DropdownMenuItem>
                                 <DropdownMenuItem className="text-destructive">
-                                    Reject
+                                    Suspend
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                             </DropdownMenu>

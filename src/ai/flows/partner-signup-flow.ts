@@ -10,6 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { FAKE_PARTNER_DB } from '@/lib/db';
 import { z } from 'zod';
 
 const PartnerSignupInputSchema = z.object({
@@ -27,24 +28,6 @@ const PartnerSignupInputSchema = z.object({
 });
 export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
 
-
-// In a real app, this would be a database like Firestore.
-// For this prototype, we'll use an in-memory array to simulate a user database.
-const FAKE_PARTNER_DB: PartnerSignupInput[] = [
-    {
-        partnerType: "business",
-        shopName: "Sangeetha Mobiles",
-        ownerName: "Priya Singh",
-        phone: "9123456789",
-        email: "priya.s@example.com",
-    },
-    {
-        partnerType: "individual",
-        fullName: "Amit Patel",
-        phone: "9988776655",
-        email: "amit.p@example.com",
-    }
-];
 
 const PartnerSignupOutputSchema = z.object({
   message: z.string().describe('A success message for the user.'),
@@ -71,7 +54,7 @@ const partnerSignupFlow = ai.defineFlow(
     
     // Check for duplicate partners based on email (case-insensitive) or phone number
     const existingPartner = FAKE_PARTNER_DB.find(
-        (partner) => partner.email.toLowerCase() === input.email.toLowerCase() || partner.phone === input.phone
+        (partner) => (partner.email && partner.email.toLowerCase() === input.email.toLowerCase()) || (partner.phone && partner.phone === input.phone)
     );
 
     if (existingPartner) {
