@@ -17,5 +17,10 @@ export const FAKE_PARTNER_DB: PartnerSignupInput[] = [
         fullName: "Amit Patel",
         phone: "9988776655",
         email: "amit.p@example.com",
-    }
-];
+    },
+    {
+        partnerType: "individual",
+        fullName: "Chris Dsouza",
+        phone: "9619798708",
+        email: "christopher.p.dsouza@gmail.com",
+    },];
