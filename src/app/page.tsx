@@ -74,12 +74,15 @@ const services: Service[] = [
   },
   { 
     name: 'Finance', 
-    icon: Landmark, 
     color: '#2E7D32',
+    icon: Landmark, 
     links: [
         { name: 'HDFC Bank', href: 'https://www.hdfcbank.com/?ref=1shopapp'},
         { name: 'ICICI Bank', href: 'https://www.icicibank.com/?ref=1shopapp'},
         { name: 'State Bank of India', href: 'https://www.onlinesbi.sbi/?ref=1shopapp'},
+        { name: 'Axis Bank', href: 'https://www.axisbank.com/?ref=1shopapp'},
+        { name: 'Kotak Mahindra Bank', href: 'https://www.kotak.com/en/personal-banking.html?ref=1shopapp'},
+        { name: 'Punjab National Bank', href: 'https://www.pnbindia.in/?ref=1shopapp'},
     ]
   },
   {
