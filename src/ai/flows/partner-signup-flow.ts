@@ -5,37 +5,14 @@
  *
  * - partnerSignup - A function that handles the partner signup process.
  * - getPartners - A function to retrieve all partners.
- * - PartnerSignupInput - The input type for the partnerSignup function.
- * - PartnerSignupOutput - The return type for the partnerSignup function.
  */
 
 import { ai } from '@/ai/genkit';
 import { FAKE_PARTNER_DB } from '@/lib/db';
-import { z } from 'zod';
 import fs from 'fs/promises';
 import path from 'path';
+import { PartnerSignupInputSchema, type PartnerSignupInput, PartnerSignupOutputSchema, type PartnerSignupOutput } from '../schemas';
 
-const PartnerSignupInputSchema = z.object({
-  partnerType: z.enum(['business', 'individual']),
-  // Business fields
-  shopName: z.string().optional(),
-  ownerName: z.string().optional(),
-  gstNumber: z.string().optional(),
-  // Individual fields
-  fullName: z.string().optional(),
-  panNumber: z.string().optional(),
-  // Common fields
-  phone: z.string().describe("The partner's phone number."),
-  email: z.string().email().describe("The partner's email address."),
-});
-export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
-
-
-const PartnerSignupOutputSchema = z.object({
-  message: z.string().describe('A success message for the user.'),
-  referralCode: z.string().describe('The unique referral code generated for the partner.'),
-});
-export type PartnerSignupOutput = z.infer<typeof PartnerSignupOutputSchema>;
 
 // NOTE: This is a hack for the prototype to persist data.
 // In a real app, you would use a proper database like Firestore.

@@ -26,7 +26,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
-import { getPartners, type PartnerSignupInput } from '@/ai/flows/partner-signup-flow';
+import { getPartners } from '@/ai/flows/partner-signup-flow';
+import type { PartnerSignupInput } from '@/ai/schemas';
 import { Skeleton } from '@/components/ui/skeleton';
 
 

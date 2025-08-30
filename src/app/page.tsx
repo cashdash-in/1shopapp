@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
 import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
+import { FeedbackDialog } from '@/components/feedback-dialog';
+import { Button } from '@/components/ui/button';
 
 const services: Service[] = [
   { 
@@ -176,7 +178,7 @@ export default function Home() {
           </div>
         </div>
         <footer className="text-center mt-8 max-w-4xl mx-auto px-4 space-y-4">
-            <div className="flex justify-center items-center gap-4">
+            <div className="flex justify-center items-center gap-2 md:gap-4 flex-wrap">
                <Link href="/about" className="text-xs text-muted-foreground hover:text-foreground underline">
                   About Us
               </Link>
@@ -186,6 +188,9 @@ export default function Home() {
               <Link href="/terms" className="text-xs text-muted-foreground hover:text-foreground underline">
                   Terms & Conditions
               </Link>
+               <FeedbackDialog>
+                    <Button variant="link" className="text-xs text-muted-foreground hover:text-foreground underline p-0 h-auto">Feedback</Button>
+               </FeedbackDialog>
               <Link href="/admin" className="text-xs text-muted-foreground hover:text-foreground underline">
                   Admin
               </Link>

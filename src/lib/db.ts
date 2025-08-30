@@ -1,5 +1,5 @@
 
-import type { PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
+import type { PartnerSignupInput } from "@/ai/schemas";
 
 // In a real app, this would be a database like Firestore.
 // For this prototype, we'll use an in-memory array to simulate a user database.
