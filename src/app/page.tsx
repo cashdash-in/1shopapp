@@ -14,6 +14,7 @@ const services: Service[] = [
     links: [
       { name: 'Flipkart', href: 'https://www.flipkart.com?ref=1shopapp' },
       { name: 'Amazon', href: 'https://www.amazon.in?ref=1shopapp' },
+      { name: 'Myntra', href: 'https://www.myntra.com?ref=1shopapp' },
       { name: 'Meesho', href: 'https://www.meesho.com?ref=1shopapp' },
       { name: 'DMart', href: 'https://www.dmart.in?ref=1shopapp' },
       { name: 'Blinkit', href: 'https://www.blinkit.com?ref=1shopapp' },
