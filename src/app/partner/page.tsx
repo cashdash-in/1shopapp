@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,37 +9,43 @@ import { Handshake } from "lucide-react";
 import Link from "next/link";
 import { partnerSignup, type PartnerSignupOutput, type PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
 
+interface FormState {
+  result: PartnerSignupOutput | null;
+  error: string | null;
+}
+
+async function handlePartnerSignup(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const input: PartnerSignupInput = {
+    shopName: formData.get('shop-name') as string,
+    ownerName: formData.get('owner-name') as string,
+    phone: formData.get('phone') as string,
+    email: formData.get('email') as string,
+  };
+
+  try {
+    const response = await partnerSignup(input);
+    return { result: response, error: null };
+  } catch (err) {
+    console.error(err);
+    return { result: null, error: 'An error occurred. Please try again.' };
+  }
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? 'Registering...' : 'Register Interest'}
+    </Button>
+  );
+}
 
 export default function PartnerPage() {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<PartnerSignupOutput | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
-    setError(null);
-    
-    const formData = new FormData(e.currentTarget);
-    const input: PartnerSignupInput = {
-      shopName: formData.get('shop-name') as string,
-      ownerName: formData.get('owner-name') as string,
-      phone: formData.get('phone') as string,
-      email: formData.get('email') as string,
-    };
-
-    try {
-      // Directly call the flow from the client component
-      const response = await partnerSignup(input);
-      setResult(response);
-    } catch (err) {
-      setError('An error occurred. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const initialState: FormState = { result: null, error: null };
+  const [state, formAction] = useFormState(handlePartnerSignup, initialState);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -81,36 +87,34 @@ export default function PartnerPage() {
               <CardDescription>Fill out the form below to register your interest. We'll get back to you shortly.</CardDescription>
             </CardHeader>
             <CardContent>
-              {result ? (
+              {state.result ? (
                 <div className="space-y-4 text-center p-4 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                  <h3 className="text-xl font-semibold text-green-800 dark:text-green-300">{result.message}</h3>
+                  <h3 className="text-xl font-semibold text-green-800 dark:text-green-300">{state.result.message}</h3>
                   <p className="text-muted-foreground">Your referral code is:</p>
-                  <p className="text-2xl font-bold text-primary bg-muted/50 rounded-md py-2">{result.referralCode}</p>
+                  <p className="text-2xl font-bold text-primary bg-muted/50 rounded-md py-2">{state.result.referralCode}</p>
                    <p className="text-xs text-muted-foreground pt-4">You can now start sharing this code with your customers!</p>
-                   <Button onClick={() => setResult(null)} className="mt-4">Register another partner</Button>
+                   <Button onClick={() => window.location.reload()} className="mt-4">Register another partner</Button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form action={formAction} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="shop-name">Shop Name</Label>
-                    <Input id="shop-name" name="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required disabled={loading}/>
+                    <Input id="shop-name" name="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="owner-name">Your Name</Label>
-                    <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required disabled={loading} />
+                    <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" name="phone" type="tel" placeholder="e.g., '9876543210'" required disabled={loading} />
+                    <Input id="phone" name="phone" type="tel" placeholder="e.g., '9876543210'" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required disabled={loading} />
+                    <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required />
                   </div>
-                   {error && <p className="text-sm text-destructive">{error}</p>}
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Registering...' : 'Register Interest'}
-                  </Button>
+                   {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+                  <SubmitButton />
                 </form>
               )}
             </CardContent>
