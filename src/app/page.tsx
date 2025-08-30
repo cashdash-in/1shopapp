@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Bot, Search, Handshake } from 'lucide-react';
+import { Bot, Search } from 'lucide-react';
 import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Car } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
@@ -138,12 +138,6 @@ const services: Service[] = [
       { name: 'Zerodha', href: 'https://zerodha.com/' },
       { name: 'Groww', href: 'https://groww.in/' },
     ]
-  },
-  {
-    name: 'Partner with Us',
-    icon: Handshake,
-    color: '#34D399',
-    href: '/partner',
   }
 ];
 
