@@ -1,12 +1,8 @@
+
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Bot, Search } from 'lucide-react';
 import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Car } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
@@ -142,16 +138,6 @@ const services: Service[] = [
 ];
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const router = useRouter();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/compare?q=${encodeURIComponent(searchQuery)}`);
-    }
-  };
-
   return (
     <>
       <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
@@ -164,22 +150,6 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full max-w-xl mb-8">
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Compare prices across stores..."
-              className="w-full pl-10 pr-20 h-12 text-base"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 h-9">
-              Compare
-            </Button>
-          </form>
-        </div>
-
         <div className="w-full max-w-5xl">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
             {services.map((service) => (
@@ -190,9 +160,12 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <footer className="text-center mt-8 max-w-2xl mx-auto px-4 space-y-2">
+        <footer className="text-center mt-8 max-w-2xl mx-auto px-4 space-y-4">
             <p className="text-xs text-muted-foreground">
-                Some of the links we share are part of affiliate programs. When you make a purchase, we may receive a small thank-you from the brand—without affecting your cost. It’s a quiet way you help keep 1ShopApp free for all.
+                <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform and is not partnered, affiliated, or collaborating with any of the brands displayed. The logos and brand names are the property of their respective owners. We provide a consolidated access point to these services for user convenience. Clicking on these links is at the user's own discretion.
+            </p>
+             <p className="text-xs text-muted-foreground">
+                <span className='font-bold'>Affiliate Disclosure:</span> Some of the links on this platform are affiliate links. If you click on a link and make a purchase, we may earn a commission at no additional cost to you. This helps support our platform and keep it free for everyone.
             </p>
             <div className="flex justify-center items-center gap-4">
               <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
@@ -204,15 +177,6 @@ export default function Home() {
             </div>
         </footer>
       </main>
-      <Link href="/assistant" passHref>
-        <Button
-          variant="default"
-          className="fixed bottom-8 left-8 h-16 w-16 rounded-full shadow-lg hover:scale-110 transition-transform"
-        >
-          <Bot className="h-8 w-8" />
-          <span className="sr-only">Open AI Assistant</span>
-        </Button>
-      </Link>
     </>
   );
 }
