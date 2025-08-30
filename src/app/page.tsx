@@ -142,6 +142,7 @@ const services: Service[] = [
       { name: 'Groww', href: 'https://groww.in/' },
       { name: 'Angel Broking', href: 'https://www.angelone.in/' },
       { name: 'Sharekhan', href: 'https://www.sharekhan.com/' },
+      { name: 'ICICI Securities', href: 'https://www.icicidirect.com/' },
     ]
   }
 ];
