@@ -50,6 +50,7 @@ const services: Service[] = [
       { name: 'Goibibo', href: 'https://www.goibibo.com/?ref=1shopapp'},
       { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
       { name: 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
+      { name: 'OYO', href: 'https://www.oyorooms.com/?ref=1shopapp' },
     ] 
   },
   {

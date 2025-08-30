@@ -23,7 +23,7 @@ const brandData = [
     },
     {
       category: 'Travel',
-      brands: ['MakeMyTrip', 'Goibibo', 'Ixigo', 'Cleartrip']
+      brands: ['MakeMyTrip', 'Goibibo', 'Ixigo', 'Cleartrip', 'OYO']
     },
     {
       category: 'Housing',
@@ -119,7 +119,7 @@ export default function BrandOpportunitiesPage() {
                                             </div>
                                         </div>
                                         
-                                        <div className="flex items-start gap-4">
+                                        <div className="flex items-start gap_4">
                                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                                                 <Percent className="w-5 h-5"/>
                                             </div>
@@ -137,7 +137,7 @@ export default function BrandOpportunitiesPage() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-start gap-4">
+                                        <div className="flex items-start gap_4">
                                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                                                 <BarChart3 className="w-5 h-5"/>
                                             </div>
