@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Handshake } from "lucide-react";
 import Link from "next/link";
 import { partnerSignup, type PartnerSignupOutput, type PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface FormState {
   result: PartnerSignupOutput | null;
@@ -30,6 +31,10 @@ async function handlePartnerSignupAction(
   // Basic validation
   if (!input.partnerName || !input.ownerName || !input.phone || !input.email) {
     return { result: null, error: "Please fill out all fields.", input };
+  }
+  
+  if (!formData.get('terms')) {
+    return { result: null, error: "You must agree to the terms and conditions.", input };
   }
 
   try {
@@ -129,6 +134,20 @@ export default function PartnerPage() {
                     <Label htmlFor="email">Email Address</Label>
                     <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required />
                   </div>
+                   <div className="items-top flex space-x-2">
+                      <Checkbox id="terms" name="terms" />
+                      <div className="grid gap-1.5 leading-none">
+                        <label
+                          htmlFor="terms"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          I agree to the
+                        </label>
+                        <p className="text-sm text-muted-foreground">
+                          <Link href="/partner-terms" className="underline hover:text-primary" target="_blank">Business Partner Terms</Link> and <Link href="/individual-partner-terms" className="underline hover:text-primary" target="_blank">Individual Partner Terms</Link>.
+                        </p>
+                      </div>
+                    </div>
                    {state.error && <p className="text-sm text-destructive">{state.error}</p>}
                   <SubmitButton />
                 </form>

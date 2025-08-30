@@ -165,6 +165,9 @@ export default function Home() {
               <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform. We are not affiliated with, sponsored by, or endorsed by the brands featured. We may earn a commission from affiliate links, at no extra cost to you. Use of this service is at your own discretion.
             </p>
             <div className="flex justify-center items-center gap-4">
+               <Link href="/about" className="text-xs text-muted-foreground hover:text-foreground underline">
+                  About Us
+              </Link>
               <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
                   Partner with us
               </Link>
