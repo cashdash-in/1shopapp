@@ -25,13 +25,40 @@ async function handlePartnerSignupAction(
 ): Promise<FormState> {
 
   const partnerType = formData.get('partnerType') as 'business' | 'individual';
-
   let rawInput: PartnerSignupInput;
   let inputForState: Partial<PartnerSignupInput>;
+
+  if (!formData.get('terms')) {
+    return { result: null, error: "You must agree to the terms and conditions.", input: {
+        partnerType,
+        shopName: formData.get('shop-name') as string,
+        ownerName: formData.get('owner-name') as string,
+        gstNumber: formData.get('gst-number') as string,
+        fullName: formData.get('full-name') as string,
+        panNumber: formData.get('pan-number') as string,
+        phone: formData.get('phone') as string,
+        email: formData.get('email') as string,
+    }};
+  }
+  
+  if (formData.get('password') !== formData.get('confirm-password')) {
+     return { result: null, error: "Passwords do not match.", input: {
+        partnerType,
+        shopName: formData.get('shop-name') as string,
+        ownerName: formData.get('owner-name') as string,
+        gstNumber: formData.get('gst-number') as string,
+        fullName: formData.get('full-name') as string,
+        panNumber: formData.get('pan-number') as string,
+        phone: formData.get('phone') as string,
+        email: formData.get('email') as string,
+    }};
+  }
+
 
   const commonData = {
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
+    password: formData.get('password') as string,
   };
 
   if (partnerType === 'business') {
@@ -52,10 +79,6 @@ async function handlePartnerSignupAction(
       }
       inputForState = { ...rawInput };
   }
-  
-  if (!formData.get('terms')) {
-    return { result: null, error: "You must agree to the terms and conditions.", input: inputForState };
-  }
 
   try {
     const response = await partnerSignup(rawInput);
@@ -64,6 +87,9 @@ async function handlePartnerSignupAction(
     console.error(err);
     // Check for the specific duplicate partner error message from the flow
     if (err.message?.includes('already exists')) {
+       return { result: null, error: err.message, input: inputForState };
+    }
+     if (err.message?.includes('Password')) {
        return { result: null, error: err.message, input: inputForState };
     }
     return { result: null, error: 'An unexpected error occurred. Please try again.', input: inputForState };
@@ -207,6 +233,16 @@ export default function PartnerPage() {
                     <Label htmlFor="email">Email Address</Label>
                     <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required defaultValue={state.input?.email || ''}/>
                   </div>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input id="password" name="password" type="password" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password">Confirm Password</Label>
+                        <Input id="confirm-password" name="confirm-password" type="password" required />
+                      </div>
+                   </div>
                    <div className="items-top flex space-x-2">
                       <Checkbox id="terms" name="terms" required />
                       <div className="grid gap-1.5 leading-none">
@@ -245,7 +281,7 @@ function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
         xmlns="http://www.w3.org/2000/svg"
         width="24"
         height="24"
-        viewBox="0 0 24 24"
+        viewBox="0 0 24"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
@@ -256,5 +292,3 @@ function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
       </svg>
     )
   }
-
-    

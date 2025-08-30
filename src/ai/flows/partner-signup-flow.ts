@@ -24,6 +24,7 @@ const PartnerSignupInputSchema = z.object({
   // Common fields
   phone: z.string().describe("The partner's phone number."),
   email: z.string().email().describe("The partner's email address."),
+  password: z.string().min(6, "Password must be at least 6 characters long."),
 });
 export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
 
@@ -37,12 +38,14 @@ const FAKE_PARTNER_DB: PartnerSignupInput[] = [
         ownerName: "Priya Singh",
         phone: "9123456789",
         email: "priya.s@example.com",
+        password: "password123",
     },
     {
         partnerType: "individual",
         fullName: "Amit Patel",
         phone: "9988776655",
         email: "amit.p@example.com",
+        password: "password123",
     }
 ];
 
@@ -78,7 +81,9 @@ const partnerSignupFlow = ai.defineFlow(
         throw new Error('A partner with this email already exists. Please try with a different email.');
     }
 
-    // Add the new partner to our fake database
+    // In a real app, you would HASH the password before saving.
+    // For this prototype, we are storing it in plain text for simplicity.
+    // NEVER DO THIS IN PRODUCTION.
     FAKE_PARTNER_DB.push(input);
     console.log('New Partner Signup:', input);
     console.log('Current Partner DB:', FAKE_PARTNER_DB);
@@ -99,5 +104,3 @@ const partnerSignupFlow = ai.defineFlow(
     };
   }
 );
-
-    
