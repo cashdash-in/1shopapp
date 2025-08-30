@@ -135,6 +135,8 @@ const services: Service[] = [
       { name: 'ET Markets', href: 'https://economictimes.indiatimes.com/markets' },
       { name: 'Zerodha', href: 'https://zerodha.com/' },
       { name: 'Groww', href: 'https://groww.in/' },
+      { name: 'Angel Broking', href: 'https://www.angelone.in/' },
+      { name: 'Sharekhan', href: 'https://www.sharekhan.com/' },
     ]
   }
 ];
