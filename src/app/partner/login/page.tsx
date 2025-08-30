@@ -10,43 +10,62 @@ import { Handshake } from "lucide-react";
 import React, { useState } from "react";
 import { getPartners } from "@/ai/flows/partner-signup-flow";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+
+const SIMULATED_OTP = '123456';
 
 export default function PartnerLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { toast } = useToast();
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+
+  const handleSendOtp = async () => {
+    setError('');
+    setLoading(true);
+
+    if (!phone) {
+        setError("Please enter your phone number.");
+        setLoading(false);
+        return;
+    }
+
+     try {
+        const partners = await getPartners();
+        const partnerExists = partners.some(partner => partner.phone === phone);
+
+        if (partnerExists) {
+            setOtpSent(true);
+            toast({
+                title: "OTP Sent",
+                description: `We've sent an OTP to your number. (Hint: it's ${SIMULATED_OTP})`,
+            });
+        } else {
+            setError("No partner found with this phone number. Please register first.");
+        }
+    } catch (err) {
+        console.error("OTP send error:", err);
+        setError("An unexpected error occurred. Please try again later.");
+    } finally {
+        setLoading(false);
+    }
+  }
 
   const handleSignIn = async () => {
     setError('');
     setLoading(true);
 
-    if (!email || !password) {
-        setError("Please enter both email and password.");
+    if (otp !== SIMULATED_OTP) {
+        setError("Invalid OTP. Please try again.");
         setLoading(false);
         return;
     }
-
-    try {
-        const partners = await getPartners();
-        const partnerExists = partners.some(partner => partner.email.toLowerCase() === email.toLowerCase());
-
-        // Note: In a real app, you would also verify the password against a hashed version in your database.
-        // For this prototype, we are only checking if the email exists.
-
-        if (partnerExists) {
-            // Successful login, redirect to dashboard
-            router.push('/partner/dashboard');
-        } else {
-            setError("Invalid credentials. Please check your email and password.");
-        }
-    } catch (err) {
-        console.error("Login error:", err);
-        setError("An unexpected error occurred. Please try again later.");
-    } finally {
-        setLoading(false);
-    }
+    
+    // If OTP is correct, redirect to dashboard
+    router.push('/partner/dashboard');
   };
 
 
@@ -63,37 +82,47 @@ export default function PartnerLoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Sign In</CardTitle>
           <CardDescription>
-            Enter your email and password to access your dashboard.
+            Enter your phone number to receive an OTP.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="phone">Phone Number</Label>
             <Input 
-              id="email" 
-              type="email" 
-              placeholder="m@example.com" 
+              id="phone" 
+              type="tel" 
+              placeholder="e.g., 9876543210" 
               required 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              disabled={otpSent}
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input 
-              id="password" 
-              type="password" 
-              required 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+          {otpSent && (
+            <div className="grid gap-2">
+                <Label htmlFor="otp">OTP</Label>
+                <Input 
+                id="otp" 
+                type="text" 
+                placeholder="Enter the 6-digit OTP"
+                required 
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                />
+            </div>
+          )}
           {error && <p className="text-sm text-destructive">{error}</p>}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full" onClick={handleSignIn} disabled={loading}>
-            {loading ? 'Signing In...' : 'Sign In'}
-          </Button>
+           {!otpSent ? (
+             <Button className="w-full" onClick={handleSendOtp} disabled={loading}>
+                {loading ? 'Sending OTP...' : 'Send OTP'}
+            </Button>
+           ) : (
+            <Button className="w-full" onClick={handleSignIn} disabled={loading}>
+                {loading ? 'Signing In...' : 'Sign In'}
+            </Button>
+           )}
            <div className="text-center text-sm text-muted-foreground">
                 Don&apos;t have an account?{" "}
                 <Link href="/partner" className="underline hover:text-primary">

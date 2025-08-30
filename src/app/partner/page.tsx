@@ -41,24 +41,9 @@ async function handlePartnerSignupAction(
     }};
   }
   
-  if (formData.get('password') !== formData.get('confirm-password')) {
-     return { result: null, error: "Passwords do not match.", input: {
-        partnerType,
-        shopName: formData.get('shop-name') as string,
-        ownerName: formData.get('owner-name') as string,
-        gstNumber: formData.get('gst-number') as string,
-        fullName: formData.get('full-name') as string,
-        panNumber: formData.get('pan-number') as string,
-        phone: formData.get('phone') as string,
-        email: formData.get('email') as string,
-    }};
-  }
-
-
   const commonData = {
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
-    password: formData.get('password') as string,
   };
 
   if (partnerType === 'business') {
@@ -233,16 +218,7 @@ export default function PartnerPage() {
                     <Label htmlFor="email">Email Address</Label>
                     <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required defaultValue={state.input?.email || ''}/>
                   </div>
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input id="password" name="password" type="password" required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="confirm-password">Confirm Password</Label>
-                        <Input id="confirm-password" name="confirm-password" type="password" required />
-                      </div>
-                   </div>
+                  
                    <div className="items-top flex space-x-2">
                       <Checkbox id="terms" name="terms" required />
                       <div className="grid gap-1.5 leading-none">

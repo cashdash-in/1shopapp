@@ -24,7 +24,6 @@ const PartnerSignupInputSchema = z.object({
   // Common fields
   phone: z.string().describe("The partner's phone number."),
   email: z.string().email().describe("The partner's email address."),
-  password: z.string().min(6, "Password must be at least 6 characters long."),
 });
 export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
 
@@ -38,14 +37,12 @@ const FAKE_PARTNER_DB: PartnerSignupInput[] = [
         ownerName: "Priya Singh",
         phone: "9123456789",
         email: "priya.s@example.com",
-        password: "password123",
     },
     {
         partnerType: "individual",
         fullName: "Amit Patel",
         phone: "9988776655",
         email: "amit.p@example.com",
-        password: "password123",
     }
 ];
 
