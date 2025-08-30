@@ -190,9 +190,14 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <p className="text-xs text-muted-foreground text-center mt-8 max-w-2xl">
-          Some of the links we share are part of affiliate programs. When you make a purchase, we may receive a small thank-you from the brand—without affecting your cost. It’s a quiet way you help keep 1ShopApp free for all.
-        </p>
+        <footer className="text-center mt-8 max-w-2xl mx-auto px-4 space-y-2">
+            <p className="text-xs text-muted-foreground">
+                Some of the links we share are part of affiliate programs. When you make a purchase, we may receive a small thank-you from the brand—without affecting your cost. It’s a quiet way you help keep 1ShopApp free for all.
+            </p>
+            <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
+                Partner with us
+            </Link>
+        </footer>
       </main>
       <Link href="/assistant" passHref>
         <Button
