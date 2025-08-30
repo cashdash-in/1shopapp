@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Handshake } from "lucide-react";
 import Link from "next/link";
-import { partnerSignup } from "@/ai/flows/partner-signup-flow";
+import { partnerSignup, PartnerSignupOutput } from "@/ai/flows/partner-signup-flow";
 
 export default function PartnerPage() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ message: string; referralCode: string } | null>(null);
+  const [result, setResult] = useState<PartnerSignupOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -10,7 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-export const PartnerSignupInputSchema = z.object({
+const PartnerSignupInputSchema = z.object({
   shopName: z.string().describe("The name of the partner's shop."),
   ownerName: z.string().describe("The name of the shop owner."),
   phone: z.string().describe("The partner's phone number."),
@@ -18,7 +18,7 @@ export const PartnerSignupInputSchema = z.object({
 });
 export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
 
-export const PartnerSignupOutputSchema = z.object({
+const PartnerSignupOutputSchema = z.object({
   message: z.string().describe('A success message for the user.'),
   referralCode: z.string().describe('The unique referral code generated for the partner.'),
 });
