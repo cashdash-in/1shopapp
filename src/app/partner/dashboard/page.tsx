@@ -19,7 +19,7 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DollarSign, Package, CreditCard, Users } from "lucide-react"
+import { DollarSign, Package, CreditCard, Users, LogOut } from "lucide-react"
 import Link from 'next/link';
 
 const chartData = [
@@ -54,6 +54,12 @@ export default function PartnerDashboard() {
                     <AvatarImage src="https://picsum.photos/seed/partner/100/100" alt="Partner" />
                     <AvatarFallback>P</AvatarFallback>
                 </Avatar>
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/partner/login">
+                        <LogOut className="h-5 w-5 text-muted-foreground" />
+                        <span className="sr-only">Logout</span>
+                    </Link>
+                </Button>
             </div>
         </header>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
