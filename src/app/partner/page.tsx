@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Handshake } from "lucide-react";
 import Link from "next/link";
-import type { PartnerSignupOutput } from "@/ai/flows/partner-signup-flow";
-import { partnerSignup } from "@/ai/flows/partner-signup-flow";
+import type { PartnerSignupOutput, PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
+import { handlePartnerSignup } from "./form-action";
+
 
 export default function PartnerPage() {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function PartnerPage() {
     setError(null);
     
     const formData = new FormData(e.currentTarget);
-    const input = {
+    const input: PartnerSignupInput = {
       shopName: formData.get('shop-name') as string,
       ownerName: formData.get('owner-name') as string,
       phone: formData.get('phone') as string,
@@ -30,7 +31,7 @@ export default function PartnerPage() {
     };
 
     try {
-      const response = await partnerSignup(input);
+      const response = await handlePartnerSignup(input);
       setResult(response);
     } catch (err) {
       setError('An error occurred. Please try again.');
