@@ -110,8 +110,8 @@ export default function PartnerPage() {
         </Link>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
-        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto items-center">
+      <main className="flex-1 p-4 md:p-8 flex justify-center">
+        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto items-start pt-12">
           <div className="space-y-4">
             <h2 className="text-4xl font-extrabold tracking-tight text-foreground">
               Partner with 1ShopApp & Grow Your Business
@@ -140,6 +140,12 @@ export default function PartnerPage() {
               <CardTitle>Become a Partner</CardTitle>
                <CardDescription>
                 Register your interest below.
+                 <span className="block mt-1">
+                    Already a partner?{' '}
+                    <Link href="/partner/login" className="underline hover:text-primary font-semibold">
+                        Sign in here.
+                    </Link>
+                </span>
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -236,13 +242,7 @@ export default function PartnerPage() {
                 </form>
               )}
             </CardContent>
-            <CardFooter className="flex-col items-start gap-4">
-                 <div className="text-sm text-muted-foreground">
-                    Already a partner?{' '}
-                    <Link href="/partner/login" className="underline hover:text-primary font-semibold">
-                        Sign in here.
-                    </Link>
-                </div>
+            <CardFooter>
                  <p className="text-xs text-muted-foreground">
                     Your information is used for identity verification and commission payments only. We respect your privacy.
                  </p>
@@ -272,4 +272,3 @@ function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
       </svg>
     )
   }
-
