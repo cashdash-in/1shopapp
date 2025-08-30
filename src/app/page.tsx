@@ -83,6 +83,8 @@ const services: Service[] = [
         { name: 'Axis Bank', href: 'https://www.axisbank.com/?ref=1shopapp'},
         { name: 'Kotak Mahindra Bank', href: 'https://www.kotak.com/en/personal-banking.html?ref=1shopapp'},
         { name: 'Punjab National Bank', href: 'https://www.pnbindia.in/?ref=1shopapp'},
+        { name: 'IndusInd Bank', href: 'https://www.indusind.com/?ref=1shopapp'},
+        { name: 'Bandhan Bank', href: 'https://www.bandhanbank.com/?ref=1shopapp'}
     ]
   },
   {
