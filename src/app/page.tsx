@@ -194,9 +194,14 @@ export default function Home() {
             <p className="text-xs text-muted-foreground">
                 Some of the links we share are part of affiliate programs. When you make a purchase, we may receive a small thank-you from the brand—without affecting your cost. It’s a quiet way you help keep 1ShopApp free for all.
             </p>
-            <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
-                Partner with us
-            </Link>
+            <div className="flex justify-center items-center gap-4">
+              <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
+                  Partner with us
+              </Link>
+              <Link href="/admin" className="text-xs text-muted-foreground hover:text-foreground underline">
+                  Admin
+              </Link>
+            </div>
         </footer>
       </main>
       <Link href="/assistant" passHref>
