@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Car } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 
 const services: Service[] = [
@@ -53,13 +53,14 @@ const services: Service[] = [
     ] 
   },
   {
-    name: 'Cabs',
-    icon: Car,
-    color: '#FFD700',
+    name: 'Housing',
+    icon: HomeIcon,
+    color: '#38A169',
     links: [
-      { name: 'Uber', href: 'https://www.uber.com/in/en/' },
-      { name: 'Ola', href: 'https://www.olacabs.com/' },
-      { name: 'inDrive', href: 'https://www.indrive.com/en/home/' },
+        { name: 'MagicBricks', href: 'https://www.magicbricks.com/'},
+        { name: '99acres', href: 'https://www.99acres.com/'},
+        { name: 'Housing.com', href: 'https://housing.com/'},
+        { name: 'NoBroker', href: 'https://www.nobroker.in/'},
     ]
   },
   { 
@@ -88,10 +89,13 @@ const services: Service[] = [
     ]
   },
   {
-    name: 'Logistics',
+    name: 'Transport & Logistics',
     icon: Truck,
     color: '#FFC300',
     links: [
+      { name: 'Uber', href: 'https://www.uber.com/in/en/' },
+      { name: 'Ola', href: 'https://www.olacabs.com/' },
+      { name: 'inDrive', href: 'https://www.indrive.com/en/home/' },
       { name: 'Delhivery', href: 'https://www.delhivery.com/' },
       { name: 'Blue Dart', href: 'https://www.bluedart.com/' },
       { name: 'DTDC', href: 'https://www.dtdc.in/' },
