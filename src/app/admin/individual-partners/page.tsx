@@ -26,69 +26,47 @@ import {
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
 
-const partners = [
+const individualPartners = [
     {
-        shopName: "Raju Mobile Shop",
-        ownerName: "Raju Kumar",
-        phone: "9876543210",
-        email: "raju.kumar@example.com",
+        name: "Anjali Gupta",
+        phone: "9876512345",
+        email: "anjali.g@example.com",
         status: "Approved",
-        revenue: "₹12,500",
-        commission: "₹1,250",
+        revenue: "₹5,500",
+        commission: "₹550",
     },
     {
-        shopName: "Sangeetha Mobiles",
-        ownerName: "Priya Singh",
-        phone: "9123456789",
-        email: "priya.s@example.com",
+        name: "Suresh Reddy",
+        phone: "9123498765",
+        email: "suresh.r@example.com",
         status: "Pending",
         revenue: "₹0",
         commission: "₹0",
     },
     {
-        shopName: "The Mobile Store",
-        ownerName: "Amit Patel",
-        phone: "9988776655",
-        email: "amit.p@example.com",
+        name: "Deepak Kumar",
+        phone: "9988771122",
+        email: "deepak.k@example.com",
         status: "Approved",
-        revenue: "₹8,200",
-        commission: "₹820",
-    },
-    {
-        shopName: "Quick Fix Mobiles",
-        ownerName: "Sunita Devi",
-        phone: "9765432109",
-        email: "sunita.d@example.com",
-        status: "Approved",
-        revenue: "₹21,000",
-        commission: "₹2,100",
-    },
-     {
-        shopName: "Future Gadgets",
-        ownerName: "Vikram Sharma",
-        phone: "9654321098",
-        email: "vikram.s@example.com",
-        status: "Pending",
-        revenue: "₹0",
-        commission: "₹0",
+        revenue: "₹3,100",
+        commission: "₹310",
     },
 ]
 
-export default function PartnersPage() {
+export default function IndividualPartnersPage() {
     return (
         <Card>
         <CardHeader>
-          <CardTitle>Business Partners</CardTitle>
+          <CardTitle>Individual Partners</CardTitle>
           <CardDescription>
-            Manage your business partners and view their performance.
+            Manage your individual partners and view their performance.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Shop Name</TableHead>
-                <TableHead className="hidden md:table-cell">Owner</TableHead>
+                <TableHead>Name</TableHead>
                 <TableHead className="hidden md:table-cell">Contact</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="hidden md:table-cell">Total Revenue</TableHead>
@@ -99,10 +77,9 @@ export default function PartnersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-                {partners.map(partner => (
+                {individualPartners.map(partner => (
                     <TableRow key={partner.email}>
-                        <TableCell className="font-medium">{partner.shopName}</TableCell>
-                        <TableCell className="hidden md:table-cell">{partner.ownerName}</TableCell>
+                        <TableCell className="font-medium">{partner.name}</TableCell>
                         <TableCell className="hidden md:table-cell">{partner.email}<br/>{partner.phone}</TableCell>
                         <TableCell>
                             <Badge variant={partner.status === 'Approved' ? 'default' : 'secondary'}>

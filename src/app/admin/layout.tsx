@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake } from 'lucide-react';
+import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake, User } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,8 @@ export default function AdminLayout({
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: Home },
-    { href: '/admin/partners', label: 'Partners', icon: Handshake },
+    { href: '/admin/partners', label: 'Business Partners', icon: Handshake },
+    { href: '/admin/individual-partners', label: 'Individual Partners', icon: User },
   ];
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
