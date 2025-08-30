@@ -1,4 +1,6 @@
 
+'use client';
+
 import {
   Accordion,
   AccordionContent,
@@ -6,7 +8,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, Percent, Star, BarChart3, ArrowRight } from "lucide-react"
+import { DollarSign, Percent, Star, BarChart3, Target, TrendingUp, FileText, CheckSquare, BrainCircuit } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox";
 
 const brandData = [
     {
@@ -66,13 +73,13 @@ export default function BrandOpportunitiesPage() {
     return (
         <div className="flex flex-col gap-4">
              <div className="flex items-center">
-                <h1 className="text-lg font-semibold md:text-2xl">Brand Opportunities</h1>
+                <h1 className="text-lg font-semibold md:text-2xl">Brand Campaign Planner</h1>
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>Monetization & Partnership Strategies</CardTitle>
+                    <CardTitle>Monetization & Partnership Strategy</CardTitle>
                     <CardDescription>
-                        A detailed guide on how we can collaborate with brands to generate revenue and enhance user value.
+                        Use this tool to plan and structure potential campaigns for each brand partner.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -81,81 +88,86 @@ export default function BrandOpportunitiesPage() {
                             <AccordionItem value={brand} key={brand}>
                                 <AccordionTrigger className="text-lg font-medium hover:no-underline">{brand}</AccordionTrigger>
                                 <AccordionContent>
-                                    <div className="space-y-6 pl-2 pt-2 border-l-2 border-primary ml-2">
-                                        
+                                    <form className="space-y-8 pl-2 pt-2 border-l-2 border-primary ml-2">
+
+                                        {/* Campaign Goal Section */}
                                         <div className="flex items-start gap-4">
                                             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                                                <DollarSign className="w-5 h-5"/>
+                                                <Target className="w-5 h-5"/>
                                             </div>
-                                            <div>
-                                                <h4 className="font-semibold text-foreground">Affiliate Link Commissions</h4>
-                                                <p className="text-muted-foreground text-sm">
-                                                    This is the most direct revenue stream. We can partner with {brand} through an affiliate network (like Cuelinks, Admitad, or directly). Instead of a standard link, we would use a unique tracking link.
-                                                </p>
-                                                <p className="text-muted-foreground text-sm mt-2">
-                                                    <span className="font-semibold text-foreground">Action:</span> Contact {brand}'s marketing/partnerships team to enroll in their affiliate program.
-                                                </p>
-                                                <p className="text-muted-foreground text-sm mt-1">
-                                                    <span className="font-semibold text-foreground">Revenue Model:</span> Earn a percentage (e.g., 2-10%) of the total sales value for every purchase made by a user who clicks through from our app.
-                                                </p>
+                                            <div className="w-full grid gap-2">
+                                                <h4 className="font-semibold text-foreground">Campaign Goal & Objective</h4>
+                                                <p className="text-muted-foreground text-sm">Define the primary purpose of this campaign.</p>
+                                                <Textarea placeholder={`e.g., Drive 15% more traffic to ${brand} during the Diwali sale.`} className="mt-1"/>
                                             </div>
                                         </div>
 
+                                         {/* KPIs Section */}
                                         <div className="flex items-start gap-4">
                                             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                                                <Star className="w-5 h-5"/>
+                                                <TrendingUp className="w-5 h-5"/>
                                             </div>
-                                            <div>
-                                                <h4 className="font-semibold text-foreground">Sponsored Placements (Featured Tile)</h4>
-                                                <p className="text-muted-foreground text-sm">
-                                                    Brands often pay for visibility. We can offer {brand} a premium, "featured" spot within its category. For example, it could be the first tile a user sees.
-                                                </p>
-                                                 <p className="text-muted-foreground text-sm mt-2">
-                                                    <span className="font-semibold text-foreground">Action:</span> Create a media kit outlining user demographics and traffic, and pitch a "Featured Partner" package to {brand}.
-                                                </p>
-                                                <p className="text-muted-foreground text-sm mt-1">
-                                                    <span className="font-semibold text-foreground">Revenue Model:</span> Charge a flat monthly or quarterly fee for this premium placement.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="flex items-start gap_4">
-                                             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                                                <Percent className="w-5 h-5"/>
-                                            </div>
-                                            <div>
-                                                <h4 className="font-semibold text-foreground">Exclusive Coupon Codes & Deals</h4>
-                                                <p className="text-muted-foreground text-sm">
-                                                    We can collaborate with {brand} to provide coupon codes or deals exclusive to 1ShopApp users. This adds significant value for our users and gives {brand} access to a targeted audience.
-                                                </p>
-                                                <p className="text-muted-foreground text-sm mt-2">
-                                                    <span className="font-semibold text-foreground">Action:</span> Propose a partnership where {brand} provides a unique discount code (e.g., "1SHOPAPP15") for our users.
-                                                </p>
-                                                <p className="text-muted-foreground text-sm mt-1">
-                                                    <span className="font-semibold text-foreground">Revenue Model:</span> This can be a fixed fee for running the campaign, a higher commission on sales using the code, or simply a way to drive user engagement and loyalty.
-                                                </p>
+                                            <div className="w-full grid gap-2">
+                                                <h4 className="font-semibold text-foreground">Key Performance Indicators (KPIs)</h4>
+                                                <p className="text-muted-foreground text-sm">Set measurable targets to track success.</p>
+                                                <div className="grid md:grid-cols-2 gap-4 mt-1">
+                                                    <div className="space-y-1">
+                                                        <Label htmlFor={`${brand}-kpi-ctr`}>Target Click-Through Rate (%)</Label>
+                                                        <Input id={`${brand}-kpi-ctr`} placeholder="e.g., 5"/>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <Label htmlFor={`${brand}-kpi-conversions`}>Target Conversions / Sales</Label>
+                                                        <Input id={`${brand}-kpi-conversions`} placeholder="e.g., 500"/>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-start gap_4">
-                                             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                                                <BarChart3 className="w-5 h-5"/>
+                                        {/* Campaign Types Section */}
+                                        <div className="flex items-start gap-4">
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                                                <CheckSquare className="w-5 h-5"/>
                                             </div>
-                                            <div>
-                                                <h4 className="font-semibold text-foreground">Data & User Insights</h4>
-                                                <p className="text-muted-foreground text-sm">
-                                                   As our platform grows, the aggregated, anonymized data we collect is highly valuable. We can provide {brand} with reports on user behavior.
-                                                </p>
-                                                <p className="text-muted-foreground text-sm mt-2">
-                                                    <span className="font-semibold text-foreground">Example Insights:</span> "What percentage of users who click on {brand} also click on banking apps?" or "What are the peak usage hours for the Shopping category?"
-                                                </p>
-                                                 <p className="text-muted-foreground text-sm mt-1">
-                                                    <span className="font-semibold text-foreground">Revenue Model:</span> Sell monthly or quarterly insight reports for a subscription fee.
-                                                </p>
+                                            <div className="w-full grid gap-2">
+                                                <h4 className="font-semibold text-foreground">Select Campaign Type(s)</h4>
+                                                <p className="text-muted-foreground text-sm">Choose the promotional methods to use for this campaign.</p>
+                                                <div className="grid md:grid-cols-2 gap-4 mt-2">
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox id={`${brand}-type-affiliate`} />
+                                                        <Label htmlFor={`${brand}-type-affiliate`} className="font-normal flex items-center gap-2"><DollarSign className="w-4 h-4 text-muted-foreground"/>Affiliate Links</Label>
+                                                    </div>
+                                                     <div className="flex items-center space-x-2">
+                                                        <Checkbox id={`${brand}-type-sponsored`} />
+                                                        <Label htmlFor={`${brand}-type-sponsored`} className="font-normal flex items-center gap-2"><Star className="w-4 h-4 text-muted-foreground"/>Sponsored Placement</Label>
+                                                    </div>
+                                                     <div className="flex items-center space-x-2">
+                                                        <Checkbox id={`${brand}-type-coupon`} />
+                                                        <Label htmlFor={`${brand}-type-coupon`} className="font-normal flex items-center gap-2"><Percent className="w-4 h-4 text-muted-foreground"/>Exclusive Coupon/Deal</Label>
+                                                    </div>
+                                                     <div className="flex items-center space-x-2">
+                                                        <Checkbox id={`${brand}-type-data`} />
+                                                        <Label htmlFor={`${brand}-type-data`} className="font-normal flex items-center gap-2"><BarChart3 className="w-4 h-4 text-muted-foreground"/>Data & Insights Report</Label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                    </div>
+                                        {/* Required Info Section */}
+                                        <div className="flex items-start gap-4">
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                                                <FileText className="w-5 h-5"/>
+                                            </div>
+                                            <div className="w-full grid gap-2">
+                                                <h4 className="font-semibold text-foreground">Information Required from {brand}</h4>
+                                                <p className="text-muted-foreground text-sm">List the assets and details needed from the brand to launch.</p>
+                                                <Textarea placeholder="e.g., - Official affiliate tracking links. - High-resolution logo. - List of coupon codes and validity." className="mt-1"/>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-end pt-4">
+                                            <Button type="button" onClick={(e) => e.preventDefault()}>Save Campaign Plan</Button>
+                                        </div>
+                                    </form>
                                 </AccordionContent>
                             </AccordionItem>
                         ))}
@@ -164,4 +176,5 @@ export default function BrandOpportunitiesPage() {
             </Card>
         </div>
     )
-}
+
+    
