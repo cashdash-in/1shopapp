@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Handshake } from "lucide-react";
 import Link from "next/link";
-import type { PartnerSignupOutput, PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
-import { handlePartnerSignup } from "./form-action";
+import { partnerSignup, type PartnerSignupOutput, type PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
 
 
 export default function PartnerPage() {
@@ -31,7 +30,8 @@ export default function PartnerPage() {
     };
 
     try {
-      const response = await handlePartnerSignup(input);
+      // Directly call the flow from the client component
+      const response = await partnerSignup(input);
       setResult(response);
     } catch (err) {
       setError('An error occurred. Please try again.');
