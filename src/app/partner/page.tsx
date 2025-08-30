@@ -3,7 +3,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Handshake } from "lucide-react";
@@ -86,9 +86,12 @@ export default function PartnerPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="p-4 border-b flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <Handshake className="h-8 w-8 text-primary" />
-          <h1 className="text-2xl font-bold tracking-tight">1ShopApp Partner Program</h1>
+          <Handshake className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-bold tracking-tight">1ShopApp Partner Program</h1>
         </Link>
+        <Button asChild variant="outline">
+            <Link href="/partner/login">Partner Login</Link>
+        </Button>
       </header>
 
       <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
@@ -119,7 +122,12 @@ export default function PartnerPage() {
           <Card className="w-full max-w-md">
             <CardHeader>
               <CardTitle>Become a Partner</CardTitle>
-              <CardDescription>Fill out the form below to register your interest. We'll get back to you shortly.</CardDescription>
+               <CardDescription>
+                Register your interest below. Already a partner?{' '}
+                <Link href="/partner/login" className="underline hover:text-primary">
+                    Sign in here.
+                </Link>
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {state.result ? (
@@ -214,6 +222,11 @@ export default function PartnerPage() {
                 </form>
               )}
             </CardContent>
+            <CardFooter>
+                 <p className="text-xs text-muted-foreground">
+                    Your information is used for identity verification and commission payments only. We respect your privacy.
+                 </p>
+            </CardFooter>
           </Card>
         </div>
       </main>

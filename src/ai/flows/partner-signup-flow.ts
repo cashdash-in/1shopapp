@@ -90,7 +90,7 @@ const partnerSignupFlow = ai.defineFlow(
       .toUpperCase()
       .replace(/\s+/g, '-') // Replace spaces with a dash
       .replace(/[^A-Z0-9-]/g, '') // Remove non-alphanumeric characters except dashes
-      .trim();
+      .trim() || 'PARTNER'; // Fallback in case the name is empty after cleaning
 
     return {
       message: 'Thank you for registering!',
