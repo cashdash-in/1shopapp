@@ -15,22 +15,30 @@ import { z } from 'zod';
 // For this prototype, we'll use an in-memory array to simulate a user database.
 const FAKE_PARTNER_DB: PartnerSignupInput[] = [
     {
-        partnerName: "Sangeetha Mobiles",
+        partnerType: "business",
+        shopName: "Sangeetha Mobiles",
         ownerName: "Priya Singh",
         phone: "9123456789",
         email: "priya.s@example.com",
     },
     {
-        partnerName: "Amit Patel",
-        ownerName: "Amit Patel",
+        partnerType: "individual",
+        fullName: "Amit Patel",
         phone: "9988776655",
         email: "amit.p@example.com",
     }
 ];
 
 const PartnerSignupInputSchema = z.object({
-  partnerName: z.string().describe("The name of the partner or their shop."),
-  ownerName: z.string().describe("The name of the contact person."),
+  partnerType: z.enum(['business', 'individual']),
+  // Business fields
+  shopName: z.string().optional().describe("The name of the partner's shop."),
+  ownerName: z.string().optional().describe("The name of the business owner."),
+  gstNumber: z.string().optional().describe("The GST Number for the business."),
+  // Individual fields
+  fullName: z.string().optional().describe("The full name of the individual partner."),
+  panNumber: z.string().optional().describe("The PAN number of the individual partner."),
+  // Common fields
   phone: z.string().describe("The partner's phone number."),
   email: z.string().email().describe("The partner's email address."),
 });
@@ -68,8 +76,10 @@ const partnerSignupFlow = ai.defineFlow(
     console.log('New Partner Signup:', input);
     console.log('Current Partner DB:', FAKE_PARTNER_DB);
 
+    const partnerName = input.partnerType === 'business' ? input.shopName : input.fullName;
+
     // Generate a simple referral code.
-    const referralCode = input.partnerName
+    const referralCode = (partnerName || 'PARTNER')
       .toUpperCase()
       .replace(/\s+/g, '-') // Replace spaces with a dash
       .replace(/[^A-Z0-9-]/g, '') // Remove non-alphanumeric characters except dashes
@@ -81,3 +91,5 @@ const partnerSignupFlow = ai.defineFlow(
     };
   }
 );
+
+    

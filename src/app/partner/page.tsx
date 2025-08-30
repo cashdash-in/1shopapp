@@ -10,6 +10,8 @@ import { Handshake } from "lucide-react";
 import Link from "next/link";
 import { partnerSignup, type PartnerSignupOutput, type PartnerSignupInput } from "@/ai/flows/partner-signup-flow";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import React from "react";
 
 interface FormState {
   result: PartnerSignupOutput | null;
@@ -21,17 +23,33 @@ async function handlePartnerSignupAction(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+
+  const partnerType = formData.get('partnerType') as 'business' | 'individual';
+
   const input: PartnerSignupInput = {
-    partnerName: formData.get('partner-name') as string,
-    ownerName: formData.get('owner-name') as string,
+    partnerType,
+    // Business fields
+    shopName: formData.get('shop-name') as string | undefined,
+    ownerName: formData.get('owner-name') as string | undefined,
+    gstNumber: formData.get('gst-number') as string | undefined,
+    // Individual fields
+    fullName: formData.get('full-name') as string | undefined,
+    panNumber: formData.get('pan-number') as string | undefined,
+    // Common fields
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
   };
 
   // Basic validation
-  if (!input.partnerName || !input.ownerName || !input.phone || !input.email) {
-    return { result: null, error: "Please fill out all fields.", input };
+  if (!input.phone || !input.email) {
+    return { result: null, error: "Please fill out all required fields.", input };
   }
+   if (partnerType === 'business' && (!input.shopName || !input.ownerName)) {
+      return { result: null, error: "Please fill out all business fields.", input };
+   }
+    if (partnerType === 'individual' && !input.fullName) {
+       return { result: null, error: "Please fill out all individual fields.", input };
+    }
   
   if (!formData.get('terms')) {
     return { result: null, error: "You must agree to the terms and conditions.", input };
@@ -62,6 +80,7 @@ function SubmitButton() {
 export default function PartnerPage() {
   const initialState: FormState = { result: null, error: null, input: null };
   const [state, formAction] = useFormState(handlePartnerSignupAction, initialState);
+  const [partnerType, setPartnerType] = React.useState<'business' | 'individual'>('business');
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -118,14 +137,56 @@ export default function PartnerPage() {
                 </div>
               ) : (
                 <form action={formAction} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="partner-name">Your Name / Shop Name</Label>
-                    <Input id="partner-name" name="partner-name" placeholder="e.g., 'Raju Kumar' or 'Raju Mobile Shop'" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="owner-name">Contact Person</Label>
-                    <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required />
-                  </div>
+                    <div className="space-y-2">
+                        <Label>Partner Type</Label>
+                        <RadioGroup 
+                            name="partnerType"
+                            defaultValue="business" 
+                            className="flex gap-4" 
+                            onValueChange={(value: 'business' | 'individual') => setPartnerType(value)}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="business" id="r-business" />
+                                <Label htmlFor="r-business">Business</Label>
+                            </div>
+                             <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="individual" id="r-individual" />
+                                <Label htmlFor="r-individual">Individual</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
+
+                  {partnerType === 'business' && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="shop-name">Shop Name</Label>
+                        <Input id="shop-name" name="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="owner-name">Owner Name</Label>
+                        <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required />
+                      </div>
+                       <div className="space-y-2">
+                        <Label htmlFor="gst-number">GST Number (Optional)</Label>
+                        <Input id="gst-number" name="gst-number" placeholder="e.g., '29ABCDE1234F1Z5'" />
+                      </div>
+                    </>
+                  )}
+
+                  {partnerType === 'individual' && (
+                     <>
+                      <div className="space-y-2">
+                        <Label htmlFor="full-name">Full Name</Label>
+                        <Input id="full-name" name="full-name" placeholder="e.g., 'Raju Kumar'" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="pan-number">PAN Number (Optional)</Label>
+                        <Input id="pan-number" name="pan-number" placeholder="e.g., 'ABCDE1234F'" />
+                      </div>
+                    </>
+                  )}
+
+
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
                     <Input id="phone" name="phone" type="tel" placeholder="e.g., '9876543210'" required />
@@ -135,7 +196,7 @@ export default function PartnerPage() {
                     <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required />
                   </div>
                    <div className="items-top flex space-x-2">
-                      <Checkbox id="terms" name="terms" />
+                      <Checkbox id="terms" name="terms" required />
                       <div className="grid gap-1.5 leading-none">
                         <label
                           htmlFor="terms"
@@ -178,3 +239,5 @@ function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
       </svg>
     )
   }
+
+    
