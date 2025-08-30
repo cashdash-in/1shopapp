@@ -12,9 +12,10 @@ import { partnerSignup, type PartnerSignupOutput, type PartnerSignupInput } from
 interface FormState {
   result: PartnerSignupOutput | null;
   error: string | null;
+  input: PartnerSignupInput | null;
 }
 
-async function handlePartnerSignup(
+async function handlePartnerSignupAction(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
@@ -25,12 +26,17 @@ async function handlePartnerSignup(
     email: formData.get('email') as string,
   };
 
+  // Basic validation
+  if (!input.shopName || !input.ownerName || !input.phone || !input.email) {
+    return { result: null, error: "Please fill out all fields.", input };
+  }
+
   try {
     const response = await partnerSignup(input);
-    return { result: response, error: null };
-  } catch (err) {
+    return { result: response, error: null, input: null };
+  } catch (err: any) {
     console.error(err);
-    return { result: null, error: 'An error occurred. Please try again.' };
+    return { result: null, error: err.message || 'An unexpected error occurred. Please try again.', input };
   }
 }
 
@@ -44,8 +50,8 @@ function SubmitButton() {
 }
 
 export default function PartnerPage() {
-  const initialState: FormState = { result: null, error: null };
-  const [state, formAction] = useFormState(handlePartnerSignup, initialState);
+  const initialState: FormState = { result: null, error: null, input: null };
+  const [state, formAction] = useFormState(handlePartnerSignupAction, initialState);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
