@@ -15,12 +15,12 @@ import { z } from 'zod';
 const PartnerSignupInputSchema = z.object({
   partnerType: z.enum(['business', 'individual']),
   // Business fields
-  shopName: z.string().optional().describe("The name of the partner's shop."),
-  ownerName: z.string().optional().describe("The name of the business owner."),
-  gstNumber: z.string().optional().describe("The GST Number for the business."),
+  shopName: z.string().optional(),
+  ownerName: z.string().optional(),
+  gstNumber: z.string().optional(),
   // Individual fields
-  fullName: z.string().optional().describe("The full name of the individual partner."),
-  panNumber: z.string().optional().describe("The PAN number of the individual partner."),
+  fullName: z.string().optional(),
+  panNumber: z.string().optional(),
   // Common fields
   phone: z.string().describe("The partner's phone number."),
   email: z.string().email().describe("The partner's email address."),
@@ -99,3 +99,5 @@ const partnerSignupFlow = ai.defineFlow(
     };
   }
 );
+
+    

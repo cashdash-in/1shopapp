@@ -26,18 +26,32 @@ async function handlePartnerSignupAction(
 
   const partnerType = formData.get('partnerType') as 'business' | 'individual';
 
-  const rawInput: PartnerSignupInput = {
-    partnerType,
-    shopName: formData.get('shop-name') as string,
-    ownerName: formData.get('owner-name') as string,
-    gstNumber: formData.get('gst-number') as string,
-    fullName: formData.get('full-name') as string,
-    panNumber: formData.get('pan-number') as string,
+  let rawInput: PartnerSignupInput;
+  let inputForState: Partial<PartnerSignupInput>;
+
+  const commonData = {
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
   };
 
-  const inputForState: Partial<PartnerSignupInput> = { ...rawInput };
+  if (partnerType === 'business') {
+      rawInput = {
+          partnerType,
+          ...commonData,
+          shopName: formData.get('shop-name') as string,
+          ownerName: formData.get('owner-name') as string,
+          gstNumber: formData.get('gst-number') as string,
+      }
+      inputForState = { ...rawInput };
+  } else { // individual
+      rawInput = {
+          partnerType,
+          ...commonData,
+          fullName: formData.get('full-name') as string,
+          panNumber: formData.get('pan-number') as string,
+      }
+      inputForState = { ...rawInput };
+  }
   
   if (!formData.get('terms')) {
     return { result: null, error: "You must agree to the terms and conditions.", input: inputForState };
