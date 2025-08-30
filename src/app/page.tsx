@@ -162,10 +162,7 @@ export default function Home() {
         </div>
         <footer className="text-center mt-8 max-w-2xl mx-auto px-4 space-y-4">
             <p className="text-xs text-muted-foreground">
-                <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform and is not partnered, affiliated, or collaborating with any of the brands displayed. The logos and brand names are the property of their respective owners. We provide a consolidated access point to these services for user convenience. Clicking on these links is at the user's own discretion.
-            </p>
-             <p className="text-xs text-muted-foreground">
-                <span className='font-bold'>Affiliate Disclosure:</span> Some of the links on this platform are affiliate links. If you click on a link and make a purchase, we may earn a commission at no additional cost to you. This helps support our platform and keep it free for everyone.
+              <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform for user convenience and is not affiliated with the brands shown. We may earn a commission from affiliate links, at no extra cost to you. Use of this service is at your own discretion.
             </p>
             <div className="flex justify-center items-center gap-4">
               <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
