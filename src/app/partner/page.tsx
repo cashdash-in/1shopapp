@@ -27,42 +27,43 @@ async function handlePartnerSignupAction(
   const partnerType = formData.get('partnerType') as 'business' | 'individual';
   let rawInput: PartnerSignupInput;
   let inputForState: Partial<PartnerSignupInput>;
+  
+  const getFormData = (fd: FormData) => ({
+    partnerType,
+    shopName: fd.get('shop-name') as string | undefined,
+    ownerName: fd.get('owner-name') as string | undefined,
+    gstNumber: fd.get('gst-number') as string | undefined,
+    fullName: fd.get('full-name') as string | undefined,
+    panNumber: fd.get('pan-number') as string | undefined,
+    phone: fd.get('phone') as string,
+    email: fd.get('email') as string,
+  });
+  
+  inputForState = getFormData(formData);
 
   if (!formData.get('terms')) {
-    return { result: null, error: "You must agree to the terms and conditions.", input: {
-        partnerType,
-        shopName: formData.get('shop-name') as string,
-        ownerName: formData.get('owner-name') as string,
-        gstNumber: formData.get('gst-number') as string,
-        fullName: formData.get('full-name') as string,
-        panNumber: formData.get('pan-number') as string,
-        phone: formData.get('phone') as string,
-        email: formData.get('email') as string,
-    }};
+    return { result: null, error: "You must agree to the terms and conditions.", input: inputForState };
   }
   
   const commonData = {
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
+    partnerType,
   };
 
   if (partnerType === 'business') {
       rawInput = {
-          partnerType,
           ...commonData,
           shopName: formData.get('shop-name') as string,
           ownerName: formData.get('owner-name') as string,
-          gstNumber: formData.get('gst-number') as string,
+          gstNumber: formData.get('gst-number') as string || undefined,
       }
-      inputForState = { ...rawInput };
   } else { // individual
       rawInput = {
-          partnerType,
           ...commonData,
           fullName: formData.get('full-name') as string,
-          panNumber: formData.get('pan-number') as string,
+          panNumber: formData.get('pan-number') as string || undefined,
       }
-      inputForState = { ...rawInput };
   }
 
   try {
@@ -72,9 +73,6 @@ async function handlePartnerSignupAction(
     console.error(err);
     // Check for the specific duplicate partner error message from the flow
     if (err.message?.includes('already exists')) {
-       return { result: null, error: err.message, input: inputForState };
-    }
-     if (err.message?.includes('Password')) {
        return { result: null, error: err.message, input: inputForState };
     }
     return { result: null, error: 'An unexpected error occurred. Please try again.', input: inputForState };
@@ -91,11 +89,17 @@ function SubmitButton() {
 }
 
 export default function PartnerPage() {
-  const initialState: FormState = { result: null, error: null, input: null };
+  const initialState: FormState = { result: null, error: null, input: { partnerType: 'business' } };
   const [state, formAction] = useFormState(handlePartnerSignupAction, initialState);
   const [partnerType, setPartnerType] = React.useState<'business' | 'individual'>(
     state.input?.partnerType || 'business'
   );
+
+  React.useEffect(() => {
+    if (state.input?.partnerType) {
+        setPartnerType(state.input.partnerType);
+    }
+  }, [state.input?.partnerType]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

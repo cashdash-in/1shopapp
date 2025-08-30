@@ -69,18 +69,15 @@ const partnerSignupFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // Check for duplicate partners based on email (case-insensitive)
+    // Check for duplicate partners based on email (case-insensitive) or phone number
     const existingPartner = FAKE_PARTNER_DB.find(
-        (partner) => partner.email.toLowerCase() === input.email.toLowerCase()
+        (partner) => partner.email.toLowerCase() === input.email.toLowerCase() || partner.phone === input.phone
     );
 
     if (existingPartner) {
-        throw new Error('A partner with this email already exists. Please try with a different email.');
+        throw new Error('A partner with this email or phone number already exists. Please try logging in instead.');
     }
 
-    // In a real app, you would HASH the password before saving.
-    // For this prototype, we are storing it in plain text for simplicity.
-    // NEVER DO THIS IN PRODUCTION.
     FAKE_PARTNER_DB.push(input);
     console.log('New Partner Signup:', input);
     console.log('Current Partner DB:', FAKE_PARTNER_DB);
