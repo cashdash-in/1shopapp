@@ -16,7 +16,7 @@ import React from "react";
 interface FormState {
   result: PartnerSignupOutput | null;
   error: string | null;
-  input: PartnerSignupInput | null;
+  input: Partial<PartnerSignupInput> | null;
 }
 
 async function handlePartnerSignupAction(
@@ -26,45 +26,44 @@ async function handlePartnerSignupAction(
 
   const partnerType = formData.get('partnerType') as 'business' | 'individual';
 
-  const input: PartnerSignupInput = {
+  const rawInput: PartnerSignupInput = {
     partnerType,
-    // Business fields
-    shopName: formData.get('shop-name') as string | undefined,
-    ownerName: formData.get('owner-name') as string | undefined,
-    gstNumber: formData.get('gst-number') as string | undefined,
-    // Individual fields
-    fullName: formData.get('full-name') as string | undefined,
-    panNumber: formData.get('pan-number') as string | undefined,
-    // Common fields
+    shopName: formData.get('shop-name') as string || undefined,
+    ownerName: formData.get('owner-name') as string || undefined,
+    gstNumber: formData.get('gst-number') as string || undefined,
+    fullName: formData.get('full-name') as string || undefined,
+    panNumber: formData.get('pan-number') as string || undefined,
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
   };
 
+  const inputForState: Partial<PartnerSignupInput> = { ...rawInput };
+
   // Basic validation
-  if (!input.phone || !input.email) {
-    return { result: null, error: "Please fill out all required fields.", input };
+  if (!rawInput.phone || !rawInput.email) {
+    return { result: null, error: "Please fill out all required fields.", input: inputForState };
   }
-   if (partnerType === 'business' && (!input.shopName || !input.ownerName)) {
-      return { result: null, error: "Please fill out all business fields.", input };
+   if (partnerType === 'business' && (!rawInput.shopName || !rawInput.ownerName)) {
+      return { result: null, error: "Please fill out all business fields.", input: inputForState };
    }
-    if (partnerType === 'individual' && !input.fullName) {
-       return { result: null, error: "Please fill out all individual fields.", input };
+    if (partnerType === 'individual' && !rawInput.fullName) {
+       return { result: null, error: "Please fill out all individual fields.", input: inputForState };
     }
   
   if (!formData.get('terms')) {
-    return { result: null, error: "You must agree to the terms and conditions.", input };
+    return { result: null, error: "You must agree to the terms and conditions.", input: inputForState };
   }
 
   try {
-    const response = await partnerSignup(input);
+    const response = await partnerSignup(rawInput);
     return { result: response, error: null, input: null };
   } catch (err: any) {
     console.error(err);
     // Check for the specific duplicate partner error message from the flow
     if (err.message?.includes('already exists')) {
-       return { result: null, error: err.message, input };
+       return { result: null, error: err.message, input: inputForState };
     }
-    return { result: null, error: 'An unexpected error occurred. Please try again.', input };
+    return { result: null, error: 'An unexpected error occurred. Please try again.', input: inputForState };
   }
 }
 
@@ -80,7 +79,9 @@ function SubmitButton() {
 export default function PartnerPage() {
   const initialState: FormState = { result: null, error: null, input: null };
   const [state, formAction] = useFormState(handlePartnerSignupAction, initialState);
-  const [partnerType, setPartnerType] = React.useState<'business' | 'individual'>('business');
+  const [partnerType, setPartnerType] = React.useState<'business' | 'individual'>(
+    state.input?.partnerType || 'business'
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -149,7 +150,7 @@ export default function PartnerPage() {
                         <Label>Partner Type</Label>
                         <RadioGroup 
                             name="partnerType"
-                            defaultValue="business" 
+                            value={partnerType}
                             className="flex gap-4" 
                             onValueChange={(value: 'business' | 'individual') => setPartnerType(value)}
                         >
@@ -168,15 +169,15 @@ export default function PartnerPage() {
                     <>
                       <div className="space-y-2">
                         <Label htmlFor="shop-name">Shop Name</Label>
-                        <Input id="shop-name" name="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required />
+                        <Input id="shop-name" name="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required defaultValue={state.input?.shopName || ''}/>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="owner-name">Owner Name</Label>
-                        <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required />
+                        <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required defaultValue={state.input?.ownerName || ''}/>
                       </div>
                        <div className="space-y-2">
                         <Label htmlFor="gst-number">GST Number (Optional)</Label>
-                        <Input id="gst-number" name="gst-number" placeholder="e.g., '29ABCDE1234F1Z5'" />
+                        <Input id="gst-number" name="gst-number" placeholder="e.g., '29ABCDE1234F1Z5'" defaultValue={state.input?.gstNumber || ''}/>
                       </div>
                     </>
                   )}
@@ -185,11 +186,11 @@ export default function PartnerPage() {
                      <>
                       <div className="space-y-2">
                         <Label htmlFor="full-name">Full Name</Label>
-                        <Input id="full-name" name="full-name" placeholder="e.g., 'Raju Kumar'" required />
+                        <Input id="full-name" name="full-name" placeholder="e.g., 'Raju Kumar'" required defaultValue={state.input?.fullName || ''}/>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="pan-number">PAN Number (Optional)</Label>
-                        <Input id="pan-number" name="pan-number" placeholder="e.g., 'ABCDE1234F'" />
+                        <Input id="pan-number" name="pan-number" placeholder="e.g., 'ABCDE1234F'" defaultValue={state.input?.panNumber || ''}/>
                       </div>
                     </>
                   )}
@@ -197,11 +198,11 @@ export default function PartnerPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" name="phone" type="tel" placeholder="e.g., '9876543210'" required />
+                    <Input id="phone" name="phone" type="tel" placeholder="e.g., '9876543210'" required defaultValue={state.input?.phone || ''}/>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required />
+                    <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required defaultValue={state.input?.email || ''}/>
                   </div>
                    <div className="items-top flex space-x-2">
                       <Checkbox id="terms" name="terms" required />
