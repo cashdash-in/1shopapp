@@ -1,19 +1,42 @@
 'use client';
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Handshake } from "lucide-react";
 import Link from "next/link";
+import { partnerSignup } from "@/ai/flows/partner-signup-flow";
 
 export default function PartnerPage() {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{ message: string; referralCode: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // For now, we'll just log to console.
-    // In a real app, this would submit to a server.
-    alert('Thank you for your interest! We will be in touch soon.');
+    setLoading(true);
+    setResult(null);
+    setError(null);
+    
+    const formData = new FormData(e.currentTarget);
+    const input = {
+      shopName: formData.get('shop-name') as string,
+      ownerName: formData.get('owner-name') as string,
+      phone: formData.get('phone') as string,
+      email: formData.get('email') as string,
+    };
+
+    try {
+      const response = await partnerSignup(input);
+      setResult(response);
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,27 +79,38 @@ export default function PartnerPage() {
               <CardDescription>Fill out the form below to register your interest. We'll get back to you shortly.</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="shop-name">Shop Name</Label>
-                  <Input id="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required />
+              {result ? (
+                <div className="space-y-4 text-center p-4 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                  <h3 className="text-xl font-semibold text-green-800 dark:text-green-300">{result.message}</h3>
+                  <p className="text-muted-foreground">Your referral code is:</p>
+                  <p className="text-2xl font-bold text-primary bg-muted/50 rounded-md py-2">{result.referralCode}</p>
+                   <p className="text-xs text-muted-foreground pt-4">You can now start sharing this code with your customers!</p>
+                   <Button onClick={() => setResult(null)} className="mt-4">Register another partner</Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="owner-name">Your Name</Label>
-                  <Input id="owner-name" placeholder="e.g., 'Raju Kumar'" required />
-                </div>
-                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="e.g., '9876543210'" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="e.g., 'raju@example.com'" required />
-                </div>
-                <Button type="submit" className="w-full">
-                  Register Interest
-                </Button>
-              </form>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="shop-name">Shop Name</Label>
+                    <Input id="shop-name" name="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required disabled={loading}/>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="owner-name">Your Name</Label>
+                    <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required disabled={loading} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input id="phone" name="phone" type="tel" placeholder="e.g., '9876543210'" required disabled={loading} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input id="email" name="email" type="email" placeholder="e.g., 'raju@example.com'" required disabled={loading} />
+                  </div>
+                   {error && <p className="text-sm text-destructive">{error}</p>}
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Registering...' : 'Register Interest'}
+                  </Button>
+                </form>
+              )}
             </CardContent>
           </Card>
         </div>
