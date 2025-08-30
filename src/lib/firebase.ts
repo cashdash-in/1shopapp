@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp, getApp, getApps, type FirebaseApp } from "firebase/app";
+import { getAnalytics, type Analytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -16,7 +16,15 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+let app: FirebaseApp | null = null;
+let analytics: Analytics | null = null;
+
+if (firebaseConfig.projectId) {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    if (typeof window !== 'undefined') {
+        analytics = getAnalytics(app);
+    }
+}
+
 
 export { app, analytics };
