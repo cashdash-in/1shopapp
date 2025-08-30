@@ -108,9 +108,6 @@ export default function PartnerPage() {
           <Handshake className="h-6 w-6 text-primary" />
           <h1 className="text-xl font-bold tracking-tight">1ShopApp Partner Program</h1>
         </Link>
-        <Button asChild variant="outline">
-            <Link href="/partner/login">Partner Login</Link>
-        </Button>
       </header>
 
       <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
@@ -142,10 +139,7 @@ export default function PartnerPage() {
             <CardHeader>
               <CardTitle>Become a Partner</CardTitle>
                <CardDescription>
-                Register your interest below. Already a partner?{' '}
-                <Link href="/partner/login" className="underline hover:text-primary">
-                    Sign in here.
-                </Link>
+                Register your interest below.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -242,7 +236,13 @@ export default function PartnerPage() {
                 </form>
               )}
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex-col items-start gap-4">
+                 <div className="text-sm text-muted-foreground">
+                    Already a partner?{' '}
+                    <Link href="/partner/login" className="underline hover:text-primary font-semibold">
+                        Sign in here.
+                    </Link>
+                </div>
                  <p className="text-xs text-muted-foreground">
                     Your information is used for identity verification and commission payments only. We respect your privacy.
                  </p>
@@ -272,3 +272,4 @@ function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
       </svg>
     )
   }
+
