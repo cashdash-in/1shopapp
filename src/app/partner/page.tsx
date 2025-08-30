@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useFormState, useFormStatus } from "react-dom";
@@ -20,14 +21,14 @@ async function handlePartnerSignupAction(
   formData: FormData
 ): Promise<FormState> {
   const input: PartnerSignupInput = {
-    shopName: formData.get('shop-name') as string,
+    partnerName: formData.get('partner-name') as string,
     ownerName: formData.get('owner-name') as string,
     phone: formData.get('phone') as string,
     email: formData.get('email') as string,
   };
 
   // Basic validation
-  if (!input.shopName || !input.ownerName || !input.phone || !input.email) {
+  if (!input.partnerName || !input.ownerName || !input.phone || !input.email) {
     return { result: null, error: "Please fill out all fields.", input };
   }
 
@@ -36,7 +37,11 @@ async function handlePartnerSignupAction(
     return { result: response, error: null, input: null };
   } catch (err: any) {
     console.error(err);
-    return { result: null, error: err.message || 'An unexpected error occurred. Please try again.', input };
+    // Check for the specific duplicate partner error message from the flow
+    if (err.message?.includes('already exists')) {
+       return { result: null, error: err.message, input };
+    }
+    return { result: null, error: 'An unexpected error occurred. Please try again.', input };
   }
 }
 
@@ -99,16 +104,21 @@ export default function PartnerPage() {
                   <p className="text-muted-foreground">Your referral code is:</p>
                   <p className="text-2xl font-bold text-primary bg-muted/50 rounded-md py-2">{state.result.referralCode}</p>
                    <p className="text-xs text-muted-foreground pt-4">You can now start sharing this code with your customers!</p>
-                   <Button onClick={() => window.location.reload()} className="mt-4">Register another partner</Button>
+                   <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                    <Button onClick={() => window.location.reload()} className="w-full" variant="outline">Register Another</Button>
+                    <Button asChild className="w-full">
+                        <Link href="/partner/dashboard">Go to Dashboard</Link>
+                    </Button>
+                   </div>
                 </div>
               ) : (
                 <form action={formAction} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="shop-name">Shop Name</Label>
-                    <Input id="shop-name" name="shop-name" placeholder="e.g., 'Raju Mobile Shop'" required />
+                    <Label htmlFor="partner-name">Your Name / Shop Name</Label>
+                    <Input id="partner-name" name="partner-name" placeholder="e.g., 'Raju Kumar' or 'Raju Mobile Shop'" required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="owner-name">Your Name</Label>
+                    <Label htmlFor="owner-name">Contact Person</Label>
                     <Input id="owner-name" name="owner-name" placeholder="e.g., 'Raju Kumar'" required />
                   </div>
                   <div className="space-y-2">
