@@ -42,8 +42,8 @@ const partnerSignupFlow = ai.defineFlow(
     // Generate a simple referral code.
     const referralCode = input.shopName
       .toUpperCase()
-      .replace(/[^A-Z0-9]/g, '-') // Replace non-alphanumeric with a dash
-      .replace(/-+/g, '-') // Replace multiple dashes with a single one
+      .replace(/\s+/g, '-') // Replace spaces with a dash
+      .replace(/[^A-Z0-9-]/g, '') // Remove non-alphanumeric characters except dashes
       .trim();
 
     return {

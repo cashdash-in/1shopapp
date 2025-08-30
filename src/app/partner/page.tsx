@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Handshake } from "lucide-react";
 import Link from "next/link";
-import { partnerSignup, PartnerSignupOutput } from "@/ai/flows/partner-signup-flow";
+import type { PartnerSignupOutput } from "@/ai/flows/partner-signup-flow";
+import { partnerSignup } from "@/ai/flows/partner-signup-flow";
 
 export default function PartnerPage() {
   const [loading, setLoading] = useState(false);
