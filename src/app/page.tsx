@@ -125,7 +125,7 @@ const services: Service[] = [
     ]
   },
   {
-    name: 'Financials',
+    name: 'Market',
     icon: LineChart,
     color: '#0288D1',
     links: [
