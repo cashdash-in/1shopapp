@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Bot, User, Sparkles } from 'lucide-react';
-import { shoppingAssistant } from '@/ai/flows/assistant-flow';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowRight, Bot, User, Sparkles, ShoppingCart } from 'lucide-react';
+import { shoppingAssistant, type AssistantResponse, type Deal } from '@/ai/flows/assistant-flow';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import Link from 'next/link';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  deals?: Deal[];
 }
 
 export default function AssistantPage() {
@@ -29,8 +31,12 @@ export default function AssistantPage() {
     setIsLoading(true);
 
     try {
-      const assistantResponse = await shoppingAssistant(currentInput);
-      const assistantMessage: Message = { role: 'assistant', content: assistantResponse };
+      const assistantResponse: AssistantResponse = await shoppingAssistant(currentInput);
+      const assistantMessage: Message = { 
+        role: 'assistant', 
+        content: assistantResponse.summary,
+        deals: assistantResponse.deals,
+      };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error getting assistant response:', error);
@@ -60,12 +66,21 @@ export default function AssistantPage() {
                   <AvatarFallback><Sparkles /></AvatarFallback>
                 </Avatar>
               )}
-              <div className={`rounded-lg p-4 max-w-[80%] ${
-                message.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
-              }`}>
-                <p className="whitespace-pre-wrap">{message.content}</p>
+              <div className="flex flex-col gap-4 max-w-[80%]">
+                <div className={`rounded-lg p-4 ${
+                  message.role === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                </div>
+                 {message.deals && message.deals.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {message.deals.map((deal, dealIndex) => (
+                      <DealCard key={dealIndex} deal={deal} />
+                    ))}
+                  </div>
+                )}
               </div>
               {message.role === 'user' && (
                  <Avatar>
@@ -109,4 +124,27 @@ export default function AssistantPage() {
       </footer>
     </div>
   );
+}
+
+
+function DealCard({ deal }: { deal: Deal }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">{deal.title}</CardTitle>
+        <CardDescription>{deal.retailer}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">{deal.description}</p>
+        {deal.url && (
+            <Button asChild className="w-full">
+                <Link href={deal.url} target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    View Deal
+                </Link>
+            </Button>
+        )}
+      </CardContent>
+    </Card>
+  )
 }

@@ -125,14 +125,20 @@ const DUMMY_PRODUCTS: Product[] = [
 export const findProducts = ai.defineTool(
     {
       name: 'findProducts',
-      description: 'Search for products by name.',
-      inputSchema: z.string().describe('The search query for the product.'),
+      description: 'Search for products by name to find deals and promotions.',
+      inputSchema: z.object({
+        query: z.string().describe('The user\'s search query for a product.'),
+      }),
       outputSchema: z.array(ProductSchema),
     },
-    async (query) => {
+    async ({query}) => {
       console.log(`Searching for products with query: ${query}`);
+      if (!query) {
+        return [];
+      }
+      const lowerCaseQuery = query.toLowerCase();
       const filteredProducts = DUMMY_PRODUCTS.filter((product) =>
-        product.name.toLowerCase().includes(query.toLowerCase())
+        product.name.toLowerCase().includes(lowerCaseQuery)
       );
       console.log(`Found ${filteredProducts.length} products.`);
       return filteredProducts;
