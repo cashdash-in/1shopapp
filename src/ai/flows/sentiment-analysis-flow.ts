@@ -20,8 +20,7 @@ async function persistFeedback(newFeedback: SentimentAnalysis) {
     const dbPath = path.join(process.cwd(), 'src', 'lib', 'feedback-db.ts');
     
     // Create a string representation of the new feedback object
-    const newFeedbackString = `
-    {
+    const newFeedbackString = `{
         id: "${newFeedback.id}",
         submittedAt: "${newFeedback.submittedAt}",
         feedback: { text: \`${newFeedback.feedback.text.replace(/`/g, '\\`')}\` },
@@ -30,24 +29,30 @@ async function persistFeedback(newFeedback: SentimentAnalysis) {
             categories: [${newFeedback.analysis.categories.map(c => `"${c}"`).join(', ')}],
             summary: \`${newFeedback.analysis.summary.replace(/`/g, '\\`')}\`,
         }
-    },`;
+    },
+    `;
 
     try {
         let fileContent = await fs.readFile(dbPath, 'utf-8');
         
-        const insertionIndex = fileContent.lastIndexOf('];');
-        if (insertionIndex === -1) {
-            throw new Error("Could not find the end of FAKE_FEEDBACK_DB array in feedback-db.ts");
-        }
+        // Find the opening bracket of the FAKE_FEEDBACK_DB array
+        const insertionIndex = fileContent.indexOf('[') + 1;
 
-        const updatedContent = fileContent.slice(0, insertionIndex) + newFeedbackString + fileContent.slice(insertionIndex);
+        if (insertionIndex === 0) { // If '[' is not found, indexOf returns -1, so +1 makes it 0
+            throw new Error("Could not find the start of FAKE_FEEDBACK_DB array in feedback-db.ts");
+        }
+        
+        // Insert the new feedback string right after the opening bracket
+        const updatedContent = fileContent.slice(0, insertionIndex) + '\n' + newFeedbackString + fileContent.slice(insertionIndex);
         
         await fs.writeFile(dbPath, updatedContent, 'utf-8');
         
+        // This is important: we also need to update the in-memory array for the current request
         FAKE_FEEDBACK_DB.unshift(newFeedback);
         console.log('Successfully persisted new feedback.');
     } catch (error) {
         console.error("!!! FAILED TO PERSIST FEEDBACK TO FILE !!!", error);
+         // Fallback to in-memory only for this request if file write fails
         FAKE_FEEDBACK_DB.unshift(newFeedback);
     }
 }

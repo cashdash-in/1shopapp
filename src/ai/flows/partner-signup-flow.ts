@@ -20,13 +20,12 @@ async function persistPartner(newPartner: PartnerSignupInput) {
     const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.ts');
     
     // Create a string representation of the new partner object
-    const newPartnerString = `
-    {
+    const newPartnerString = `{
         partnerType: "${newPartner.partnerType}",
-        ${newPartner.shopName ? `shopName: "${newPartner.shopName}",` : ''}
-        ${newPartner.ownerName ? `ownerName: "${newPartner.ownerName}",` : ''}
+        ${newPartner.shopName ? `shopName: "${newPartner.shopName.replace(/"/g, '\\"')}",` : ''}
+        ${newPartner.ownerName ? `ownerName: "${newPartner.ownerName.replace(/"/g, '\\"')}",` : ''}
         ${newPartner.gstNumber ? `gstNumber: "${newPartner.gstNumber}",` : ''}
-        ${newPartner.fullName ? `fullName: "${newPartner.fullName}",` : ''}
+        ${newPartner.fullName ? `fullName: "${newPartner.fullName.replace(/"/g, '\\"')}",` : ''}
         ${newPartner.panNumber ? `panNumber: "${newPartner.panNumber}",` : ''}
         phone: "${newPartner.phone}",
         email: "${newPartner.email}",
@@ -35,24 +34,24 @@ async function persistPartner(newPartner: PartnerSignupInput) {
     try {
         let fileContent = await fs.readFile(dbPath, 'utf-8');
         
-        // Find the closing bracket of the FAKE_PARTNER_DB array
-        const insertionIndex = fileContent.lastIndexOf('];');
-        if (insertionIndex === -1) {
-            throw new Error("Could not find the end of FAKE_PARTNER_DB array in db.ts");
+        // Find the opening bracket of the FAKE_PARTNER_DB array
+        const insertionIndex = fileContent.indexOf('[') + 1;
+        if (insertionIndex === 0) { // If '[' is not found, indexOf returns -1, so +1 makes it 0
+            throw new Error("Could not find the start of FAKE_PARTNER_DB array in db.ts");
         }
 
-        // Insert the new partner string before the closing bracket
-        const updatedContent = fileContent.slice(0, insertionIndex) + newPartnerString + fileContent.slice(insertionIndex);
+        // Insert the new partner string right after the opening bracket
+        const updatedContent = fileContent.slice(0, insertionIndex) + '\n' + newPartnerString + fileContent.slice(insertionIndex);
         
         await fs.writeFile(dbPath, updatedContent, 'utf-8');
         
         // This is important: we also need to update the in-memory array for the current request
-        FAKE_PARTNER_DB.push(newPartner);
+        FAKE_PARTNER_DB.unshift(newPartner);
         console.log('Successfully persisted new partner.');
     } catch (error) {
         console.error("!!! FAILED TO PERSIST PARTNER TO FILE !!!", error);
         // Fallback to in-memory only for this request if file write fails
-        FAKE_PARTNER_DB.push(newPartner);
+        FAKE_PARTNER_DB.unshift(newPartner);
     }
 }
 
