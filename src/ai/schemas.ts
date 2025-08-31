@@ -45,10 +45,11 @@ export const SentimentOutputSchema = z.object({
 });
 export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
 
-export const SentimentAnalysisSchema = z.object({
+export const FeedbackSchema = z.object({
   id: z.string(),
   submittedAt: z.string().datetime(),
   feedback: SentimentInputSchema,
-  analysis: SentimentOutputSchema,
+  analysis: SentimentOutputSchema.optional(),
 });
-export type SentimentAnalysis = z.infer<typeof SentimentAnalysisSchema>;
+export type Feedback = z.infer<typeof FeedbackSchema>;
+

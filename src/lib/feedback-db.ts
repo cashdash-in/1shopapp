@@ -1,10 +1,10 @@
 
-import type { SentimentAnalysis } from "@/ai/schemas";
+import type { Feedback } from "@/ai/schemas";
 
 // In a real app, this would be a database like Firestore.
 // For this prototype, we'll use an in-memory array to simulate a user feedback database.
 // New feedback will be prepended to this array.
-export const FAKE_FEEDBACK_DB: SentimentAnalysis[] = [
+export const FAKE_FEEDBACK_DB: Feedback[] = [
     {
         id: "fb_1722446400000",
         submittedAt: "2024-07-31T12:00:00.000Z",
@@ -34,4 +34,11 @@ export const FAKE_FEEDBACK_DB: SentimentAnalysis[] = [
             categories: ["Bug Report", "UI/UX"],
             summary: "User reports an issue with links not opening in a new tab as expected.",
         }
-    },];
+    },
+    {
+        id: "fb_1722187200000",
+        submittedAt: "2024-07-28T12:00:00.000Z",
+        feedback: { text: "This is a great idea. It saves so much space. Can you add Nykaa to the beauty section?" },
+    },
+];
+

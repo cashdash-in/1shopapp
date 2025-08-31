@@ -10,12 +10,11 @@ import {
   DialogDescription,
   DialogFooter,
   DialogTrigger,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
-import { analyzeAndStoreSentiment } from '@/ai/flows/sentiment-analysis-flow';
-import { ThumbsUp, MessageSquare, Bot } from 'lucide-react';
+import { submitFeedback } from '@/ai/flows/feedback-submission-flow';
+import { ThumbsUp, MessageSquare } from 'lucide-react';
 
 interface FeedbackDialogProps {
   children: React.ReactNode;
@@ -36,7 +35,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
     setError('');
     setLoading(true);
     try {
-      await analyzeAndStoreSentiment({ text: feedback });
+      await submitFeedback({ text: feedback });
       setSubmitted(true);
     } catch (err) {
       console.error(err);
@@ -46,21 +45,23 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
     }
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    // Reset state after a short delay to allow the dialog to close smoothly
-    setTimeout(() => {
-        setFeedback('');
-        setSubmitted(false);
-        setError('');
-        setLoading(false);
-    }, 300);
+  const handleDialogChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+        // Reset state after a short delay to allow the dialog to close smoothly
+        setTimeout(() => {
+            setFeedback('');
+            setSubmitted(false);
+            setError('');
+            setLoading(false);
+        }, 300);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]" onEscapeKeyDown={handleClose}>
+      <DialogContent className="sm:max-w-[425px]" onEscapeKeyDown={() => handleDialogChange(false)}>
         {submitted ? (
           <>
             <DialogHeader>
@@ -68,12 +69,12 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                 <ThumbsUp className="h-16 w-16 text-green-500 mb-4" />
                 <DialogTitle className="text-2xl">Thank You!</DialogTitle>
                 <DialogDescription className="mt-2">
-                  Your feedback has been submitted. We appreciate you taking the time to help us improve.
+                  Your feedback has been submitted successfully. We appreciate you taking the time to help us improve.
                 </DialogDescription>
               </div>
             </DialogHeader>
             <DialogFooter>
-              <Button onClick={handleClose} className="w-full">Close</Button>
+              <Button onClick={() => handleDialogChange(false)} className="w-full">Close</Button>
             </DialogFooter>
           </>
         ) : (
@@ -84,7 +85,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                     <DialogTitle className="text-2xl">Share Your Feedback</DialogTitle>
                 </div>
               <DialogDescription>
-                Have a suggestion or an issue? Let us know! Your feedback helps us make 1ShopApp better for everyone.
+                Have a suggestion or an issue? Let us know! Your input helps us make 1ShopApp better for everyone.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -96,13 +97,9 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                 disabled={loading}
               />
               {error && <p className="text-sm text-destructive">{error}</p>}
-               <div className="flex items-center gap-2 text-xs text-muted-foreground p-2 bg-muted/50 rounded-lg">
-                    <Bot className="h-6 w-6 text-primary/80 flex-shrink-0" />
-                    <span>Our AI assistant will analyze this feedback to help us understand user needs better.</span>
-                </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={handleClose}>Cancel</Button>
+              <Button variant="outline" onClick={() => handleDialogChange(false)} disabled={loading}>Cancel</Button>
               <Button onClick={handleSubmit} disabled={loading}>
                 {loading ? 'Submitting...' : 'Submit Feedback'}
               </Button>
@@ -113,3 +110,4 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
     </Dialog>
   );
 }
+
