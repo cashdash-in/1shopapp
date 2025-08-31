@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -9,26 +10,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { trackAdminLogin } from "@/lib/analytics";
-
-// This is a simplified server action inside a client component file.
-// In a real-world scenario, this would be in a separate actions file.
-async function setLoginCookie(password: string): Promise<{ success: boolean; message: string }> {
-    'use server';
-    // IMPORTANT: This is a prototype implementation.
-    // In a real production app, use a secure authentication provider.
-    if (password === process.env.ADMIN_PASSWORD) {
-        const { cookies } = await import('next/headers');
-        cookies().set('admin-auth', 'true', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 60 * 60 * 24, // 1 day
-            path: '/',
-        });
-        return { success: true, message: "Login successful!" };
-    } else {
-        return { success: false, message: "Invalid password." };
-    }
-}
+import { setLoginCookie } from "./actions";
 
 
 export default function AdminLoginPage() {
