@@ -33,10 +33,14 @@ export type PartnerSignupOutput = z.infer<typeof PartnerSignupOutputSchema>;
 
 
 // Schemas for Sentiment Analysis Flow
-export const SentimentInputSchema = z.object({
+export const FeedbackSubmissionInputSchema = z.object({
   text: z.string().describe('The customer feedback text to be analyzed.'),
+  rating: z.number().min(1).max(5).describe('A star rating from 1 to 5.'),
 });
-export type SentimentInput = z.infer<typeof SentimentInputSchema>;
+export type FeedbackSubmissionInput = z.infer<typeof FeedbackSubmissionInputSchema>;
+
+export const SentimentAnalysisInputSchema = FeedbackSubmissionInputSchema;
+export type SentimentAnalysisInput = z.infer<typeof SentimentAnalysisInputSchema>;
 
 export const SentimentOutputSchema = z.object({
   sentiment: z.enum(['Positive', 'Negative', 'Neutral']).describe('The overall sentiment of the text.'),
@@ -48,8 +52,7 @@ export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
 export const FeedbackSchema = z.object({
   id: z.string(),
   submittedAt: z.string().datetime(),
-  feedback: SentimentInputSchema,
+  feedback: FeedbackSubmissionInputSchema,
   analysis: SentimentOutputSchema.optional(),
 });
 export type Feedback = z.infer<typeof FeedbackSchema>;
-

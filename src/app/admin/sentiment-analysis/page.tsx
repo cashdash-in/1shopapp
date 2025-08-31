@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useMemo, useTransition } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from '@/components/ui/badge';
-import { Frown, Meh, Smile, Tag, Bot, Sparkles, BrainCircuit } from 'lucide-react';
+import { Frown, Meh, Smile, Tag, Bot, Sparkles, BrainCircuit, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import { getFeedback, updateFeedback } from '@/ai/flows/feedback-submission-flow';
 import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
@@ -29,6 +29,19 @@ const SentimentIcon = ({ sentiment }: { sentiment: 'Positive' | 'Negative' | 'Ne
         case 'Neutral': return <Meh className="h-4 w-4 text-amber-500" />;
         default: return null;
     }
+}
+
+const StarDisplay = ({ rating }: { rating: number }) => {
+    return (
+        <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+                <Star
+                    key={i}
+                    className={`h-4 w-4 ${i < rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground'}`}
+                />
+            ))}
+        </div>
+    )
 }
 
 export default function SentimentAnalysisPage() {
@@ -158,7 +171,7 @@ export default function SentimentAnalysisPage() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Feedback</TableHead>
-                                        <TableHead>Date</TableHead>
+                                        <TableHead>Rating</TableHead>
                                         <TableHead className="text-right">Action / Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -167,7 +180,7 @@ export default function SentimentAnalysisPage() {
                                         Array.from({length: 5}).map((_, i) => (
                                             <TableRow key={i}>
                                                 <TableCell><Skeleton className="h-5 w-full"/></TableCell>
-                                                <TableCell><Skeleton className="h-5 w-24"/></TableCell>
+                                                <TableCell><Skeleton className="h-5 w-20"/></TableCell>
                                                 <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto"/></TableCell>
                                             </TableRow>
                                         ))
@@ -190,8 +203,8 @@ export default function SentimentAnalysisPage() {
                                                     <p className="text-muted-foreground italic">{item.feedback.text}</p>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-muted-foreground text-xs">
-                                                {format(parseISO(item.submittedAt), "MMM d, yyyy")}
+                                            <TableCell>
+                                                 <StarDisplay rating={item.feedback.rating} />
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 {item.analysis ? (
@@ -224,4 +237,3 @@ export default function SentimentAnalysisPage() {
         </div>
     )
 }
-

@@ -14,7 +14,8 @@ import {
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { submitFeedback } from '@/ai/flows/feedback-submission-flow';
-import { ThumbsUp, MessageSquare } from 'lucide-react';
+import { ThumbsUp, MessageSquare, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FeedbackDialogProps {
   children: React.ReactNode;
@@ -22,12 +23,18 @@ interface FeedbackDialogProps {
 
 export function FeedbackDialog({ children }: FeedbackDialogProps) {
   const [feedback, setFeedback] = useState('');
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [open, setOpen] = useState(false);
 
   const handleSubmit = async () => {
+    if (rating === 0) {
+      setError("Please select a star rating.");
+      return;
+    }
     if (!feedback.trim()) {
       setError("Please enter some feedback before submitting.");
       return;
@@ -35,7 +42,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
     setError('');
     setLoading(true);
     try {
-      await submitFeedback({ text: feedback });
+      await submitFeedback({ text: feedback, rating });
       setSubmitted(true);
     } catch (err) {
       console.error(err);
@@ -51,6 +58,8 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
         // Reset state after a short delay to allow the dialog to close smoothly
         setTimeout(() => {
             setFeedback('');
+            setRating(0);
+            setHoverRating(0);
             setSubmitted(false);
             setError('');
             setLoading(false);
@@ -89,6 +98,28 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div className="flex justify-center items-center gap-2">
+                  {[...Array(5)].map((_, index) => {
+                      const starValue = index + 1;
+                      return (
+                          <button
+                            key={starValue}
+                            onMouseEnter={() => setHoverRating(starValue)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => setRating(starValue)}
+                            disabled={loading}
+                            className="p-1"
+                          >
+                              <Star className={cn(
+                                  "h-8 w-8 transition-colors",
+                                  starValue <= (hoverRating || rating)
+                                      ? "text-amber-400 fill-amber-400"
+                                      : "text-muted-foreground/50"
+                              )} />
+                          </button>
+                      );
+                  })}
+              </div>
               <Textarea
                 placeholder="What's on your mind?"
                 value={feedback}
@@ -96,7 +127,7 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
                 rows={5}
                 disabled={loading}
               />
-              {error && <p className="text-sm text-destructive">{error}</p>}
+              {error && <p className="text-sm text-destructive text-center">{error}</p>}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => handleDialogChange(false)} disabled={loading}>Cancel</Button>
@@ -110,4 +141,3 @@ export function FeedbackDialog({ children }: FeedbackDialogProps) {
     </Dialog>
   );
 }
-

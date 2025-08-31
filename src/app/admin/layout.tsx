@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake, User, Megaphone, Lightbulb, BrainCircuit, FileText } from 'lucide-react';
+import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake, User, Megaphone, Lightbulb, BrainCircuit, FileText, BarChart3 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ export default function AdminLayout({
     { href: '/admin/partners', label: 'Partners', icon: Handshake },
     { href: '/admin/promotions', label: 'Promotions', icon: Megaphone },
     { href: '/admin/brand-opportunities', label: 'Brand Opportunities', icon: Lightbulb },
+    { href: '/admin/brand-popularity', label: 'Brand Popularity', icon: BarChart3 },
     { href: '/admin/sentiment-analysis', label: 'Sentiment Analysis', icon: BrainCircuit },
     { href: '/admin/contracts', label: 'Contracts', icon: FileText },
   ];

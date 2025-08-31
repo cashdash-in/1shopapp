@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { trackLinkClick } from '@/lib/analytics';
 
 // All services data, including brand links
 const ALL_SERVICES_DATA = [
@@ -37,7 +38,7 @@ const ALL_SERVICES_DATA = [
       { name: 'PhonePe', href: 'https://www.phonepe.com/en/bill-payments/?ref=1shopapp'},
       { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
    ]},
-   { name: 'Travel', brands: [
+   { name: 'Hotels & Travel', brands: [
       { name: 'MakeMyTrip', href: 'https://www.makemytrip.com/?ref=1shopapp'},
       { name: 'Goibibo', href: 'https://www.goibibo.com/?ref=1shopapp'},
       { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
@@ -126,14 +127,15 @@ function SearchPageComponent() {
     setError('');
     
     const lowerCaseQuery = searchQuery.toLowerCase();
-    const internalResults = ALL_SERVICES_DATA.flatMap(category => 
-        category.brands.filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery) || (category.category || category.name).toLowerCase().includes(lowerCaseQuery))
-    );
-    // Remove duplicates
-    const uniqueResults = Array.from(new Set(internalResults.map(a => a.name)))
-        .map(name => {
-            return internalResults.find(a => a.name === name)!
-        });
+    const internalResults = ALL_SERVICES_DATA.flatMap(category => {
+        const categoryName = category.category || category.name;
+        return category.brands
+            .filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery) || categoryName.toLowerCase().includes(lowerCaseQuery))
+            .map(brand => ({ ...brand, category: categoryName }));
+    });
+    
+    // Remove duplicates by brand name
+    const uniqueResults = Array.from(new Map(internalResults.map(item => [item.name, item])).values());
 
     setServiceResults(uniqueResults);
     setLoading(false);
@@ -185,8 +187,8 @@ function SearchPageComponent() {
             <div className="space-y-6">
                 <Skeleton className="h-10 w-1/3" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Skeleton className="h-24 w-full rounded-lg" />
-                    <Skeleton className="h-24 w-full rounded-lg" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
                 </div>
             </div>
         )}
@@ -202,7 +204,7 @@ function SearchPageComponent() {
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {serviceResults.map(brand => (
-                             <Button key={brand.name} asChild variant="secondary" className="justify-between h-12 text-base">
+                             <Button key={brand.name} asChild variant="secondary" className="justify-between h-12 text-base" onClick={() => trackLinkClick(brand.category, brand.name)}>
                                 <Link href={brand.href} target="_blank" rel="noopener noreferrer">
                                     <span>{brand.name}</span>
                                     <ArrowUpRight className="h-4 w-4 text-muted-foreground" />

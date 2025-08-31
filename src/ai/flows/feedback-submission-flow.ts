@@ -11,14 +11,17 @@
 import { FAKE_FEEDBACK_DB } from '@/lib/feedback-db';
 import fs from 'fs/promises';
 import path from 'path';
-import { FeedbackSchema, type Feedback, SentimentInputSchema, type SentimentInput } from '../schemas';
+import { FeedbackSchema, type Feedback, FeedbackSubmissionInputSchema, type FeedbackSubmissionInput } from '../schemas';
 
 // Helper function to stringify a feedback object for file writing
 function stringifyFeedback(feedback: Feedback): string {
     const fields = [
         `id: "${feedback.id}"`,
         `submittedAt: "${feedback.submittedAt}"`,
-        `feedback: { text: \`${feedback.feedback.text.replace(/`/g, '\\`')}\` }`,
+        `feedback: { 
+            text: \`${feedback.feedback.text.replace(/`/g, '\\`')}\`,
+            rating: ${feedback.feedback.rating}
+        }`,
     ];
 
     if (feedback.analysis) {
@@ -61,7 +64,7 @@ ${allFeedbackString}
 }
 
 // The main function that clients will call to submit feedback
-export async function submitFeedback(input: SentimentInput): Promise<Feedback> {
+export async function submitFeedback(input: FeedbackSubmissionInput): Promise<Feedback> {
   const newFeedback: Feedback = {
     id: `fb_${Date.now()}`,
     submittedAt: new Date().toISOString(),
@@ -99,4 +102,3 @@ export async function getFeedback(): Promise<Feedback[]> {
     // In a real app, you'd fetch this from your database.
     return Promise.resolve(FAKE_FEEDBACK_DB);
 }
-
