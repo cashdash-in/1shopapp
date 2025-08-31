@@ -43,6 +43,8 @@ const ALL_SERVICES_DATA = [
       { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
       { name: 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
       { name: 'OYO', href: 'https://www.oyorooms.com/?ref=1shopapp' },
+      { name: 'Booking.com', href: 'https://www.booking.com/?ref=1shopapp' },
+      { name: 'Agoda', href: 'https://www.agoda.com/?ref=1shopapp' },
    ]},
    { name: 'Housing', brands: [
         { name: 'MagicBricks', href: 'https://www.magicbricks.com/'},
