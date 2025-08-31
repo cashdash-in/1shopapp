@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,6 @@ import { partnerSignup } from "@/ai/flows/partner-signup-flow";
 import type { PartnerSignupOutput, PartnerSignupInput } from "@/ai/schemas";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import React from "react";
 
 interface FormState {
   result: PartnerSignupOutput | null;
@@ -91,7 +91,7 @@ function SubmitButton() {
 
 export default function PartnerPage() {
   const initialState: FormState = { result: null, error: null, input: { partnerType: 'business' } };
-  const [state, formAction] = useFormState(handlePartnerSignupAction, initialState);
+  const [state, formAction] = React.useActionState(handlePartnerSignupAction, initialState);
   const [partnerType, setPartnerType] = React.useState<'business' | 'individual'>(
     state.input?.partnerType || 'business'
   );
