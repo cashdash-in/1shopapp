@@ -22,6 +22,7 @@ export default function PartnerLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [currentPartner, setCurrentPartner] = useState(null);
 
   const handleSendOtp = async () => {
     setError('');
@@ -35,9 +36,10 @@ export default function PartnerLoginPage() {
 
      try {
         const partners = await getPartners();
-        const partnerExists = partners.some(partner => partner.phone === phone);
+        const partnerExists = partners.find(partner => partner.phone === phone);
 
         if (partnerExists) {
+            setCurrentPartner(partnerExists as any);
             setOtpSent(true);
             toast({
                 title: "OTP Sent",
@@ -64,8 +66,14 @@ export default function PartnerLoginPage() {
         return;
     }
     
-    // If OTP is correct, redirect to dashboard
-    router.push('/partner/dashboard');
+    // If OTP is correct, store partner data and redirect
+    if (currentPartner) {
+        localStorage.setItem('loggedInPartner', JSON.stringify(currentPartner));
+        router.push('/partner/dashboard');
+    } else {
+         setError("An error occurred. Please try sending the OTP again.");
+         setLoading(false);
+    }
   };
 
 
