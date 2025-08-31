@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search as SearchIcon, ShoppingCart, ArrowUpRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -106,6 +106,7 @@ const ALL_SERVICES_DATA = [
 ];
 
 function SearchPageComponent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   
@@ -119,13 +120,20 @@ function SearchPageComponent() {
   const [productResults, setProductResults] = useState<ProductSearchOutput | null>(null);
 
   useEffect(() => {
+    // This effect runs when `query` (from URL) changes.
+    setCurrentQuery(query);
     if (query) {
-      handleSearch(query);
+      performSearch(query);
+    } else {
+        // Clear results if there is no query
+        setServiceResults([]);
+        setProductResults(null);
+        setLoading(false);
     }
   }, [query]);
 
-  const handleSearch = async (currentQuery: string) => {
-    if (!currentQuery) return;
+  const performSearch = async (searchQuery: string) => {
+    if (!searchQuery) return;
 
     setLoading(true);
     setError('');
@@ -133,7 +141,7 @@ function SearchPageComponent() {
     setProductResults(null);
 
     // Perform internal search first
-    const lowerCaseQuery = currentQuery.toLowerCase();
+    const lowerCaseQuery = searchQuery.toLowerCase();
     const internalResults = ALL_SERVICES_DATA.flatMap(category => 
         category.brands.filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery))
     );
@@ -141,7 +149,7 @@ function SearchPageComponent() {
 
     // Then, call the AI for external product search
     try {
-      const results = await searchProducts({ query: currentQuery });
+      const results = await searchProducts({ query: searchQuery });
       setProductResults(results);
     } catch (err) {
       console.error("AI search failed:", err);
@@ -150,6 +158,15 @@ function SearchPageComponent() {
       setLoading(false);
     }
   };
+
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (currentQuery) {
+        // Update the URL, which will trigger the `useEffect` hook to perform the search
+        router.push(`/search?q=${encodeURIComponent(currentQuery)}`);
+    }
+  };
+
 
   const getBrandLink = (brandName: string) => {
     for (const category of ALL_SERVICES_DATA) {
@@ -163,11 +180,13 @@ function SearchPageComponent() {
     <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
       <div className="w-full max-w-3xl">
         <div className="flex items-center gap-2 mb-4">
-          <SearchIcon className="h-8 w-8 text-primary" />
+          <Link href="/" className="p-2 rounded-full hover:bg-muted -ml-2">
+            <SearchIcon className="h-8 w-8 text-primary" />
+          </Link>
           <h1 className="text-3xl font-bold tracking-tight">Search</h1>
         </div>
         
-        <form onSubmit={(e) => { e.preventDefault(); handleSearch(currentQuery); }} className="w-full relative mb-8">
+        <form onSubmit={handleFormSubmit} className="w-full relative mb-8">
           <Input
             name="search"
             id="search"
