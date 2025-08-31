@@ -7,7 +7,3 @@
   
   # The directory that contains the deploy-ready HTML files and assets.
   publish = ".next"
-
-[build.environment]
-  # Specify the Node.js version to use.
-  NODE_VERSION = "20"
