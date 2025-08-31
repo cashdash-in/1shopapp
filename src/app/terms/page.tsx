@@ -15,7 +15,7 @@ export default function TermsAndConditionsPage() {
             </Link>
           <div className="text-center pt-8">
             <CardTitle className="text-3xl font-bold tracking-tight">Terms and Conditions</CardTitle>
-            <CardDescription>Last updated: July 2024</CardDescription>
+            <CardDescription>Last updated: August 2024</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="space-y-6 text-sm text-muted-foreground leading-relaxed">
