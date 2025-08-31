@@ -194,7 +194,7 @@ export default function Home() {
                 <Input
                     name="search"
                     id="search"
-                    placeholder="Search for any product or service..."
+                    placeholder="Search for your Favourite App or Website"
                     className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md"
                 />
                 <Button type="submit" size="icon" className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full w-9 h-9">

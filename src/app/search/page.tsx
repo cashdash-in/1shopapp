@@ -170,7 +170,7 @@ function SearchPageComponent() {
           <Input
             name="search"
             id="search"
-            placeholder="Search for any service or brand..."
+            placeholder="Search for your Favourite App or Website"
             className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md"
             value={currentQuery}
             onChange={(e) => setCurrentQuery(e.target.value)}
