@@ -48,20 +48,24 @@ export default function PartnerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedPartner = localStorage.getItem('loggedInPartner');
-    if (storedPartner) {
-        try {
-            const parsedPartner = JSON.parse(storedPartner);
-            setPartner(parsedPartner);
-        } catch (e) {
-            console.error("Failed to parse partner data from localStorage", e);
+    // This timeout is to ensure that any potential race condition with hydration is avoided.
+    // In a real-world scenario with proper auth, this might not be needed.
+    setTimeout(() => {
+        const storedPartner = localStorage.getItem('loggedInPartner');
+        if (storedPartner) {
+            try {
+                const parsedPartner = JSON.parse(storedPartner);
+                setPartner(parsedPartner);
+            } catch (e) {
+                console.error("Failed to parse partner data from localStorage", e);
+                router.push('/partner/login');
+            }
+        } else {
+            // If no partner is logged in, redirect to login page
             router.push('/partner/login');
         }
-    } else {
-        // If no partner is logged in, redirect to login page
-        router.push('/partner/login');
-    }
-    setLoading(false);
+        setLoading(false);
+    }, 100);
   }, [router]);
 
   const handleLogout = () => {
@@ -69,15 +73,6 @@ export default function PartnerDashboard() {
     router.push('/partner/login');
   };
 
-  const partnerName = partner?.partnerType === 'business' ? partner.shopName : partner.fullName;
-  const partnerInitials = (partnerName || 'P').charAt(0).toUpperCase();
-
-  const referralCode = ((partnerName || 'PARTNER')
-      .slice(0, 10)
-      .toUpperCase()
-      .replace(/\s+/g, '')
-      .replace(/[^A-Z0-9]/g, '')
-      .trim() || 'PARTNER') + '1234';
 
   if (loading) {
     return (
@@ -100,9 +95,19 @@ export default function PartnerDashboard() {
   }
 
   if (!partner) {
-    // This can be a brief state before redirect happens
+    // This can be a brief state before redirect happens or if data is missing
     return null;
   }
+  
+  const partnerName = partner.partnerType === 'business' ? partner.shopName : partner.fullName;
+  const partnerInitials = (partnerName || 'P').charAt(0).toUpperCase();
+
+  const referralCode = ((partnerName || 'PARTNER')
+      .slice(0, 10)
+      .toUpperCase()
+      .replace(/\s+/g, '')
+      .replace(/[^A-Z0-9]/g, '')
+      .trim() || 'PARTNER') + '1234';
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -215,7 +220,7 @@ export default function PartnerDashboard() {
               <CardTitle>Recent Referrals</CardTitle>
               <CardDescription>
                 Users who signed up using your referral code.
-              </CardDescription>
+              </              </CardDescription>
             </CardHeader>
             <CardContent className='flex-grow'>
                 <Table>
