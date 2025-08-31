@@ -13,45 +13,52 @@ import fs from 'fs/promises';
 import path from 'path';
 import { PartnerSignupInputSchema, type PartnerSignupInput, PartnerSignupOutputSchema, type PartnerSignupOutput } from '../schemas';
 
+// Helper function to stringify a partner object for file writing
+function stringifyPartner(partner: PartnerSignupInput): string {
+    const fields = [
+        `partnerType: "${partner.partnerType}"`,
+        partner.shopName && `shopName: "${partner.shopName.replace(/"/g, '\\"')}"`,
+        partner.ownerName && `ownerName: "${partner.ownerName.replace(/"/g, '\\"')}"`,
+        partner.gstNumber && `gstNumber: "${partner.gstNumber}"`,
+        partner.fullName && `fullName: "${partner.fullName.replace(/"/g, '\\"')}"`,
+        partner.panNumber && `panNumber: "${partner.panNumber}"`,
+        `phone: "${partner.phone}"`,
+        `email: "${partner.email}"`,
+        partner.commission && `commission: ${partner.commission}`
+    ].filter(Boolean).join(',\n        ');
+    return `    {\n        ${fields}\n    }`;
+}
+
 
 // NOTE: This is a hack for the prototype to persist data.
 // In a real app, you would use a proper database like Firestore.
 async function persistPartner(newPartner: PartnerSignupInput) {
     const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.ts');
+
+    // First, update the in-memory array for the current request
+    FAKE_PARTNER_DB.unshift(newPartner);
     
-    // Create a string representation of the new partner object
-    const newPartnerString = `{
-        partnerType: "${newPartner.partnerType}",
-        ${newPartner.shopName ? `shopName: "${newPartner.shopName.replace(/"/g, '\\"')}",` : ''}
-        ${newPartner.ownerName ? `ownerName: "${newPartner.ownerName.replace(/"/g, '\\"')}",` : ''}
-        ${newPartner.gstNumber ? `gstNumber: "${newPartner.gstNumber}",` : ''}
-        ${newPartner.fullName ? `fullName: "${newPartner.fullName.replace(/"/g, '\\"')}",` : ''}
-        ${newPartner.panNumber ? `panNumber: "${newPartner.panNumber}",` : ''}
-        phone: "${newPartner.phone}",
-        email: "${newPartner.email}",
-    },`;
+    // Now, regenerate the entire db.ts file content from the updated in-memory array
+    const allPartnersString = FAKE_PARTNER_DB.map(stringifyPartner).join(',\n');
+
+    const fileContent = `
+import type { PartnerSignupInput } from "@/ai/schemas";
+
+// In a real app, this would be a database like Firestore.
+// For this prototype, we'll use an in-memory array to simulate a user database.
+// By defining it in a separate file, we ensure it's a singleton and persists across requests.
+export const FAKE_PARTNER_DB: PartnerSignupInput[] = [
+${allPartnersString}
+];
+`.trimStart();
 
     try {
-        let fileContent = await fs.readFile(dbPath, 'utf-8');
-        
-        // Find the opening bracket of the FAKE_PARTNER_DB array
-        const insertionIndex = fileContent.indexOf('[') + 1;
-        if (insertionIndex === 0) { // If '[' is not found, indexOf returns -1, so +1 makes it 0
-            throw new Error("Could not find the start of FAKE_PARTNER_DB array in db.ts");
-        }
-
-        // Insert the new partner string right after the opening bracket
-        const updatedContent = fileContent.slice(0, insertionIndex) + '\n' + newPartnerString + fileContent.slice(insertionIndex);
-        
-        await fs.writeFile(dbPath, updatedContent, 'utf-8');
-        
-        // This is important: we also need to update the in-memory array for the current request
-        FAKE_PARTNER_DB.unshift(newPartner);
-        console.log('Successfully persisted new partner.');
+        await fs.writeFile(dbPath, fileContent, 'utf-8');
+        console.log('Successfully persisted new partner by regenerating db.ts');
     } catch (error) {
         console.error("!!! FAILED TO PERSIST PARTNER TO FILE !!!", error);
-        // Fallback to in-memory only for this request if file write fails
-        FAKE_PARTNER_DB.unshift(newPartner);
+        // The in-memory array is already updated, so the current request will work.
+        // Subsequent requests on new server instances will have the old data until the file is writable.
     }
 }
 

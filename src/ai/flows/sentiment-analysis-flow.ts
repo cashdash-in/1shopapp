@@ -13,47 +13,53 @@ import fs from 'fs/promises';
 import path from 'path';
 import { SentimentAnalysisSchema, type SentimentAnalysis, SentimentInputSchema, type SentimentInput, SentimentOutputSchema } from '../schemas';
 
+// Helper function to stringify a feedback object for file writing
+function stringifyFeedback(feedback: SentimentAnalysis): string {
+    const analysisCategories = feedback.analysis.categories.map(c => `"${c}"`).join(', ');
+    const fields = [
+        `id: "${feedback.id}"`,
+        `submittedAt: "${feedback.submittedAt}"`,
+        `feedback: { text: \`${feedback.feedback.text.replace(/`/g, '\\`')}\` }`,
+        `analysis: {
+            sentiment: "${feedback.analysis.sentiment}",
+            categories: [${analysisCategories}],
+            summary: \`${feedback.analysis.summary.replace(/`/g, '\\`')}\`,
+        }`
+    ].join(',\n        ');
+
+    return `    {\n        ${fields}\n    }`;
+}
+
 
 // NOTE: This is a hack for the prototype to persist data.
 // In a real app, you would use a proper database like Firestore.
 async function persistFeedback(newFeedback: SentimentAnalysis) {
     const dbPath = path.join(process.cwd(), 'src', 'lib', 'feedback-db.ts');
+
+    // First, update the in-memory array for the current request
+    FAKE_FEEDBACK_DB.unshift(newFeedback);
     
-    // Create a string representation of the new feedback object
-    const newFeedbackString = `{
-        id: "${newFeedback.id}",
-        submittedAt: "${newFeedback.submittedAt}",
-        feedback: { text: \`${newFeedback.feedback.text.replace(/`/g, '\\`')}\` },
-        analysis: {
-            sentiment: "${newFeedback.analysis.sentiment}",
-            categories: [${newFeedback.analysis.categories.map(c => `"${c}"`).join(', ')}],
-            summary: \`${newFeedback.analysis.summary.replace(/`/g, '\\`')}\`,
-        }
-    },
-    `;
+    // Now, regenerate the entire feedback-db.ts file content from the updated in-memory array
+    const allFeedbackString = FAKE_FEEDBACK_DB.map(stringifyFeedback).join(',\n');
 
+    const fileContent = `
+import type { SentimentAnalysis } from "@/ai/schemas";
+
+// In a real app, this would be a database like Firestore.
+// For this prototype, we'll use an in-memory array to simulate a user feedback database.
+// New feedback will be prepended to this array.
+export const FAKE_FEEDBACK_DB: SentimentAnalysis[] = [
+${allFeedbackString}
+];
+`.trimStart();
+    
     try {
-        let fileContent = await fs.readFile(dbPath, 'utf-8');
-        
-        // Find the opening bracket of the FAKE_FEEDBACK_DB array
-        const insertionIndex = fileContent.indexOf('[') + 1;
-
-        if (insertionIndex === 0) { // If '[' is not found, indexOf returns -1, so +1 makes it 0
-            throw new Error("Could not find the start of FAKE_FEEDBACK_DB array in feedback-db.ts");
-        }
-        
-        // Insert the new feedback string right after the opening bracket
-        const updatedContent = fileContent.slice(0, insertionIndex) + '\n' + newFeedbackString + fileContent.slice(insertionIndex);
-        
-        await fs.writeFile(dbPath, updatedContent, 'utf-8');
-        
-        // This is important: we also need to update the in-memory array for the current request
-        FAKE_FEEDBACK_DB.unshift(newFeedback);
-        console.log('Successfully persisted new feedback.');
+        await fs.writeFile(dbPath, fileContent, 'utf-8');
+        console.log('Successfully persisted new feedback by regenerating feedback-db.ts');
     } catch (error) {
         console.error("!!! FAILED TO PERSIST FEEDBACK TO FILE !!!", error);
-         // Fallback to in-memory only for this request if file write fails
-        FAKE_FEEDBACK_DB.unshift(newFeedback);
+        // The in-memory array is already updated, so the current request will work.
+        // Subsequent requests on new server instances will have the old data until the file is writable.
     }
 }
 
