@@ -3,10 +3,13 @@
 
 import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 import { FeedbackDialog } from '@/components/feedback-dialog';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import React from 'react';
 
 const services: Service[] = [
   { 
@@ -155,16 +158,39 @@ const services: Service[] = [
 ];
 
 export default function Home() {
+    const router = useRouter();
+
+    const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const query = formData.get('search') as string;
+        if (query) {
+            router.push(`/search?q=${encodeURIComponent(query)}`);
+        }
+    };
+
   return (
     <>
       <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 w-full max-w-2xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground">
             Declutter your phone. Access all your essential apps in one place and save storage space.
           </p>
+           <form onSubmit={handleSearch} className="mt-6 w-full relative">
+                <Input
+                    name="search"
+                    id="search"
+                    placeholder="Search for any product or service..."
+                    className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md"
+                />
+                <Button type="submit" size="icon" className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full w-9 h-9">
+                    <SearchIcon className="h-5 w-5" />
+                    <span className="sr-only">Search</span>
+                </Button>
+            </form>
         </div>
 
         <div className="w-full max-w-5xl">

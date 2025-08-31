@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, Percent, Star, BarChart3, Target, TrendingUp, FileText, CheckSquare, BrainCircuit } from "lucide-react"
+import { DollarSign, Percent, Star, BarChart3, Target, TrendingUp, FileText, CheckSquare, BrainCircuit, Search } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -148,6 +148,10 @@ export default function BrandOpportunitiesPage() {
                                                         <Checkbox id={`${brand}-type-data`} />
                                                         <Label htmlFor={`${brand}-type-data`} className="font-normal flex items-center gap-2"><BarChart3 className="w-4 h-4 text-muted-foreground"/>Data & Insights Report</Label>
                                                     </div>
+                                                     <div className="flex items-center space-x-2">
+                                                        <Checkbox id={`${brand}-type-search`} />
+                                                        <Label htmlFor={`${brand}-type-search`} className="font-normal flex items-center gap-2"><Search className="w-4 h-4 text-muted-foreground"/>Sponsored Search Result</Label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -177,4 +181,4 @@ export default function BrandOpportunitiesPage() {
         </div>
     )
 
-    
+}
