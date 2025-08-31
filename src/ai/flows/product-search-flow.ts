@@ -37,13 +37,13 @@ const productSearchPrompt = ai.definePrompt({
 You will be given a user's search query.
 User Query: "{{query}}"
 
-First, determine the general category of the product.
+First, determine the general category of the product and set it in the 'productCategory' field.
 Second, based on the product, identify which of the following stores are most likely to sell it. The user is in India, so prioritize Indian retailers.
 
 Available Stores:
 ${ECOMMERCE_BRANDS.join(', ')}
 
-Return a list of the most relevant brand names from the available list. Only include brands that are highly relevant. For example, if someone searches for "mascara," you should only return beauty stores like Nykaa and Purplle, not a general marketplace like Flipkart unless you are sure. If someone searches for a "laptop," Croma and Amazon are excellent choices.
+Return a list of the most relevant brand names from the available list in the 'relevantBrands' field. Only include brands that are highly relevant. For example, if someone searches for "mascara," you should only return beauty stores like Nykaa and Purplle, not a general marketplace like Flipkart unless you are sure. If someone searches for a "laptop," Croma and Amazon are excellent choices.
 `,
 });
 
