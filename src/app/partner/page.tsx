@@ -2,6 +2,7 @@
 'use client';
 
 import React from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -80,7 +81,7 @@ async function handlePartnerSignupAction(
 }
 
 function SubmitButton() {
-  const { pending } = React.useFormStatus();
+  const { pending } = useFormStatus();
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? 'Registering...' : 'Register Interest'}
@@ -272,3 +273,5 @@ function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
       </svg>
     )
   }
+
+    
