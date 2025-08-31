@@ -1,0 +1,13 @@
+# This file tells Netlify how to build your project.
+# It overrides any settings in the Netlify UI.
+
+[build]
+  # The command to run to build your site.
+  command = "npm run build"
+  
+  # The directory that contains the deploy-ready HTML files and assets.
+  publish = ".next"
+
+[build.environment]
+  # Specify the Node.js version to use.
+  NODE_VERSION = "20"
