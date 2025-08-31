@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useFormStatus } from "react-dom";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +80,7 @@ async function handlePartnerSignupAction(
 }
 
 function SubmitButton() {
-  const { pending } = useFormStatus();
+  const { pending } = React.useFormStatus();
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? 'Registering...' : 'Register Interest'}
