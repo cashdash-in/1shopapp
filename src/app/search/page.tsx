@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search as SearchIcon, ShoppingCart, ArrowUpRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -119,20 +119,7 @@ function SearchPageComponent() {
   // For AI-powered product search results
   const [productResults, setProductResults] = useState<ProductSearchOutput | null>(null);
 
-  useEffect(() => {
-    // This effect runs when `query` (from URL) changes.
-    setCurrentQuery(query);
-    if (query) {
-      performSearch(query);
-    } else {
-        // Clear results if there is no query
-        setServiceResults([]);
-        setProductResults(null);
-        setLoading(false);
-    }
-  }, [query]);
-
-  const performSearch = async (searchQuery: string) => {
+  const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery) return;
 
     setLoading(true);
@@ -140,33 +127,48 @@ function SearchPageComponent() {
     setServiceResults([]);
     setProductResults(null);
 
-    // Perform internal search first
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    const internalResults = ALL_SERVICES_DATA.flatMap(category => 
-        category.brands.filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery))
-    );
-    setServiceResults(internalResults);
-
-    // Then, call the AI for external product search
     try {
-      const results = await searchProducts({ query: searchQuery });
-      setProductResults(results);
+        // Perform both internal search and AI search concurrently
+        await Promise.all([
+            // Internal search logic
+            (async () => {
+                const lowerCaseQuery = searchQuery.toLowerCase();
+                const internalResults = ALL_SERVICES_DATA.flatMap(category => 
+                    category.brands.filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery))
+                );
+                setServiceResults(internalResults);
+            })(),
+            // AI search logic
+            (async () => {
+                const results = await searchProducts({ query: searchQuery });
+                setProductResults(results);
+            })()
+        ]);
     } catch (err) {
-      console.error("AI search failed:", err);
-      setError("Sorry, we couldn't complete the product search. Please try again.");
+        console.error("Search failed:", err);
+        setError("Sorry, we couldn't complete the search. Please try again.");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    setCurrentQuery(query);
+    if (query) {
+      performSearch(query);
+    } else {
+        setServiceResults([]);
+        setProductResults(null);
+        setLoading(false);
+    }
+  }, [query, performSearch]);
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (currentQuery) {
-        // Update the URL, which will trigger the `useEffect` hook to perform the search
+    if (currentQuery && currentQuery !== query) {
         router.push(`/search?q=${encodeURIComponent(currentQuery)}`);
     }
   };
-
 
   const getBrandLink = (brandName: string) => {
     for (const category of ALL_SERVICES_DATA) {
