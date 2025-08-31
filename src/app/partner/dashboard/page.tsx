@@ -220,7 +220,7 @@ export default function PartnerDashboard() {
               <CardTitle>Recent Referrals</CardTitle>
               <CardDescription>
                 Users who signed up using your referral code.
-              </              </CardDescription>
+              </CardDescription>
             </CardHeader>
             <CardContent className='flex-grow'>
                 <Table>
