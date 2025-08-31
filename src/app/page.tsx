@@ -62,7 +62,7 @@ const services: Service[] = [
   },
   {
     name: 'Housing',
-    icon: HomeIcon,
+    icon: Building2,
     color: '#38A169',
     links: [
         { name: 'MagicBricks', href: 'https://www.magicbricks.com/'},
@@ -242,3 +242,5 @@ export default function Home() {
     </>
   );
 }
+
+    
