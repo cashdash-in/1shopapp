@@ -43,7 +43,7 @@ const ALL_SERVICES_DATA = [
       { name: 'MakeMyTrip', href: 'https://www.makemytrip.com/?ref=1shopapp'},
       { name: 'Goibibo', href: 'https://www.goibibo.com/?ref=1shopapp'},
       { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
-      { name 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
+      { name: 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
       { name: 'OYO', href: 'https://www.oyorooms.com/?ref=1shopapp' },
    ]},
    { name: 'Housing', brands: [
