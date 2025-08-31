@@ -11,16 +11,19 @@ export const FAKE_PARTNER_DB: PartnerSignupInput[] = [
         ownerName: "Priya Singh",
         phone: "9123456789",
         email: "priya.s@example.com",
+        commission: 10,
     },
     {
         partnerType: "individual",
         fullName: "Amit Patel",
         phone: "9988776655",
         email: "amit.p@example.com",
+        commission: 10,
     },
     {
         partnerType: "individual",
         fullName: "Chris Dsouza",
         phone: "9619798708",
         email: "christopher.p.dsouza@gmail.com",
+        commission: 10,
     },];

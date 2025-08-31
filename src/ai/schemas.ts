@@ -20,6 +20,7 @@ export const PartnerSignupInputSchema = z.object({
   // Common fields
   phone: z.string().describe("The partner's phone number."),
   email: z.string().email().describe("The partner's email address."),
+  commission: z.number().optional().describe("The commission percentage for the partner."),
 });
 export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
 
