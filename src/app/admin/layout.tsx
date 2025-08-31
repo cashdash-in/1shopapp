@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake, User, Megaphone, Lightbulb, BrainCircuit } from 'lucide-react';
+import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake, User, Megaphone, Lightbulb, BrainCircuit, FileText } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ export default function AdminLayout({
     { href: '/admin/promotions', label: 'Promotions', icon: Megaphone },
     { href: '/admin/brand-opportunities', label: 'Brand Opportunities', icon: Lightbulb },
     { href: '/admin/sentiment-analysis', label: 'Sentiment Analysis', icon: BrainCircuit },
+    { href: '/admin/contracts', label: 'Contracts', icon: FileText },
   ];
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -50,7 +51,7 @@ export default function AdminLayout({
                  <Link
                   key={item.label}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${pathname.startsWith(item.href) ? 'bg-muted text-primary' : ''}`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${pathname.startsWith(item.href) && (pathname.length === item.href.length || pathname[item.href.length] === '/') ? 'bg-muted text-primary' : ''}`}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -86,7 +87,7 @@ export default function AdminLayout({
                  <Link
                   key={item.label}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${pathname.startsWith(item.href) ? 'bg-muted text-primary' : ''}`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${pathname.startsWith(item.href) && (pathname.length === item.href.length || pathname[item.href.length] === '/') ? 'bg-muted text-primary' : ''}`}
                 >
                   <item.icon className="h-5 w-5" />
                   {item.label}
