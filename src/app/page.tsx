@@ -9,7 +9,7 @@ import { FeedbackDialog } from '@/components/feedback-dialog';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const services: Service[] = [
   { 
@@ -159,6 +159,15 @@ const services: Service[] = [
 
 export default function Home() {
     const router = useRouter();
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        // Check for the admin flag in localStorage when the component mounts
+        if (typeof window !== 'undefined') {
+            const adminFlag = localStorage.getItem('isAdmin');
+            setIsAdmin(adminFlag === 'true');
+        }
+    }, []);
 
     const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -217,9 +226,11 @@ export default function Home() {
                <FeedbackDialog>
                     <Button variant="link" className="text-xs text-muted-foreground hover:text-foreground underline p-0 h-auto">Feedback</Button>
                </FeedbackDialog>
-              <Link href="/admin" className="text-xs text-muted-foreground hover:text-foreground underline">
-                  Admin
-              </Link>
+              {isAdmin && (
+                <Link href="/admin" className="text-xs text-muted-foreground hover:text-foreground underline">
+                    Admin
+                </Link>
+              )}
             </div>
              <p className="text-[10px] text-muted-foreground/80 pt-2">
               <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform. We are not affiliated with, sponsored by, or endorsed by the brands featured. We may earn a commission from affiliate links, at no extra cost to you. Use of this service is at your own discretion.

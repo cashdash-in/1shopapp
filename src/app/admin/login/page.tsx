@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { trackAdminLogin } from "@/lib/analytics";
@@ -20,6 +20,14 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    // On component mount, clear any existing admin flag
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('isAdmin');
+    }
+  }, []);
+
+
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
@@ -29,12 +37,16 @@ export default function AdminLoginPage() {
         const result = await setLoginCookie(password);
         if (result.success) {
             trackAdminLogin();
+            if (typeof window !== 'undefined') {
+                // Set a flag for the client-side UI
+                localStorage.setItem('isAdmin', 'true');
+            }
             toast({
                 title: "Login Successful",
                 description: "Redirecting to your dashboard...",
             });
             router.push('/admin');
-            router.refresh(); // Important to re-evaluate middleware
+            router.refresh(); // Important to re-evaluate middleware and update UI
         } else {
             setError(result.message);
         }
