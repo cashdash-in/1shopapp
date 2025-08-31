@@ -51,15 +51,3 @@ export const SentimentAnalysisSchema = z.object({
   analysis: SentimentOutputSchema,
 });
 export type SentimentAnalysis = z.infer<typeof SentimentAnalysisSchema>;
-
-// Schemas for Product Search Flow
-export const ProductSearchInputSchema = z.object({
-    query: z.string().describe('The user\'s search query for a product.'),
-});
-export type ProductSearchInput = z.infer<typeof ProductSearchInputSchema>;
-
-export const ProductSearchOutputSchema = z.object({
-    productCategory: z.string().describe('The general category of the product being searched for.'),
-    relevantBrands: z.array(z.string()).describe('A list of brand names from the provided list that are most likely to sell this product.'),
-});
-export type ProductSearchOutput = z.infer<typeof ProductSearchOutputSchema>;

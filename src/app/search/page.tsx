@@ -3,13 +3,11 @@
 
 import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search as SearchIcon, ShoppingCart, ArrowUpRight } from 'lucide-react';
+import { Search as SearchIcon, ArrowUpRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { searchProducts } from '@/ai/flows/product-search-flow';
-import type { ProductSearchOutput } from '@/ai/schemas';
 import Link from 'next/link';
 
 // All services data, including brand links
@@ -114,42 +112,29 @@ function SearchPageComponent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  // For internal search results
   const [serviceResults, setServiceResults] = useState<any[]>([]);
-  // For AI-powered product search results
-  const [productResults, setProductResults] = useState<ProductSearchOutput | null>(null);
 
-  const performSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery) return;
+  const performSearch = useCallback((searchQuery: string) => {
+    if (!searchQuery) {
+        setServiceResults([]);
+        return;
+    };
 
     setLoading(true);
     setError('');
-    setServiceResults([]);
-    setProductResults(null);
+    
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const internalResults = ALL_SERVICES_DATA.flatMap(category => 
+        category.brands.filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery) || (category.category || category.name).toLowerCase().includes(lowerCaseQuery))
+    );
+    // Remove duplicates
+    const uniqueResults = Array.from(new Set(internalResults.map(a => a.name)))
+        .map(name => {
+            return internalResults.find(a => a.name === name)!
+        });
 
-    try {
-        // Perform both internal search and AI search concurrently
-        await Promise.all([
-            // Internal search logic
-            (async () => {
-                const lowerCaseQuery = searchQuery.toLowerCase();
-                const internalResults = ALL_SERVICES_DATA.flatMap(category => 
-                    category.brands.filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery))
-                );
-                setServiceResults(internalResults);
-            })(),
-            // AI search logic
-            (async () => {
-                const results = await searchProducts({ query: searchQuery });
-                setProductResults(results);
-            })()
-        ]);
-    } catch (err) {
-        console.error("Search failed:", err);
-        setError("Sorry, we couldn't complete the search. Please try again.");
-    } finally {
-        setLoading(false);
-    }
+    setServiceResults(uniqueResults);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -158,7 +143,6 @@ function SearchPageComponent() {
       performSearch(query);
     } else {
         setServiceResults([]);
-        setProductResults(null);
         setLoading(false);
     }
   }, [query, performSearch]);
@@ -168,14 +152,6 @@ function SearchPageComponent() {
     if (currentQuery && currentQuery !== query) {
         router.push(`/search?q=${encodeURIComponent(currentQuery)}`);
     }
-  };
-
-  const getBrandLink = (brandName: string) => {
-    for (const category of ALL_SERVICES_DATA) {
-        const brand = category.brands.find(b => b.name === brandName);
-        if (brand) return brand.href;
-    }
-    return '#'; // Fallback
   };
 
   return (
@@ -192,7 +168,7 @@ function SearchPageComponent() {
           <Input
             name="search"
             id="search"
-            placeholder="Search for any product or service..."
+            placeholder="Search for any service or brand..."
             className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md"
             value={currentQuery}
             onChange={(e) => setCurrentQuery(e.target.value)}
@@ -210,12 +186,6 @@ function SearchPageComponent() {
                     <Skeleton className="h-24 w-full rounded-lg" />
                     <Skeleton className="h-24 w-full rounded-lg" />
                 </div>
-                 <Skeleton className="h-10 w-1/2" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Skeleton className="h-24 w-full rounded-lg" />
-                    <Skeleton className="h-24 w-full rounded-lg" />
-                    <Skeleton className="h-24 w-full rounded-lg" />
-                </div>
             </div>
         )}
 
@@ -223,11 +193,10 @@ function SearchPageComponent() {
 
         {!loading && !error && query && (
           <div className="space-y-8">
-            {/* In-App Service Results */}
-            {serviceResults.length > 0 && (
+            {serviceResults.length > 0 ? (
                 <Card>
                     <CardHeader>
-                        <CardTitle>In-App Services</CardTitle>
+                        <CardTitle>Search Results</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {serviceResults.map(brand => (
@@ -240,32 +209,8 @@ function SearchPageComponent() {
                         ))}
                     </CardContent>
                 </Card>
-            )}
-
-            {/* AI Product Search Results */}
-            {productResults && productResults.relevantBrands.length > 0 && (
-                 <Card className="border-primary/50">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                           <ShoppingCart className='text-primary'/>
-                           <span>Products found at...</span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {productResults.relevantBrands.map(brandName => (
-                            <Button key={brandName} asChild variant="secondary" className="justify-between h-12 text-base">
-                                <Link href={getBrandLink(brandName)} target="_blank" rel="noopener noreferrer">
-                                    <span>{brandName}</span>
-                                    <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                                </Link>
-                            </Button>
-                        ))}
-                    </CardContent>
-                </Card>
-            )}
-
-            {serviceResults.length === 0 && (!productResults || productResults.relevantBrands.length === 0) && (
-                <p className="text-muted-foreground text-center py-12">No results found for "{query}".</p>
+            ) : (
+                 <p className="text-muted-foreground text-center py-12">No results found for "{query}".</p>
             )}
           </div>
         )}
