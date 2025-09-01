@@ -25,8 +25,8 @@ const data = [
     { name: "Apr", total: 0 },
     { name: "May", total: 0 },
     { name: "Jun", total: 0 },
-    { name: "Jul", total: 4800 },
-    { name: "Aug", total: 5200 },
+    { name: "Jul", total: 0 },
+    { name: "Aug", total: 0 },
     { name: "Sep", total: 0 },
     { name: "Oct", total: 0 },
     { name: "Nov", total: 0 },
@@ -38,12 +38,12 @@ export default function AdminDashboard() {
   const [isRefreshing, startRefresh] = useTransition();
   const { toast } = useToast();
   const [stats, setStats] = useState({
-    totalRevenue: 125432.89,
-    uniqueVisitors: 7821,
+    totalRevenue: 0,
+    uniqueVisitors: 0,
     activePartners: 0,
-    pwaInstalls: 573,
+    pwaInstalls: 0,
     totalClicks: 0,
-    commissionsPaid: 12234.00,
+    commissionsPaid: 0,
     pendingApprovals: 0
   });
 
@@ -127,13 +127,13 @@ export default function AdminDashboard() {
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        {renderCard("Total Revenue", `₹${stats.totalRevenue.toLocaleString('en-IN')}`, "+20.1% from last month", <DollarSign className="h-4 w-4 text-muted-foreground" />, loading)}
-        {renderCard("Unique Visitors", `+${stats.uniqueVisitors.toLocaleString('en-IN')}`, "+12.5% from last month", <Users className="h-4 w-4 text-muted-foreground" />, loading)}
-        {renderCard("Active Partners", `+${stats.activePartners}`, "+18.1% from last month", <Users className="h-4 w-4 text-muted-foreground" />, loading)}
-        {renderCard("PWA Installs", `+${stats.pwaInstalls}`, "+201 since last month", <Download className="h-4 w-4 text-muted-foreground" />, loading)}
-        {renderCard("Total Clicks", `+${stats.totalClicks.toLocaleString('en-IN')}`, "+19% from last month", <MousePointerClick className="h-4 w-4 text-muted-foreground" />, loading)}
-        {renderCard("Commissions Paid", `₹${stats.commissionsPaid.toLocaleString('en-IN')}`, "+19% from last month", <CreditCard className="h-4 w-4 text-muted-foreground" />, loading)}
-        {renderCard("Pending Approvals", `+${stats.pendingApprovals}`, "2 since last hour", <Activity className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Total Revenue", `₹${stats.totalRevenue.toLocaleString('en-IN')}`, "Live data", <DollarSign className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Unique Visitors", `+${stats.uniqueVisitors.toLocaleString('en-IN')}`, "Live data", <Users className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Active Partners", `+${stats.activePartners}`, "From real signups", <Users className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("PWA Installs", `+${stats.pwaInstalls}`, "Tracked automatically", <Download className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Total Clicks", `+${stats.totalClicks.toLocaleString('en-IN')}`, "From user activity", <MousePointerClick className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Commissions Paid", `₹${stats.commissionsPaid.toLocaleString('en-IN')}`, "Live data", <CreditCard className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Pending Approvals", `+${stats.pendingApprovals}`, "Feedback awaiting analysis", <Activity className="h-4 w-4 text-muted-foreground" />, loading)}
       </div>
       <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
         <Card>
