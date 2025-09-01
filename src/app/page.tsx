@@ -16,18 +16,44 @@ const services: Service[] = [
     name: 'Shopping', 
     icon: ShoppingCart, 
     color: '#8A2BE2', 
-    links: [
-      { name: 'Flipkart', href: 'https://www.flipkart.com?ref=1shopapp' },
-      { name: 'Amazon', href: 'https://www.amazon.in?ref=1shopapp' },
-      { name: 'Myntra', href: 'https://www.myntra.com?ref=1shopapp' },
-      { name: 'Ajio', href: 'https://www.ajio.com?ref=1shopapp' },
-      { name: 'Meesho', href: 'https://www.meesho.com?ref=1shopapp' },
-      { name: 'DMart', href: 'https://www.dmart.in?ref=1shopapp' },
-      { name: 'Blinkit', href: 'https://www.blinkit.com?ref=1shopapp' },
-      { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
-      { name: 'Nykaa', href: 'https://www.nykaa.com/' },
-      { name: 'Purplle', href: 'https://www.purplle.com/' },
-      { name: 'Sephora', href: 'https://www.sephora.com/' },
+    categories: [
+        {
+            name: 'General',
+            links: [
+                { name: 'Flipkart', href: 'https://www.flipkart.com?ref=1shopapp' },
+                { name: 'Amazon', href: 'https://www.amazon.in?ref=1shopapp' },
+                { name: 'Meesho', href: 'https://www.meesho.com?ref=1shopapp' },
+            ]
+        },
+        {
+            name: 'Fashion',
+            links: [
+                { name: 'Myntra', href: 'https://www.myntra.com?ref=1shopapp' },
+                { name: 'Ajio', href: 'https://www.ajio.com?ref=1shopapp' },
+                { name: 'Nykaa Fashion', href: 'https://www.nykaafashion.com/' },
+            ]
+        },
+        {
+            name: 'Grocery',
+            links: [
+                 { name: 'DMart', href: 'https://www.dmart.in?ref=1shopapp' },
+                 { name: 'Blinkit', href: 'https://www.blinkit.com?ref=1shopapp' },
+            ]
+        },
+        {
+            name: 'Electronics',
+            links: [
+                { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
+            ]
+        },
+        {
+            name: 'Beauty',
+            links: [
+                { name: 'Nykaa', href: 'https://www.nykaa.com/' },
+                { name: 'Purplle', href: 'https://www.purplle.com/' },
+                { name: 'Sephora', href: 'https://www.sephora.com/' },
+            ]
+        }
     ] 
   },
   { 
@@ -45,7 +71,7 @@ const services: Service[] = [
     color: '#4CAF50', 
     links: [
       { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
-      { name: 'PhonePe', href: 'https://www.phonepe.com/bill-payments/'},
+      { name: 'PhonePe', href: 'https://www.phonepe.com/en/bill-payments/?ref=1shopapp'},
       { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
     ] 
   },
@@ -161,16 +187,6 @@ const services: Service[] = [
       { name: 'Angel Broking', href: 'https://www.angelone.in/' },
       { name: 'Sharekhan', href: 'https://www.sharekhan.com/' },
       { name: 'ICICI Securities', href: 'https://www.icicidirect.com/' },
-    ]
-  },
-  {
-    name: 'Beauty',
-    icon: Sparkles,
-    color: '#E5398D',
-    links: [
-      { name: 'Nykaa', href: 'https://www.nykaa.com/' },
-      { name: 'Purplle', href: 'https://www.purplle.com/' },
-      { name: 'Sephora', href: 'https://www.sephora.com/' },
     ]
   }
 ];

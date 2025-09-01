@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { ElementType } from 'react';
@@ -11,12 +12,18 @@ interface ServiceLink {
   href: string;
 }
 
+interface ServiceCategory {
+  name: string;
+  links: ServiceLink[];
+}
+
 export interface Service {
   name: string;
   icon: ElementType;
   color: string;
   href?: string;
   links?: ServiceLink[];
+  categories?: ServiceCategory[];
 }
 
 interface ServiceTileProps {
@@ -24,13 +31,13 @@ interface ServiceTileProps {
 }
 
 export function ServiceTile({ service }: ServiceTileProps) {
-  const { name, icon: Icon, color, href, links } = service;
+  const { name, icon: Icon, color, href, links, categories } = service;
 
   const handleLinkClick = () => {
     trackLinkClick(name, name); // For single links, service name is the link name
   }
 
-  if (links && links.length > 0) {
+  if ((links && links.length > 0) || (categories && categories.length > 0)) {
     return (
       <MultiLinkDialog service={service}>
         <div className="block group cursor-pointer">
@@ -65,3 +72,5 @@ export function ServiceTile({ service }: ServiceTileProps) {
     </Link>
   );
 }
+
+    
