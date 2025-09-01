@@ -1,6 +1,6 @@
 
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
 import {
@@ -10,11 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { DollarSign, Users, CreditCard, Activity, MousePointerClick, Download } from 'lucide-react'
+import { DollarSign, Users, CreditCard, Activity, MousePointerClick, Download, RefreshCw } from 'lucide-react'
 import { getPartners } from '@/ai/flows/partner-signup-flow';
 import { getFeedback } from '@/ai/flows/feedback-submission-flow';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getClickCounts } from '@/ai/flows/click-tracking-flow';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 const data = [
     { name: "Jan", total: 0 },
@@ -33,6 +35,8 @@ const data = [
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, startRefresh] = useTransition();
+  const { toast } = useToast();
   const [stats, setStats] = useState({
     totalRevenue: 125432.89,
     uniqueVisitors: 7821,
@@ -43,10 +47,8 @@ export default function AdminDashboard() {
     pendingApprovals: 0
   });
 
-   useEffect(() => {
-    async function fetchData() {
+  const fetchData = async () => {
       try {
-        setLoading(true);
         const partners = await getPartners();
         const feedback = await getFeedback();
         const clicks = await getClickCounts();
@@ -66,12 +68,29 @@ export default function AdminDashboard() {
 
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
-      } finally {
-        setLoading(false);
+         toast({
+            title: "Error",
+            description: "Failed to fetch latest dashboard data.",
+            variant: "destructive",
+        });
       }
-    }
-    fetchData();
+    };
+
+
+   useEffect(() => {
+    setLoading(true);
+    fetchData().finally(() => setLoading(false));
   }, []);
+
+  const handleRefresh = () => {
+    startRefresh(async () => {
+        await fetchData();
+        toast({
+            title: "Dashboard Refreshed",
+            description: "The latest data has been loaded.",
+        });
+    });
+  };
 
 
   const renderCard = (title: string, value: string | number, subtext: string, icon: React.ReactNode, isLoading: boolean) => (
@@ -100,6 +119,12 @@ export default function AdminDashboard() {
     <>
       <div className="flex items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
+        <div className='ml-auto'>
+            <Button onClick={handleRefresh} disabled={isRefreshing} size="sm" variant="outline">
+                <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+            </Button>
+        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         {renderCard("Total Revenue", `₹${stats.totalRevenue.toLocaleString('en-IN')}`, "+20.1% from last month", <DollarSign className="h-4 w-4 text-muted-foreground" />, loading)}

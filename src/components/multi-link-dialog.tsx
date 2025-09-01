@@ -29,14 +29,14 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-4">
              <Icon className="w-8 h-8" style={{ color: service.color }}/>
             <DialogTitle className="text-2xl">{name}</DialogTitle>
           </div>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-2 gap-3 py-4">
           {links?.map((link) => (
             <Button
               key={link.name}

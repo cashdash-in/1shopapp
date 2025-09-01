@@ -115,13 +115,15 @@ const services: Service[] = [
     ]
   },
    {
-    name: 'Beauty',
-    icon: Sparkles,
-    color: '#E5398D',
+    name: 'Theaters',
+    icon: Ticket,
+    color: '#F44336',
     links: [
-      { name: 'Nykaa', href: 'https://www.nykaa.com/' },
-      { name: 'Purplle', href: 'https://www.purplle.com/' },
-      { name: 'Sephora', href: 'https://www.sephora.com/' },
+      { name: 'BookMyShow', href: 'https://in.bookmyshow.com/' },
+      { name: 'Paytm Movies', href: 'https://paytm.com/movies' },
+      { name: 'TicketNew', href: 'https://www.ticketnew.com/' },
+      { name: 'PVR Cinemas', href: 'https://www.pvrcinemas.com/' },
+      { name: 'INOX', href: 'https://www.inoxmovies.com/' },
     ]
   },
   {
@@ -162,15 +164,13 @@ const services: Service[] = [
     ]
   },
   {
-    name: 'Theaters',
-    icon: Ticket,
-    color: '#F44336',
+    name: 'Beauty',
+    icon: Sparkles,
+    color: '#E5398D',
     links: [
-      { name: 'BookMyShow', href: 'https://in.bookmyshow.com/' },
-      { name: 'Paytm Movies', href: 'https://paytm.com/movies' },
-      { name: 'TicketNew', href: 'https://www.ticketnew.com/' },
-      { name: 'PVR Cinemas', href: 'https://www.pvrcinemas.com/' },
-      { name: 'INOX', href: 'https://www.inoxmovies.com/' },
+      { name: 'Nykaa', href: 'https://www.nykaa.com/' },
+      { name: 'Purplle', href: 'https://www.purplle.com/' },
+      { name: 'Sephora', href: 'https://www.sephora.com/' },
     ]
   }
 ];
