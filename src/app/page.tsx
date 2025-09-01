@@ -257,7 +257,7 @@ export default function Home() {
 
   return (
     <>
-      <main className="h-screen max-h-screen bg-background flex flex-col p-4 overflow-hidden">
+      <main className="min-h-screen bg-background flex flex-col p-4">
         <div className="flex-shrink-0 text-center w-full max-w-2xl mx-auto pt-8">
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
@@ -279,7 +279,7 @@ export default function Home() {
             </form>
         </div>
 
-        <div className="flex-grow w-full max-w-5xl mx-auto flex items-center justify-center">
+        <div className="flex-grow w-full max-w-5xl mx-auto flex items-center justify-center py-8">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
             {services.map((service) => (
               <ServiceTile
