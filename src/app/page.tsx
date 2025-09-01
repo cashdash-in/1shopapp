@@ -214,8 +214,8 @@ export default function Home() {
 
   return (
     <>
-      <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <div className="text-center mb-8 w-full max-w-2xl mx-auto">
+      <main className="h-screen max-h-screen bg-background flex flex-col p-4 overflow-hidden">
+        <div className="flex-shrink-0 text-center w-full max-w-2xl mx-auto pt-8">
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
@@ -236,7 +236,7 @@ export default function Home() {
             </form>
         </div>
 
-        <div className="w-full max-w-5xl">
+        <div className="flex-grow w-full max-w-5xl mx-auto flex items-center justify-center">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
             {services.map((service) => (
               <ServiceTile
@@ -246,7 +246,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <footer className="text-center mt-8 max-w-4xl mx-auto px-4 space-y-4">
+        <footer className="flex-shrink-0 text-center max-w-4xl mx-auto px-4 space-y-4 pb-4">
             <div className="flex justify-center items-center gap-2 md:gap-4 flex-wrap">
                <Link href="/about" className="text-xs text-muted-foreground hover:text-foreground underline">
                   About Us
@@ -274,5 +274,3 @@ export default function Home() {
     </>
   );
 }
-
-    
