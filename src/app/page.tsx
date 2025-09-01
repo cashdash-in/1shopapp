@@ -71,7 +71,7 @@ const services: Service[] = [
     color: '#4CAF50', 
     links: [
       { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
-      { name: 'PhonePe', href: 'https://www.phonepe.com/en/bill-payments/?ref=1shopapp'},
+      { name: 'PhonePe', href: 'https://www.phonepe.com?ref=1shopapp'},
       { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
     ] 
   },
