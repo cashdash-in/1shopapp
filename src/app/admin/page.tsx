@@ -1,5 +1,6 @@
 
 'use client'
+import React, { useEffect, useState } from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
 import {
@@ -10,23 +11,90 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { DollarSign, Users, CreditCard, Activity, MousePointerClick, Download } from 'lucide-react'
+import { getPartners } from '@/ai/flows/partner-signup-flow';
+import { getFeedback } from '@/ai/flows/feedback-submission-flow';
+import { Skeleton } from '@/components/ui/skeleton';
 
+const data = [
+    { name: "Jan", total: 0 },
+    { name: "Feb", total: 0 },
+    { name: "Mar", total: 0 },
+    { name: "Apr", total: 0 },
+    { name: "May", total: 0 },
+    { name: "Jun", total: 0 },
+    { name: "Jul", total: 4800 },
+    { name: "Aug", total: 5200 },
+    { name: "Sep", total: 0 },
+    { name: "Oct", total: 0 },
+    { name: "Nov", total: 0 },
+    { name: "Dec", total: 0 },
+  ]
 
 export default function AdminDashboard() {
-  const data = [
-    { name: "Jan", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Feb", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Mar", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Apr", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "May", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jun", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jul", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Aug", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Sep", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Oct", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Nov", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Dec", total: Math.floor(Math.random() * 5000) + 1000 },
-  ]
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalRevenue: 125432.89,
+    uniqueVisitors: 7821,
+    activePartners: 0,
+    pwaInstalls: 573,
+    totalClicks: 0,
+    commissionsPaid: 12234.00,
+    pendingApprovals: 0
+  });
+
+   useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const partners = await getPartners();
+        const feedback = await getFeedback();
+
+        // Calculate total clicks from localStorage
+        const storedClicks = localStorage.getItem('brandClicks');
+        const clicks = storedClicks ? JSON.parse(storedClicks) : {};
+        const totalClicks = Object.values(clicks).reduce((acc: number, item: any) => acc + item.clicks, 0);
+
+        // Get unanalyzed feedback count for 'pending approvals'
+        const pendingApprovals = feedback.filter(f => !f.analysis).length;
+
+        setStats(prev => ({
+          ...prev,
+          activePartners: partners.length,
+          totalClicks: totalClicks,
+          pendingApprovals: pendingApprovals
+        }));
+
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+
+  const renderCard = (title: string, value: string | number, subtext: string, icon: React.ReactNode, isLoading: boolean) => (
+      <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            {icon}
+          </CardHeader>
+          <CardContent>
+             {isLoading ? (
+                <>
+                    <Skeleton className="h-8 w-3/4 mb-1" />
+                    <Skeleton className="h-4 w-1/2" />
+                </>
+             ) : (
+                <>
+                    <div className="text-2xl font-bold">{value}</div>
+                    <p className="text-xs text-muted-foreground">{subtext}</p>
+                </>
+             )}
+          </CardContent>
+        </Card>
+  )
 
   return (
     <>
@@ -34,102 +102,13 @@ export default function AdminDashboard() {
         <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Revenue
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹1,25,432.89</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Unique Visitors
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+7,821</div>
-            <p className="text-xs text-muted-foreground">
-              +12.5% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active Partners
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+235</div>
-            <p className="text-xs text-muted-foreground">
-              +18.1% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              PWA Installs
-            </CardTitle>
-            <Download className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">
-              +201 since last month
-            </p>
-          </CardContent>
-        </Card>
-         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Clicks
-            </CardTitle>
-            <MousePointerClick className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Commissions Paid</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹12,234.00</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Pending Approvals
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12</div>
-            <p className="text-xs text-muted-foreground">
-              2 since last hour
-            </p>
-          </CardContent>
-        </Card>
+        {renderCard("Total Revenue", `₹${stats.totalRevenue.toLocaleString('en-IN')}`, "+20.1% from last month", <DollarSign className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Unique Visitors", `+${stats.uniqueVisitors.toLocaleString('en-IN')}`, "+12.5% from last month", <Users className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Active Partners", `+${stats.activePartners}`, "+18.1% from last month", <Users className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("PWA Installs", `+${stats.pwaInstalls}`, "+201 since last month", <Download className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Total Clicks", `+${stats.totalClicks.toLocaleString('en-IN')}`, "+19% from last month", <MousePointerClick className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Commissions Paid", `₹${stats.commissionsPaid.toLocaleString('en-IN')}`, "+19% from last month", <CreditCard className="h-4 w-4 text-muted-foreground" />, loading)}
+        {renderCard("Pending Approvals", `+${stats.pendingApprovals}`, "2 since last hour", <Activity className="h-4 w-4 text-muted-foreground" />, loading)}
       </div>
       <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
         <Card>

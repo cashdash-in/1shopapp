@@ -27,12 +27,12 @@ import type { PartnerSignupInput } from '@/ai/schemas';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const chartData = [
-    { month: "Jan", revenue: Math.floor(Math.random() * 2000) },
-    { month: "Feb", revenue: Math.floor(Math.random() * 3000) },
-    { month: "Mar", revenue: Math.floor(Math.random() * 2500) },
-    { month: "Apr", revenue: Math.floor(Math.random() * 3200) },
-    { month: "May", revenue: Math.floor(Math.random() * 3500) },
-    { month: "Jun", revenue: Math.floor(Math.random() * 4100) },
+    { month: "Jan", revenue: 0 },
+    { month: "Feb", revenue: 0 },
+    { month: "Mar", revenue: 0 },
+    { month: "Apr", revenue: 0 },
+    { month: "May", revenue: 0 },
+    { month: "Jun", revenue: 0 },
 ]
 
 const recentReferrals = [
@@ -48,24 +48,19 @@ export default function PartnerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // This timeout is to ensure that any potential race condition with hydration is avoided.
-    // In a real-world scenario with proper auth, this might not be needed.
-    setTimeout(() => {
-        const storedPartner = localStorage.getItem('loggedInPartner');
-        if (storedPartner) {
-            try {
-                const parsedPartner = JSON.parse(storedPartner);
-                setPartner(parsedPartner);
-            } catch (e) {
-                console.error("Failed to parse partner data from localStorage", e);
-                router.push('/partner/login');
-            }
-        } else {
-            // If no partner is logged in, redirect to login page
+    const storedPartner = localStorage.getItem('loggedInPartner');
+    if (storedPartner) {
+        try {
+            const parsedPartner = JSON.parse(storedPartner);
+            setPartner(parsedPartner);
+        } catch (e) {
+            console.error("Failed to parse partner data from localStorage", e);
             router.push('/partner/login');
         }
-        setLoading(false);
-    }, 100);
+    } else {
+        router.push('/partner/login');
+    }
+    setLoading(false);
   }, [router]);
 
   const handleLogout = () => {
