@@ -79,16 +79,31 @@ const services: Service[] = [
     name: 'Hotels & Travel', 
     icon: Plane, 
     color: '#00B9F1', 
-    links: [
-      { name: 'MakeMyTrip', href: 'https://www.makemytrip.com/?ref=1shopapp'},
-      { name: 'Goibibo', href: 'https://www.goibibo.com/?ref=1shopapp'},
-      { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
-      { name: 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
-      { name: 'OYO', href: 'https://www.oyorooms.com/?ref=1shopapp' },
-      { name: 'Booking.com', href: 'https://www.booking.com/?ref=1shopapp' },
-      { name: 'Agoda', href: 'https://www.agoda.com/?ref=1shopapp' },
-      { name: 'IRCTC', href: 'https://www.irctc.co.in/' },
-    ] 
+    categories: [
+        {
+            name: 'Flights & Hotels',
+            links: [
+                { name: 'MakeMyTrip', href: 'https://www.makemytrip.com/?ref=1shopapp'},
+                { name: 'Goibibo', href: 'https://www.goibibo.com/?ref=1shopapp'},
+                { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
+                { name: 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
+                { name: 'Booking.com', href: 'https://www.booking.com/?ref=1shopapp' },
+                { name: 'Agoda', href: 'https://www.agoda.com/?ref=1shopapp' },
+            ]
+        },
+        {
+            name: 'Trains',
+            links: [
+                { name: 'IRCTC', href: 'https://www.irctc.co.in/' },
+            ]
+        },
+        {
+            name: 'Hotel Stays',
+            links: [
+                { name: 'OYO', href: 'https://www.oyorooms.com/?ref=1shopapp' },
+            ]
+        }
+    ]
   },
   {
     name: 'Housing',

@@ -12,7 +12,7 @@ export let FAKE_CLICK_DB: Record<string, { category: string; brand: string; clic
     "Bill Pay_PhonePe": {
         "category": "Bill Pay",
         "brand": "PhonePe",
-        "clicks": 4
+        "clicks": 5
     },
     "Shopping_Nykaa": {
         "category": "Shopping",
