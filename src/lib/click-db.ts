@@ -18,5 +18,25 @@ export let FAKE_CLICK_DB: Record<string, { category: string; brand: string; clic
         "category": "Shopping",
         "brand": "Nykaa",
         "clicks": 1
+    },
+    "Hotels & Travel_Agoda": {
+        "category": "Hotels & Travel",
+        "brand": "Agoda",
+        "clicks": 1
+    },
+    "Hotels & Travel_IRCTC": {
+        "category": "Hotels & Travel",
+        "brand": "IRCTC",
+        "clicks": 1
+    },
+    "Shopping_Nykaa Fashion": {
+        "category": "Shopping",
+        "brand": "Nykaa Fashion",
+        "clicks": 1
+    },
+    "Shopping_Amazon": {
+        "category": "Shopping",
+        "brand": "Amazon",
+        "clicks": 1
     }
 };

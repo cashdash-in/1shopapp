@@ -263,7 +263,7 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             Declutter your phone. Access all your essential apps in one place and save storage space.
           </p>
            <form onSubmit={handleSearch} className="mt-6 w-full relative">
@@ -290,7 +290,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <footer className="flex-shrink-0 text-center max-w-4xl mx-auto px-4 space-y-4 pb-4">
+        <footer className="flex-shrink-0 text-center max-w-4xl mx-auto px-4 space-y-2 pb-4">
             <div className="flex justify-center items-center gap-2 md:gap-4 flex-wrap">
                <Link href="/about" className="text-xs text-muted-foreground hover:text-foreground underline">
                   About Us
