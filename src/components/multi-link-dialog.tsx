@@ -51,7 +51,7 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
                                 key={link.name}
                                 asChild
                                 variant="secondary"
-                                className="justify-between h-10 text-base"
+                                className="justify-between h-auto min-h-10 text-base whitespace-normal"
                                 onClick={() => handleLinkClick(link.name)}
                                 >
                                 <Link
@@ -59,8 +59,8 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <span>{link.name}</span>
-                                    <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                                    <span className="flex-1 text-left">{link.name}</span>
+                                    <ArrowUpRight className="h-4 w-4 ml-2" />
                                 </Link>
                                 </Button>
                             ))}
@@ -72,13 +72,13 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
 
         {/* Render links without categories */}
         {links && links.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-4">
             {links?.map((link) => (
                 <Button
                 key={link.name}
                 asChild
                 variant="secondary"
-                className="justify-between h-12 text-base"
+                className="justify-between h-auto min-h-12 text-base whitespace-normal"
                 onClick={() => handleLinkClick(link.name)}
                 >
                 <Link
@@ -86,8 +86,8 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <span>{link.name}</span>
-                    <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                    <span className='flex-1 text-left'>{link.name}</span>
+                    <ArrowUpRight className="h-4 w-4 ml-2" />
                 </Link>
                 </Button>
             ))}
