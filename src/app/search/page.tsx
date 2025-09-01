@@ -10,101 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { trackLinkClick } from '@/lib/analytics';
-
-// All services data, including brand links
-const ALL_SERVICES_DATA = [
-  { 
-    category: 'Shopping', 
-    brands: [
-      { name: 'Flipkart', href: 'https://www.flipkart.com?ref=1shopapp' },
-      { name: 'Amazon', href: 'https://www.amazon.in?ref=1shopapp' },
-      { name: 'Myntra', href: 'https://www.myntra.com?ref=1shopapp' },
-      { name: 'Ajio', href: 'https://www.ajio.com?ref=1shopapp' },
-      { name: 'Meesho', href: 'https://www.meesho.com?ref=1shopapp' },
-      { name: 'DMart', href: 'https://www.dmart.in?ref=1shopapp' },
-      { name: 'Blinkit', href: 'https://www.blinkit.com?ref=1shopapp' },
-      { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
-    ]
-  },
-  { 
-    name: 'Food Delivery', 
-    brands: [
-      { name: 'Swiggy', href: 'https://www.swiggy.com?ref=1shopapp' },
-      { name: 'Zomato', href: 'https://www.zomato.com?ref=1shopapp' },
-    ] 
-  },
-   { name: 'Bill Pay', brands: [
-      { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
-      { name: 'PhonePe', href: 'https://www.phonepe.com/en/bill-payments/?ref=1shopapp'},
-      { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
-   ]},
-   { name: 'Hotels & Travel', brands: [
-      { name: 'MakeMyTrip', href: 'https://www.makemytrip.com/?ref=1shopapp'},
-      { name: 'Goibibo', href: 'https://www.goibibo.com/?ref=1shopapp'},
-      { name: 'Ixigo', href: 'https://www.ixigo.com/?ref=1shopapp'},
-      { name: 'Cleartrip', href: 'https://www.cleartrip.com/?ref=1shopapp'},
-      { name: 'OYO', href: 'https://www.oyorooms.com/?ref=1shopapp' },
-      { name: 'Booking.com', href: 'https://www.booking.com/?ref=1shopapp' },
-      { name: 'Agoda', href: 'https://www.agoda.com/?ref=1shopapp' },
-   ]},
-   { name: 'Housing', brands: [
-        { name: 'MagicBricks', href: 'https://www.magicbricks.com/'},
-        { name: '99acres', href: 'https://www.99acres.com/'},
-        { name: 'Housing.com', href: 'https://housing.com/'},
-        { name: 'NoBroker', href: 'https://www.nobroker.in/'},
-   ]},
-   { name: 'Insurance', brands: [
-        { name: 'Policybazaar', href: 'https://www.policybazaar.com/?ref=1shopapp'},
-        { name: 'Acko', href: 'https://www.acko.com/?ref=1shopapp'},
-        { name: 'Digit', href: 'https://www.godigit.com/?ref=1shopapp'},
-   ]},
-   { name: 'Finance', brands: [
-        { name: 'HDFC Bank', href: 'https://www.hdfcbank.com/?ref=1shopapp'},
-        { name: 'ICICI Bank', href: 'https://www.icicibank.com/?ref=1shopapp'},
-        { name: 'State Bank of India', href: 'https://www.onlinesbi.sbi/?ref=1shopapp'},
-        { name: 'Axis Bank', href: 'https://www.axisbank.com/?ref=1shopapp'},
-        { name: 'Kotak Mahindra Bank', href: 'https://www.kotak.com/en/personal-banking.html?ref=1shopapp'},
-        { name: 'Punjab National Bank', href: 'https://www.pnbindia.in/?ref=1shopapp'},
-        { name: 'IndusInd Bank', href: 'https://www.indusind.com/?ref=1shopapp'},
-        { name: 'Bandhan Bank', href: 'https://www.bandhanbank.com/?ref=1shopapp'}
-   ]},
-   { name: 'Transport & Logistics', brands: [
-      { name: 'Uber', href: 'https://www.uber.com/in/en/' },
-      { name: 'Ola', href: 'https://www.olacabs.com/' },
-      { name: 'inDrive', href: 'https://www.indrive.com/en/home/' },
-      { name: 'Delhivery', href: 'https://www.delhivery.com/' },
-      { name: 'Blue Dart', href: 'https://www.bluedart.com/' },
-      { name: 'DTDC', href: 'https://www.dtdc.in/' },
-      { name: 'Shiprocket', href: 'https://www.shiprocket.in/' },
-   ]},
-   { name: 'Beauty', brands: [
-      { name: 'Nykaa', href: 'https://www.nykaa.com/' },
-      { name: 'Purplle', href: 'https://www.purplle.com/' },
-      { name: 'Sephora', href: 'https://www.sephora.com/' },
-   ]},
-   { name: 'Social Media', brands: [
-      { name: 'Facebook', href: 'https://www.facebook.com/' },
-      { name: 'Instagram', href: 'https://www.instagram.com/' },
-      { name: 'X (Twitter)', href: 'https://www.twitter.com/' },
-      { name: 'LinkedIn', href: 'https://www.linkedin.com/' },
-      { name: 'WhatsApp', href: 'https://www.whatsapp.com/' },
-   ]},
-   { name: 'News', brands: [
-      { name: 'Times of India', href: 'https://timesofindia.indiatimes.com/' },
-      { name: 'Hindustan Times', href: 'https://www.hindustantimes.com/' },
-      { name: 'The Hindu', href: 'https://www.thehindu.com/' },
-      { name: 'NDTV', href: 'https://www.ndtv.com/' },
-   ]},
-   { name: 'Market', brands: [
-      { name: 'Moneycontrol', href: 'https://www.moneycontrol.com/' },
-      { name: 'ET Markets', href: 'https://economictimes.indiatimes.com/markets' },
-      { name: 'Zerodha', href: 'https://zerodha.com/' },
-      { name: 'Groww', href: 'https://groww.in/' },
-      { name: 'Angel Broking', href: 'https://www.angelone.in/' },
-      { name: 'Sharekhan', href: 'https://www.sharekhan.com/' },
-      { name: 'ICICI Securities', href: 'https://www.icicidirect.com/' },
-   ]}
-];
+import { services as ALL_SERVICES_DATA } from '@/app/page';
 
 function SearchPageComponent() {
   const router = useRouter();
@@ -127,9 +33,21 @@ function SearchPageComponent() {
     setError('');
     
     const lowerCaseQuery = searchQuery.toLowerCase();
-    const internalResults = ALL_SERVICES_DATA.flatMap(category => {
-        const categoryName = category.category || category.name;
-        return category.brands
+
+    const internalResults = ALL_SERVICES_DATA.flatMap(service => {
+        const categoryName = service.name;
+        let brands: { name: string; href: string }[] = [];
+
+        if (service.links) {
+            brands = brands.concat(service.links);
+        }
+        if (service.categories) {
+            service.categories.forEach(category => {
+                brands = brands.concat(category.links);
+            });
+        }
+
+        return brands
             .filter(brand => brand.name.toLowerCase().includes(lowerCaseQuery) || categoryName.toLowerCase().includes(lowerCaseQuery))
             .map(brand => ({ ...brand, category: categoryName }));
     });
@@ -173,7 +91,7 @@ function SearchPageComponent() {
             name="search"
             id="search"
             placeholder="Search for your Favourite App or Website"
-            className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md"
+            className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md border"
             value={currentQuery}
             onChange={(e) => setCurrentQuery(e.target.value)}
           />
@@ -200,7 +118,7 @@ function SearchPageComponent() {
             {serviceResults.length > 0 ? (
                 <Card>
                     <CardHeader>
-                        <CardTitle>Search Results</CardTitle>
+                        <CardTitle>Search Results for &quot;{query}&quot;</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {serviceResults.map(brand => (
@@ -214,7 +132,7 @@ function SearchPageComponent() {
                     </CardContent>
                 </Card>
             ) : (
-                 <p className="text-muted-foreground text-center py-12">No results found for "{query}".</p>
+                 <p className="text-muted-foreground text-center py-12">No results found for &quot;{query}&quot;.</p>
             )}
           </div>
         )}

@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import React, { useState, useEffect } from 'react';
 import { trackPWAInstall } from '@/lib/analytics';
 
-const services: Service[] = [
+export const services: Service[] = [
   { 
     name: 'Shopping', 
     icon: ShoppingCart, 
