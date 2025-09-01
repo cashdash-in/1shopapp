@@ -270,7 +270,7 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Declutter your phone. Access all your essential apps in one place and save storage space.
           </p>
            <form onSubmit={handleSearch} className="mt-6 w-full relative">
@@ -278,7 +278,7 @@ export default function Home() {
                     name="search"
                     id="search"
                     placeholder="Search for your Favourite App or Website"
-                    className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md"
+                    className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md border"
                 />
                 <Button type="submit" size="icon" className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full w-9 h-9">
                     <SearchIcon className="h-5 w-5" />
