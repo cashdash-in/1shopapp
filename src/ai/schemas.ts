@@ -81,3 +81,28 @@ export const ProductSearchOutputSchema = z.object({
   results: z.array(z.string()).describe('A list of product names.'),
 });
 export type ProductSearchOutput = z.infer<typeof ProductSearchOutputSchema>;
+
+// Schemas for Cashback Flow
+export const CashbackTransactionSchema = z.object({
+    userId: z.string(),
+    userName: z.string(),
+    totalCashback: z.number(),
+    status: z.enum(['Pending', 'Paid']),
+    lastActivity: z.string(),
+});
+export type CashbackTransaction = z.infer<typeof CashbackTransactionSchema>;
+
+export const UserCashbackTransactionSchema = z.object({
+    id: z.string(),
+    description: z.string(),
+    amount: z.number(),
+    status: z.enum(['Credited', 'Pending', 'Paid']),
+    date: z.string(),
+});
+export type UserCashbackTransaction = z.infer<typeof UserCashbackTransactionSchema>;
+
+export const UserCashbackDetailsSchema = z.object({
+    totalBalance: z.number(),
+    transactions: z.array(UserCashbackTransactionSchema),
+});
+export type UserCashbackDetails = z.infer<typeof UserCashbackDetailsSchema>;

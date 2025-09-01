@@ -8,20 +8,31 @@ import { Button } from "@/components/ui/button";
 import { Wallet, Gift, ShoppingBag, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-
-// Mock data - in a real app, this would be fetched for the logged-in user
-const cashbackDetails = {
-  totalBalance: 225.75,
-  transactions: [
-    { id: "txn_1", description: "Cashback from Flipkart", amount: 50.25, status: "Credited", date: "2024-08-20" },
-    { id: "txn_2", description: "Cashback from Myntra", amount: 75.50, status: "Credited", date: "2024-08-18" },
-    { id: "txn_3", description: "Cashback from Swiggy", amount: 25.00, status: "Pending", date: "2024-08-22" },
-    { id: "txn_4", description: "Withdrawal to Bank Account", amount: -100.00, status: "Paid", date: "2024-08-15" },
-    { id: "txn_5", description: "Cashback from Amazon", amount: 175.00, status: "Credited", date: "2024-08-12" },
-  ]
-};
+import { useEffect, useState } from "react";
+import { getUserCashbackDetails } from "@/ai/flows/cashback-flow";
+import type { UserCashbackDetails } from "@/ai/schemas";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CashbackPage() {
+  const [cashbackDetails, setCashbackDetails] = useState<UserCashbackDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // In a real app, you'd pass a real user ID. For this prototype, the flow returns a default user.
+        const data = await getUserCashbackDetails("user_abc123");
+        setCashbackDetails(data);
+      } catch (error) {
+        console.error("Failed to fetch cashback details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background items-center justify-center p-4 md:p-8">
       <Card className="w-full max-w-4xl">
@@ -42,12 +53,16 @@ export default function CashbackPage() {
                     <CardTitle>Total Balance</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-4xl font-bold text-primary">
-                        ₹{cashbackDetails.totalBalance.toFixed(2)}
-                    </p>
+                    {loading ? (
+                       <Skeleton className="h-10 w-40 mx-auto" />
+                    ) : (
+                       <p className="text-4xl font-bold text-primary">
+                        ₹{cashbackDetails?.totalBalance.toFixed(2) || '0.00'}
+                       </p>
+                    )}
                 </CardContent>
                  <CardFooter className="flex justify-center">
-                    <Button>
+                    <Button disabled={loading || cashbackDetails?.totalBalance === 0}>
                         <Gift className="mr-2 h-4 w-4" />
                         Withdraw Funds
                     </Button>
@@ -71,20 +86,37 @@ export default function CashbackPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {cashbackDetails.transactions.map((tx) => (
-                            <TableRow key={tx.id}>
-                                <TableCell className="font-medium">{tx.description}</TableCell>
-                                <TableCell className={tx.amount > 0 ? 'text-green-500' : 'text-red-500'}>
-                                    {tx.amount > 0 ? `+₹${tx.amount.toFixed(2)}` : `-₹${Math.abs(tx.amount).toFixed(2)}`}
+                        {loading ? (
+                            Array.from({length: 4}).map((_, i) => (
+                                <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-6 w-20 ml-auto rounded-full" /></TableCell>
+                                </TableRow>
+                            ))
+                        ) : cashbackDetails?.transactions.length === 0 ? (
+                           <TableRow>
+                                <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
+                                    No transactions yet. Start shopping to earn cashback!
                                 </TableCell>
-                                <TableCell>{tx.date}</TableCell>
-                                <TableCell className="text-right">
-                                    <Badge variant={tx.status === "Credited" ? "default" : tx.status === "Paid" ? "secondary" : "outline"}>
-                                        {tx.status}
-                                    </Badge>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                           </TableRow>
+                        ) : (
+                            cashbackDetails?.transactions.map((tx) => (
+                                <TableRow key={tx.id}>
+                                    <TableCell className="font-medium">{tx.description}</TableCell>
+                                    <TableCell className={tx.amount > 0 ? 'text-green-500' : 'text-red-500'}>
+                                        {tx.amount > 0 ? `+₹${tx.amount.toFixed(2)}` : `-₹${Math.abs(tx.amount).toFixed(2)}`}
+                                    </TableCell>
+                                    <TableCell>{tx.date}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Badge variant={tx.status === "Credited" ? "default" : tx.status === "Paid" ? "secondary" : "outline"}  className={tx.status === 'Credited' ? 'bg-green-600' : ''}>
+                                            {tx.status}
+                                        </Badge>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>

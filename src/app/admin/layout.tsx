@@ -2,8 +2,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake, User, Megaphone, Lightbulb, BrainCircuit, FileText, BarChart3, Wallet } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Bell, Home, LineChart, Package, ShoppingCart, Users, Handshake, User, Megaphone, Lightbulb, BrainCircuit, FileText, BarChart3, Wallet, LogOut } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {CircleUser} from 'lucide-react'
+import { logout } from './login/actions';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminLayout({
   children,
@@ -26,6 +28,17 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    await logout();
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+    router.push('/admin/login');
+  }
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: Home },
@@ -112,7 +125,10 @@ export default function AdminLayout({
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

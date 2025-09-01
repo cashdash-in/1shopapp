@@ -1,6 +1,6 @@
 
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -26,45 +26,51 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
-
-// Mock data, in a real app this would come from a database
-const cashbackData = [
-  {
-    userId: "user_abc123",
-    userName: "Rohan Sharma",
-    totalCashback: 150.75,
-    status: "Pending",
-    lastActivity: "2024-08-15"
-  },
-  {
-    userId: "user_def456",
-    userName: "Priya Patel",
-    totalCashback: 275.50,
-    status: "Paid",
-    lastActivity: "2024-07-30"
-  },
-  {
-    userId: "user_ghi789",
-    userName: "Ankit Jain",
-    totalCashback: 50.00,
-    status: "Pending",
-    lastActivity: "2024-08-20"
-  },
-   {
-    userId: "user_jkl012",
-    userName: "Sneha Reddy",
-    totalCashback: 450.25,
-    status: "Paid",
-    lastActivity: "2024-06-10"
-  }
-];
+import { getCashbackData, updateCashbackStatus } from '@/ai/flows/cashback-flow';
+import type { CashbackTransaction } from '@/ai/schemas';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CashbackAdminPage() {
-    const [transactions, setTransactions] = useState(cashbackData);
+    const [transactions, setTransactions] = useState<CashbackTransaction[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
 
-    const handleStatusChange = (userId: string, newStatus: "Pending" | "Paid") => {
-        setTransactions(prev => prev.map(t => t.userId === userId ? {...t, status: newStatus} : t));
-        // In a real app, you would call a server action here to update the database.
+    const fetchTransactions = async () => {
+        try {
+            setLoading(true);
+            const data = await getCashbackData();
+            setTransactions(data);
+        } catch (error) {
+            console.error("Failed to fetch cashback data:", error);
+            toast({ title: "Error", description: "Could not load cashback data.", variant: "destructive" });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchTransactions();
+    }, []);
+
+    const handleStatusChange = async (userId: string, newStatus: "Pending" | "Paid") => {
+       try {
+            // Optimistically update UI
+            setTransactions(prev => prev.map(t => t.userId === userId ? {...t, status: newStatus} : t));
+
+            // Call server action
+            await updateCashbackStatus(userId, newStatus);
+            
+            toast({
+                title: "Status Updated",
+                description: `Transaction for ${userId} marked as ${newStatus}.`,
+            });
+       } catch (error) {
+            console.error("Failed to update status:", error);
+            toast({ title: "Update Failed", description: "Could not update status. Reverting.", variant: "destructive" });
+            // Revert optimistic update on failure
+            fetchTransactions();
+       }
     }
 
     return (
@@ -89,7 +95,17 @@ export default function CashbackAdminPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {transactions.map((transaction) => (
+                        {loading ? (
+                            Array.from({length: 4}).map((_, i) => (
+                                <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                                    <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+                                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                                    <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                                </TableRow>
+                            ))
+                        ) : transactions.map((transaction) => (
                             <TableRow key={transaction.userId}>
                                 <TableCell className="font-medium">{transaction.userName}</TableCell>
                                 <TableCell>₹{transaction.totalCashback.toFixed(2)}</TableCell>
