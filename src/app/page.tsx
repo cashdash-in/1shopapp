@@ -47,14 +47,6 @@ const services: Service[] = [
                 { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
             ]
         },
-        {
-            name: 'Beauty',
-            links: [
-                { name: 'Nykaa', href: 'https://www.nykaa.com/' },
-                { name: 'Purplle', href: 'https://www.purplle.com/' },
-                { name: 'Sephora', href: 'https://www.sephora.com/' },
-            ]
-        }
     ] 
   },
   { 
@@ -271,7 +263,7 @@ export default function Home() {
             1ShopApp
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground whitespace-nowrap">
-            Declutter your phone. All your essential apps in one place.
+            Declutter your phone. Save Space. All your essential apps in one place.
           </p>
            <form onSubmit={handleSearch} className="mt-6 w-full relative">
                 <Input
