@@ -326,7 +326,7 @@ export default function Home() {
               )}
             </div>
              <p className="text-[10px] text-muted-foreground/80 pt-2">
-              1ShopApp is an independent platform and your gateway to other websites. We do not collect any personal data. All trademarks and logos are the property of their respective owners. Use of this service is at your own discretion. Some links help support 1ShopApp when used—at no extra cost to you.
+              <span className="font-bold">Disclaimer:</span> 1ShopApp is an independent platform and your gateway to other websites. We do not collect any personal data. All trademarks and logos are the property of their respective owners. Use of this service is at your own discretion. Some links help support 1ShopApp when used—at no extra cost to you.
             </p>
         </footer>
       </main>
