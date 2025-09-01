@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2, Ticket } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2, Ticket, Download } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 import { FeedbackDialog } from '@/components/feedback-dialog';
 import { Button } from '@/components/ui/button';
@@ -191,16 +191,40 @@ const services: Service[] = [
   }
 ];
 
+// Define the type for the beforeinstallprompt event
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: Array<string>;
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed',
+    platform: string
+  }>;
+  prompt(): Promise<void>;
+}
+
 export default function Home() {
     const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
+    const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
     useEffect(() => {
-        // Check for the admin flag in localStorage when the component mounts
+        // Check for the admin flag in localStorage
         if (typeof window !== 'undefined') {
             const adminFlag = localStorage.getItem('isAdmin');
             setIsAdmin(adminFlag === 'true');
         }
+
+        // Handle PWA installation prompt
+        const handleBeforeInstallPrompt = (e: Event) => {
+            e.preventDefault();
+            setInstallPrompt(e as BeforeInstallPromptEvent);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        };
+
     }, []);
 
     const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
@@ -210,6 +234,11 @@ export default function Home() {
         if (query) {
             router.push(`/search?q=${encodeURIComponent(query)}`);
         }
+    };
+
+    const handleInstallClick = () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
     };
 
   return (
@@ -260,6 +289,11 @@ export default function Home() {
                <FeedbackDialog>
                     <Button variant="link" className="text-xs text-muted-foreground hover:text-foreground underline p-0 h-auto">Feedback</Button>
                </FeedbackDialog>
+               {installPrompt && (
+                 <Button variant="link" className="text-xs text-muted-foreground hover:text-foreground underline p-0 h-auto" onClick={handleInstallClick}>
+                    <Download className="w-3 h-3 mr-1"/> Install App
+                </Button>
+               )}
               {isAdmin && (
                 <Link href="/admin" className="text-xs text-muted-foreground hover:text-foreground underline">
                     Admin
@@ -267,7 +301,7 @@ export default function Home() {
               )}
             </div>
              <p className="text-[10px] text-muted-foreground/80 pt-2">
-              <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform. We are not affiliated with, sponsored by, or endorsed by the brands featured. We may earn a commission from affiliate links, at no extra cost to you. Use of this service is at your own discretion.
+              <span className='font-bold'>Disclaimer:</span> 1ShopApp is an independent platform and your gateway to other websites. We do not collect any personal data. All trademarks and logos are the property of their respective owners. Use of this service is at your own discretion.
             </p>
         </footer>
       </main>

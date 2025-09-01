@@ -14,13 +14,7 @@ export default function RootLayout({
 }>) {
 
   useEffect(() => {
-    const handleInstallPrompt = (e: Event) => {
-      // This event is fired when the browser detects the app is installable.
-      // We can use this to track if the user sees the install prompt.
-    };
-
-    window.addEventListener('beforeinstallprompt', handleInstallPrompt);
-
+    // This listener is purely for analytics to track successful installations.
     const handleAppInstalled = () => {
         trackPWAInstall();
     };
@@ -28,7 +22,6 @@ export default function RootLayout({
     window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
