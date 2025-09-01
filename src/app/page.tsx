@@ -294,9 +294,6 @@ export default function Home() {
                <Link href="/about" className="text-xs text-muted-foreground hover:text-foreground underline">
                   About Us
               </Link>
-               <Link href="/cashback" className="text-xs text-muted-foreground hover:text-foreground underline">
-                  My Cashback
-              </Link>
               <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
                   Partner with us
               </Link>
