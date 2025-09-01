@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import React, { useState, useEffect } from 'react';
+import { trackPWAInstall } from '@/lib/analytics';
 
 const services: Service[] = [
   { 
@@ -254,6 +255,12 @@ export default function Home() {
     const handleInstallClick = () => {
         if (!installPrompt) return;
         installPrompt.prompt();
+        // Analytics for the prompt being shown can be tracked here
+        installPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                trackPWAInstall(); // Custom analytics event
+            }
+        });
     };
 
   return (
@@ -263,7 +270,7 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
-          <p className="text-base text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground">
             Declutter your phone. Access all your essential apps in one place and save storage space.
           </p>
            <form onSubmit={handleSearch} className="mt-6 w-full relative">
@@ -319,7 +326,7 @@ export default function Home() {
               )}
             </div>
              <p className="text-[10px] text-muted-foreground/80 pt-2">
-              Disclaimer: 1ShopApp connects you to external sites. No personal data is collected. Trademarks belong to their owners. Use responsibly. Some links help support 1ShopApp when used—at no extra cost to you.
+              1ShopApp is an independent platform and your gateway to other websites. We do not collect any personal data. All trademarks and logos are the property of their respective owners. Use of this service is at your own discretion. Some links help support 1ShopApp when used—at no extra cost to you.
             </p>
         </footer>
       </main>
