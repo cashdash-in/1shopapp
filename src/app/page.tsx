@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2 } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2, Ticket } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 import { FeedbackDialog } from '@/components/feedback-dialog';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,9 @@ const services: Service[] = [
       { name: 'DMart', href: 'https://www.dmart.in?ref=1shopapp' },
       { name: 'Blinkit', href: 'https://www.blinkit.com?ref=1shopapp' },
       { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
+      { name: 'Nykaa', href: 'https://www.nykaa.com/' },
+      { name: 'Purplle', href: 'https://www.purplle.com/' },
+      { name: 'Sephora', href: 'https://www.sephora.com/' },
     ] 
   },
   { 
@@ -42,7 +45,7 @@ const services: Service[] = [
     color: '#4CAF50', 
     links: [
       { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
-      { name: 'PhonePe', href: 'https://www.phonepe.com/en/bill-payments/?ref=1shopapp'},
+      { name: 'PhonePe', href: 'https://www.phonepe.com/bill-payments/'},
       { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
     ] 
   },
@@ -58,6 +61,7 @@ const services: Service[] = [
       { name: 'OYO', href: 'https://www.oyorooms.com/?ref=1shopapp' },
       { name: 'Booking.com', href: 'https://www.booking.com/?ref=1shopapp' },
       { name: 'Agoda', href: 'https://www.agoda.com/?ref=1shopapp' },
+      { name: 'IRCTC', href: 'https://www.irctc.co.in/' },
     ] 
   },
   {
@@ -110,7 +114,7 @@ const services: Service[] = [
       { name: 'Shiprocket', href: 'https://www.shiprocket.in/' },
     ]
   },
-  {
+   {
     name: 'Beauty',
     icon: Sparkles,
     color: '#E5398D',
@@ -155,6 +159,18 @@ const services: Service[] = [
       { name: 'Angel Broking', href: 'https://www.angelone.in/' },
       { name: 'Sharekhan', href: 'https://www.sharekhan.com/' },
       { name: 'ICICI Securities', href: 'https://www.icicidirect.com/' },
+    ]
+  },
+  {
+    name: 'Theaters',
+    icon: Ticket,
+    color: '#F44336',
+    links: [
+      { name: 'BookMyShow', href: 'https://in.bookmyshow.com/' },
+      { name: 'Paytm Movies', href: 'https://paytm.com/movies' },
+      { name: 'TicketNew', href: 'https://www.ticketnew.com/' },
+      { name: 'PVR Cinemas', href: 'https://www.pvrcinemas.com/' },
+      { name: 'INOX', href: 'https://www.inoxmovies.com/' },
     ]
   }
 ];
