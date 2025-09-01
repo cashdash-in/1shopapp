@@ -270,8 +270,8 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Declutter your phone. Access all your essential apps in one place and save storage space.
+          <p className="text-sm sm:text-base text-muted-foreground whitespace-nowrap">
+            Declutter your phone. All your essential apps in one place.
           </p>
            <form onSubmit={handleSearch} className="mt-6 w-full relative">
                 <Input
