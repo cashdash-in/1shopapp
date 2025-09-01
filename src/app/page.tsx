@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2, Ticket, Download } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2, Ticket, Download, Wallet } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 import { FeedbackDialog } from '@/components/feedback-dialog';
 import { Button } from '@/components/ui/button';
@@ -146,7 +146,7 @@ const services: Service[] = [
     color: '#F44336',
     links: [
       { name: 'BookMyShow', href: 'https://in.bookmyshow.com/' },
-      { name: 'Paytm Movies', href: 'https://paytm.com/movies' },
+      { name: 'Paytm Insider', href: 'https://insider.in/' },
       { name: 'TicketNew', href: 'https://www.ticketnew.com/' },
       { name: 'PVR Cinemas', href: 'https://www.pvrcinemas.com/' },
       { name: 'INOX', href: 'https://www.inoxmovies.com/' },
@@ -279,6 +279,9 @@ export default function Home() {
             <div className="flex justify-center items-center gap-2 md:gap-4 flex-wrap">
                <Link href="/about" className="text-xs text-muted-foreground hover:text-foreground underline">
                   About Us
+              </Link>
+               <Link href="/cashback" className="text-xs text-muted-foreground hover:text-foreground underline">
+                  My Cashback
               </Link>
               <Link href="/partner" className="text-xs text-muted-foreground hover:text-foreground underline">
                   Partner with us

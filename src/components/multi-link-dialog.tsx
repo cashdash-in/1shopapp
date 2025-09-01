@@ -31,10 +31,10 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className="sm:max-w-4xl bg-accent text-accent-foreground border-blue-500">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-4">
-             <Icon className="w-8 h-8" style={{ color: service.color }}/>
+             <Icon className="w-8 h-8"/>
             <DialogTitle className="text-2xl">{name}</DialogTitle>
           </div>
         </DialogHeader>
@@ -44,7 +44,7 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
             <div className='flex flex-row flex-wrap gap-x-8 gap-y-4'>
                 {categories.map((category) => (
                     <div key={category.name} className='space-y-2 flex-shrink-0'>
-                        <h4 className='font-semibold text-foreground'>{category.name}</h4>
+                        <h4 className='font-semibold '>{category.name}</h4>
                         <div className="flex flex-col gap-2">
                             {category.links.map((link) => (
                                 <Button
