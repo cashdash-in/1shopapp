@@ -5,18 +5,8 @@
  * @fileOverview This file exports a function for searching products.
  * This is a placeholder and is not implemented.
  */
+import type { ProductSearchInput, ProductSearchOutput } from '../schemas';
 
-import {z} from 'zod';
-
-export const ProductSearchInputSchema = z.object({
-  query: z.string().describe('The search query for the product.'),
-});
-export type ProductSearchInput = z.infer<typeof ProductSearchInputSchema>;
-
-export const ProductSearchOutputSchema = z.object({
-  results: z.array(z.string()).describe('A list of product names.'),
-});
-export type ProductSearchOutput = z.infer<typeof ProductSearchOutputSchema>;
 
 export async function searchProducts(
   input: ProductSearchInput

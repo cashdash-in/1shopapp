@@ -14,6 +14,7 @@ import { DollarSign, Users, CreditCard, Activity, MousePointerClick, Download } 
 import { getPartners } from '@/ai/flows/partner-signup-flow';
 import { getFeedback } from '@/ai/flows/feedback-submission-flow';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getClickCounts } from '@/ai/flows/click-tracking-flow';
 
 const data = [
     { name: "Jan", total: 0 },
@@ -48,11 +49,10 @@ export default function AdminDashboard() {
         setLoading(true);
         const partners = await getPartners();
         const feedback = await getFeedback();
+        const clicks = await getClickCounts();
 
-        // Calculate total clicks from localStorage
-        const storedClicks = localStorage.getItem('brandClicks');
-        const clicks = storedClicks ? JSON.parse(storedClicks) : {};
-        const totalClicks = Object.values(clicks).reduce((acc: number, item: any) => acc + item.clicks, 0);
+        // Calculate total clicks from the server
+        const totalClicks = clicks.reduce((acc, item) => acc + item.clicks, 0);
 
         // Get unanalyzed feedback count for 'pending approvals'
         const pendingApprovals = feedback.filter(f => !f.analysis).length;

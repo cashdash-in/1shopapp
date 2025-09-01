@@ -6,12 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from '@/components/ui/skeleton';
-
-interface ClickData {
-    category: string;
-    brand: string;
-    clicks: number;
-}
+import { getClickCounts } from '@/ai/flows/click-tracking-flow';
+import type { ClickData } from '@/ai/schemas';
 
 interface PopularityData extends ClickData {
     popularity: number; // Percentage
@@ -23,26 +19,30 @@ export default function BrandPopularityPage() {
 
     useEffect(() => {
         setLoading(true);
-        // In a real app, this data would come from a database.
-        // For this prototype, we'll retrieve it from localStorage.
-        const storedClicks = localStorage.getItem('brandClicks');
-        const clicks: Record<string, ClickData> = storedClicks ? JSON.parse(storedClicks) : {};
+        async function fetchData() {
+            try {
+                const clickDataArray = await getClickCounts();
 
-        const clickDataArray = Object.values(clicks);
+                // Calculate total clicks per category
+                const categoryTotals = clickDataArray.reduce((acc, item) => {
+                    acc[item.category] = (acc[item.category] || 0) + item.clicks;
+                    return acc;
+                }, {} as Record<string, number>);
 
-        // Calculate total clicks per category
-        const categoryTotals = clickDataArray.reduce((acc, item) => {
-            acc[item.category] = (acc[item.category] || 0) + item.clicks;
-            return acc;
-        }, {} as Record<string, number>);
+                const calculatedData = clickDataArray.map(item => ({
+                    ...item,
+                    popularity: categoryTotals[item.category] ? (item.clicks / categoryTotals[item.category]) * 100 : 0
+                })).sort((a, b) => b.clicks - a.clicks); // Sort by most clicks
 
-        const calculatedData = clickDataArray.map(item => ({
-            ...item,
-            popularity: categoryTotals[item.category] ? (item.clicks / categoryTotals[item.category]) * 100 : 0
-        })).sort((a, b) => b.clicks - a.clicks); // Sort by most clicks
+                setPopularityData(calculatedData);
+            } catch (error) {
+                console.error("Failed to fetch brand popularity data:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
 
-        setPopularityData(calculatedData);
-        setLoading(false);
+        fetchData();
     }, []);
 
     return (

@@ -56,3 +56,28 @@ export const FeedbackSchema = z.object({
   analysis: SentimentOutputSchema.optional(),
 });
 export type Feedback = z.infer<typeof FeedbackSchema>;
+
+// Schemas for Click Tracking Flow
+export const ClickUpdateInputSchema = z.object({
+  category: z.string(),
+  brand: z.string(),
+});
+export type ClickUpdateInput = z.infer<typeof ClickUpdateInputSchema>;
+
+export const ClickDataSchema = z.object({
+    category: z.string(),
+    brand: z.string(),
+    clicks: z.number(),
+});
+export type ClickData = z.infer<typeof ClickDataSchema>;
+
+// Schemas for Product Search Flow
+export const ProductSearchInputSchema = z.object({
+  query: z.string().describe('The search query for the product.'),
+});
+export type ProductSearchInput = z.infer<typeof ProductSearchInputSchema>;
+
+export const ProductSearchOutputSchema = z.object({
+  results: z.array(z.string()).describe('A list of product names.'),
+});
+export type ProductSearchOutput = z.infer<typeof ProductSearchOutputSchema>;
