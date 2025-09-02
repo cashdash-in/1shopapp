@@ -39,9 +39,6 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
               <DialogTitle className="text-2xl">{name}</DialogTitle>
           </div>
         </DialogHeader>
-        <a href="/" className="absolute top-14 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50 flex-shrink-0">
-            1
-        </a>
         {/* Render links with categories */}
         {categories && categories.length > 0 && (
             <div className={cn(
