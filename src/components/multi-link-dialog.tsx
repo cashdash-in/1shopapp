@@ -41,10 +41,8 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
         </DialogHeader>
         {/* The 'X' close button is part of DialogContent and is absolute positioned */}
         {/* Adding the '1' button separately */}
-        <Link href="/" passHref legacyBehavior>
-          <a className="absolute top-14 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
-              1
-          </a>
+        <Link href="/" className="absolute top-14 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
+            1
         </Link>
 
         {/* Render links with categories */}
