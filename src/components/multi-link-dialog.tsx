@@ -34,16 +34,16 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md rounded-lg">
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-4 pr-12">
-             <Icon className="w-8 h-8"/>
-            <DialogTitle className="text-2xl">{name}</DialogTitle>
+          <div className="flex items-center justify-between gap-3 mb-4 pr-12">
+            <div className='flex items-center gap-3'>
+              <Icon className="w-8 h-8"/>
+              <DialogTitle className="text-2xl">{name}</DialogTitle>
+            </div>
+            <a href="/" className="h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50 flex-shrink-0">
+                1
+            </a>
           </div>
         </DialogHeader>
-        {/* The 'X' close button is part of DialogContent and is absolute positioned */}
-        {/* Adding the '1' button separately */}
-        <a href="/" className="absolute top-14 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
-            1
-        </a>
 
         {/* Render links with categories */}
         {categories && categories.length > 0 && (
