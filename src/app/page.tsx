@@ -59,14 +59,28 @@ export const services: Service[] = [
     ] 
   },
   { 
-    name: 'Bill Pay', 
+    name: 'Bill pay and Utilities', 
     icon: Receipt, 
     color: '#4CAF50', 
-    links: [
-      { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
-      { name: 'PhonePe', href: 'https://www.phonepe.com?ref=1shopapp'},
-      { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
-    ] 
+    categories: [
+      {
+        name: 'Bill Pay',
+        links: [
+          { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
+          { name: 'PhonePe', href: 'https://www.phonepe.com?ref=1shopapp'},
+          { name: 'Google Pay', href: 'https://pay.google.com/intl/en_in/about/?ref=1shopapp'},
+          { name: 'HP Pay', href: 'https://pay.hindustanpetroleum.com/hp-pay-web/user-login'},
+        ]
+      },
+      {
+          name: 'Utilities',
+          links: [
+              { name: 'Electricity Bill', href: 'https://www.google.com/search?q=electricity+bill+payment' },
+              { name: 'Water Bill', href: 'https://www.google.com/search?q=water+bill+payment' },
+              { name: 'Gas Cylinder', href: 'https://www.google.com/search?q=gas+cylinder+booking' },
+          ]
+      }
+    ]
   },
   { 
     name: 'Hotels & Travel', 
@@ -356,3 +370,5 @@ export default function Home() {
     </>
   );
 }
+
+    
