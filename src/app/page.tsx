@@ -331,8 +331,8 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-2">
             1ShopApp
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground whitespace-nowrap">
-            Declutter your phone. Save Space. All your essential apps in one place.
+          <p className="text-sm sm:text-base text-muted-foreground whitespace-normal">
+            Access all your essential apps in one place and Save Space.
           </p>
            <form onSubmit={handleSearch} className="mt-6 w-full relative">
                 <Input
@@ -383,11 +383,16 @@ export default function Home() {
                 </Link>
               )}
             </div>
-             <p className="text-[10px] text-muted-foreground/80 pt-2">
-              <span className="font-bold">Disclaimer:</span> 1ShopApp is an independent platform and your gateway to other websites. We do not collect any personal data. All trademarks and logos are the property of their respective owners. Use of this service is at your own discretion. Some links help support 1ShopApp when used—at no extra cost to you.
-            </p>
+             <div className="text-[10px] text-muted-foreground/80 pt-2 space-y-1">
+                <p>
+                    <span className="font-bold">Disclaimer:</span> 1ShopApp is an independent platform and your gateway to other websites. We do not collect any personal data. All trademarks and logos are the property of their respective owners. Use of this service is at your own discretion. Some links help support 1ShopApp when used—at no extra cost to you.
+                </p>
+                <p className="font-semibold">Powered by Snazzify.co.in</p>
+             </div>
         </footer>
       </main>
     </>
   );
 }
+
+    
