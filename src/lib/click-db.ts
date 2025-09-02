@@ -58,5 +58,25 @@ export let FAKE_CLICK_DB: Record<string, { category: string; brand: string; clic
         "category": "Emails",
         "brand": "Rediffmail",
         "clicks": 1
+    },
+    "Bill pay and Utilities_Electricity Bill": {
+        "category": "Bill pay and Utilities",
+        "brand": "Electricity Bill",
+        "clicks": 1
+    },
+    "Bill pay and Utilities_Water Bill": {
+        "category": "Bill pay and Utilities",
+        "brand": "Water Bill",
+        "clicks": 1
+    },
+    "Bill pay and Utilities_Gas Cylinder": {
+        "category": "Bill pay and Utilities",
+        "brand": "Gas Cylinder",
+        "clicks": 1
+    },
+    "Bill pay and Utilities_HP Pay": {
+        "category": "Bill pay and Utilities",
+        "brand": "HP Pay",
+        "clicks": 2
     }
 };

@@ -64,7 +64,7 @@ export const services: Service[] = [
     color: '#4CAF50', 
     categories: [
       {
-        name: 'Bill Pay',
+        name: 'UPI',
         links: [
           { name: 'Paytm', href: 'https://paytm.com/recharge?ref=1shopapp'},
           { name: 'PhonePe', href: 'https://www.phonepe.com?ref=1shopapp'},
@@ -370,5 +370,3 @@ export default function Home() {
     </>
   );
 }
-
-    
