@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -35,18 +34,18 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md rounded-lg">
         <DialogHeader>
-           <DialogClose asChild>
-             <Link href="/" passHref>
-                <div className="fixed top-4 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
-                    1
-                </div>
-            </Link>
-           </DialogClose>
           <div className="flex items-center gap-3 mb-4 pr-12">
              <Icon className="w-8 h-8"/>
             <DialogTitle className="text-2xl">{name}</DialogTitle>
           </div>
         </DialogHeader>
+        {/* The 'X' close button is part of DialogContent and is absolute positioned */}
+        {/* Adding the '1' button separately */}
+        <Link href="/" passHref>
+          <div className="absolute top-14 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
+              1
+          </div>
+        </Link>
 
         {/* Render links with categories */}
         {categories && categories.length > 0 && (
