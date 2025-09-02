@@ -47,6 +47,13 @@ export const services: Service[] = [
                 { name: 'Croma', href: 'https://www.croma.com?ref=1shopapp' },
             ]
         },
+        {
+            name: 'Beauty',
+            links: [
+                { name: 'Nykaa', href: 'https://www.nykaa.com/' },
+                { name: 'Purplle', href: 'https://www.purplle.com/' },
+            ]
+        },
     ] 
   },
   { 
@@ -127,10 +134,23 @@ export const services: Service[] = [
     name: 'Insurance', 
     icon: Shield, 
     color: '#6A1B9A', 
-    links: [
-        { name: 'Policybazaar', href: 'https://www.policybazaar.com/?ref=1shopapp'},
-        { name: 'Acko', href: 'https://www.acko.com/?ref=1shopapp'},
-        { name: 'Digit', href: 'https://www.godigit.com/?ref=1shopapp'},
+    categories: [
+        {
+            name: 'Health Insurance',
+            links: [
+                { name: 'Policybazaar', href: 'https://www.policybazaar.com/health-insurance/'},
+                { name: 'Acko', href: 'https://www.acko.com/health-insurance/'},
+                { name: 'Digit', href: 'https://www.godigit.com/health-insurance'},
+            ]
+        },
+        {
+            name: 'Motor Insurance',
+            links: [
+                { name: 'Policybazaar', href: 'https://www.policybazaar.com/motor-insurance/'},
+                { name: 'Acko', href: 'https://www.acko.com/car-insurance/'},
+                { name: 'Digit', href: 'https://www.godigit.com/motor-insurance'},
+            ]
+        }
     ]
   },
   { 
@@ -229,7 +249,8 @@ export const services: Service[] = [
             name: 'AI Tools',
             links: [
                 { name: 'ChatGPT', href: 'https://chat.openai.com' },
-                { name: 'Copilot', href: 'https://copilot.microsoft.com' },
+                { name
+: 'Copilot', href: 'https://copilot.microsoft.com' },
             ]
         }
     ]
@@ -318,7 +339,7 @@ export default function Home() {
                     name="search"
                     id="search"
                     placeholder="Search for your Favourite App or Website"
-                    className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md border"
+                    className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md border-primary/20"
                 />
                 <Button type="submit" size="icon" className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full w-9 h-9">
                     <SearchIcon className="h-5 w-5" />
