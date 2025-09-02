@@ -134,23 +134,10 @@ export const services: Service[] = [
     name: 'Insurance', 
     icon: Shield, 
     color: '#6A1B9A', 
-    categories: [
-        {
-            name: 'Health Insurance',
-            links: [
-                { name: 'Policybazaar', href: 'https://www.policybazaar.com/health-insurance/'},
-                { name: 'Acko', href: 'https://www.acko.com/health-insurance/'},
-                { name: 'Digit', href: 'https://www.godigit.com/health-insurance'},
-            ]
-        },
-        {
-            name: 'Motor Insurance',
-            links: [
-                { name: 'Policybazaar', href: 'https://www.policybazaar.com/motor-insurance/'},
-                { name: 'Acko', href: 'https://www.acko.com/car-insurance/'},
-                { name: 'Digit', href: 'https://www.godigit.com/motor-insurance'},
-            ]
-        }
+    links: [
+        { name: 'Policybazaar', href: 'https://www.policybazaar.com/motor-insurance/'},
+        { name: 'Acko', href: 'https://www.acko.com/car-insurance/'},
+        { name: 'Digit', href: 'https://www.godigit.com/motor-insurance'},
     ]
   },
   { 
@@ -249,8 +236,7 @@ export const services: Service[] = [
             name: 'AI Tools',
             links: [
                 { name: 'ChatGPT', href: 'https://chat.openai.com' },
-                { name
-: 'Copilot', href: 'https://copilot.microsoft.com' },
+                { name: 'Copilot', href: 'https://copilot.microsoft.com' },
             ]
         }
     ]
@@ -394,5 +380,3 @@ export default function Home() {
     </>
   );
 }
-
-    
