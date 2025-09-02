@@ -205,6 +205,9 @@ export const services: Service[] = [
         { name: 'Google', href: 'https://www.google.com' },
         { name: 'Bing', href: 'https://www.bing.com' },
         { name: 'DuckDuckGo', href: 'https://www.duckduckgo.com' },
+        { name: 'Yahoo Search', href: 'https://search.yahoo.com' },
+        { name: 'ChatGPT', href: 'https://chat.openai.com' },
+        { name: 'Copilot', href: 'https://copilot.microsoft.com' },
     ]
   },
   {
@@ -215,6 +218,7 @@ export const services: Service[] = [
         { name: 'Gmail', href: 'https://mail.google.com' },
         { name: 'Outlook', href: 'https://outlook.live.com' },
         { name: 'Yahoo Mail', href: 'https://mail.yahoo.com' },
+        { name: 'Rediffmail', href: 'https://mail.rediff.com' },
     ]
   }
 ];
@@ -244,7 +248,7 @@ export default function Home() {
         // Handle PWA installation prompt
         const handleBeforeInstallPrompt = (e: Event) => {
             e.preventDefault();
-            setInstallPrompt(e as BeforeInstallPromptEvent);
+            setInstallPrompt(e as BeforeInstallGpromptEvent);
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
