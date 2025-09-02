@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -14,6 +15,7 @@ import type { Service } from './service-tile';
 import { ArrowUpRight } from 'lucide-react';
 import { trackLinkClick } from '@/lib/analytics';
 import { Separator } from './ui/separator';
+import { cn } from '@/lib/utils';
 
 
 interface MultiLinkDialogProps {
@@ -33,7 +35,14 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md rounded-lg">
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-4">
+           <DialogClose asChild>
+             <Link href="/" passHref>
+                <div className="fixed top-4 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
+                    1
+                </div>
+            </Link>
+           </DialogClose>
+          <div className="flex items-center gap-3 mb-4 pr-12">
              <Icon className="w-8 h-8"/>
             <DialogTitle className="text-2xl">{name}</DialogTitle>
           </div>
@@ -41,7 +50,10 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
 
         {/* Render links with categories */}
         {categories && categories.length > 0 && (
-            <div className='flex flex-row flex-wrap gap-x-8 gap-y-4'>
+            <div className={cn(
+                'flex flex-col gap-4', // Default vertical layout
+                name === 'Shopping' && 'flex-row flex-wrap gap-x-8 gap-y-4' // Horizontal for Shopping
+            )}>
                 {categories.map((category) => (
                     <div key={category.name} className='space-y-2 flex-shrink-0'>
                         <h4 className='font-semibold '>{category.name}</h4>

@@ -78,5 +78,10 @@ export let FAKE_CLICK_DB: Record<string, { category: string; brand: string; clic
         "category": "Bill pay and Utilities",
         "brand": "HP Pay",
         "clicks": 2
+    },
+    "Emails_Gmail": {
+        "category": "Emails",
+        "brand": "Gmail",
+        "clicks": 1
     }
 };
