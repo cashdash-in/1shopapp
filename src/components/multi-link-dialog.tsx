@@ -41,17 +41,17 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
         </DialogHeader>
         {/* The 'X' close button is part of DialogContent and is absolute positioned */}
         {/* Adding the '1' button separately */}
-        <Link href="/" passHref>
-          <div className="absolute top-14 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
+        <Link href="/" passHref legacyBehavior>
+          <a className="absolute top-14 right-4 h-10 w-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl font-bold cursor-pointer z-50">
               1
-          </div>
+          </a>
         </Link>
 
         {/* Render links with categories */}
         {categories && categories.length > 0 && (
             <div className={cn(
                 'flex flex-col gap-4', // Default vertical layout
-                name === 'Shopping' && 'flex-row flex-wrap gap-x-8 gap-y-4' // Horizontal for Shopping
+                name === 'Shopping' && 'md:flex-row md:flex-wrap md:gap-x-8 md:gap-y-4' // Horizontal for Shopping on medium screens and up
             )}>
                 {categories.map((category) => (
                     <div key={category.name} className='space-y-2 flex-shrink-0'>
