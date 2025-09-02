@@ -198,16 +198,26 @@ export const services: Service[] = [
     ]
   },
   {
-    name: 'Search Engines',
+    name: 'Search Engine and AI tools',
     icon: SearchIcon,
     color: '#4285F4',
-    links: [
-        { name: 'Google', href: 'https://www.google.com' },
-        { name: 'Bing', href: 'https://www.bing.com' },
-        { name: 'DuckDuckGo', href: 'https://www.duckduckgo.com' },
-        { name: 'Yahoo Search', href: 'https://search.yahoo.com' },
-        { name: 'ChatGPT', href: 'https://chat.openai.com' },
-        { name: 'Copilot', href: 'https://copilot.microsoft.com' },
+    categories: [
+        {
+            name: 'Search Engines',
+            links: [
+                { name: 'Google', href: 'https://www.google.com' },
+                { name: 'Bing', href: 'https://www.bing.com' },
+                { name: 'DuckDuckGo', href: 'https://www.duckduckgo.com' },
+                { name: 'Yahoo Search', href: 'https://search.yahoo.com' },
+            ]
+        },
+        {
+            name: 'AI Tools',
+            links: [
+                { name: 'ChatGPT', href: 'https://chat.openai.com' },
+                { name: 'Copilot', href: 'https://copilot.microsoft.com' },
+            ]
+        }
     ]
   },
   {
@@ -248,7 +258,7 @@ export default function Home() {
         // Handle PWA installation prompt
         const handleBeforeInstallPrompt = (e: Event) => {
             e.preventDefault();
-            setInstallPrompt(e as BeforeInstallGpromptEvent);
+            setInstallPrompt(e as BeforeInstallPromptEvent);
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);

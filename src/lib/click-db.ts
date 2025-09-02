@@ -43,5 +43,20 @@ export let FAKE_CLICK_DB: Record<string, { category: string; brand: string; clic
         "category": "Search Engines",
         "brand": "Google",
         "clicks": 1
+    },
+    "Search Engines_Copilot": {
+        "category": "Search Engines",
+        "brand": "Copilot",
+        "clicks": 1
+    },
+    "Search Engines_ChatGPT": {
+        "category": "Search Engines",
+        "brand": "ChatGPT",
+        "clicks": 1
+    },
+    "Emails_Rediffmail": {
+        "category": "Emails",
+        "brand": "Rediffmail",
+        "clicks": 1
     }
 };
