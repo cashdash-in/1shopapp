@@ -31,7 +31,7 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-md sm:max-w-2xl md:max-w-4xl bg-accent text-accent-foreground border-blue-500">
+      <DialogContent className="w-[95vw] max-w-md rounded-lg">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-4">
              <Icon className="w-8 h-8"/>

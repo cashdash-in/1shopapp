@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { ServiceTile } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2, Ticket, Download, Wallet } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Sparkles, Users, Newspaper, LineChart, Home as HomeIcon, Lightbulb, Search as SearchIcon, Building2, Ticket, Download, Wallet, Mail } from 'lucide-react';
 import type { Service } from '@/components/service-tile';
 import { FeedbackDialog } from '@/components/feedback-dialog';
 import { Button } from '@/components/ui/button';
@@ -120,18 +120,29 @@ export const services: Service[] = [
     ]
   },
   { 
-    name: 'Finance', 
+    name: 'Finance & Investing', 
     color: '#2E7D32',
     icon: Landmark, 
-    links: [
-        { name: 'HDFC Bank', href: 'https://www.hdfcbank.com/?ref=1shopapp'},
-        { name: 'ICICI Bank', href: 'https://www.icicibank.com/?ref=1shopapp'},
-        { name: 'State Bank of India', href: 'https://www.onlinesbi.sbi/?ref=1shopapp'},
-        { name: 'Axis Bank', href: 'https://www.axisbank.com/?ref=1shopapp'},
-        { name: 'Kotak Mahindra Bank', href: 'https://www.kotak.com/en/personal-banking.html?ref=1shopapp'},
-        { name: 'Punjab National Bank', href: 'https://www.pnbindia.in/?ref=1shopapp'},
-        { name: 'IndusInd Bank', href: 'https://www.indusind.com/?ref=1shopapp'},
-        { name: 'Bandhan Bank', href: 'https://www.bandhanbank.com/?ref=1shopapp'}
+    categories: [
+        {
+            name: 'Banking',
+            links: [
+                { name: 'HDFC Bank', href: 'https://www.hdfcbank.com/?ref=1shopapp'},
+                { name: 'ICICI Bank', href: 'https://www.icicibank.com/?ref=1shopapp'},
+                { name: 'State Bank of India', href: 'https://www.onlinesbi.sbi/?ref=1shopapp'},
+                { name: 'Axis Bank', href: 'https://www.axisbank.com/?ref=1shopapp'},
+                { name: 'Kotak Mahindra Bank', href: 'https://www.kotak.com/en/personal-banking.html?ref=1shopapp'},
+            ]
+        },
+        {
+            name: 'Trading',
+            links: [
+                { name: 'Moneycontrol', href: 'https://www.moneycontrol.com/' },
+                { name: 'ET Markets', href: 'https://economictimes.indiatimes.com/markets' },
+                { name: 'Zerodha', href: 'https://zerodha.com/' },
+                { name: 'Groww', href: 'https://groww.in/' },
+            ]
+        }
     ]
   },
   {
@@ -161,40 +172,49 @@ export const services: Service[] = [
     ]
   },
   {
-    name: 'Social Media',
+    name: 'News & Social',
     icon: Users,
     color: '#1DA1F2',
-    links: [
-      { name: 'Facebook', href: 'https://www.facebook.com/' },
-      { name: 'Instagram', href: 'https://www.instagram.com/' },
-      { name: 'X (Twitter)', href: 'https://www.twitter.com/' },
-      { name: 'LinkedIn', href: 'https://www.linkedin.com/' },
-      { name: 'WhatsApp', href: 'https://www.whatsapp.com/' },
+    categories: [
+        {
+            name: 'Social Media',
+            links: [
+                { name: 'Facebook', href: 'https://www.facebook.com/' },
+                { name: 'Instagram', href: 'https://www.instagram.com/' },
+                { name: 'X (Twitter)', href: 'https://www.twitter.com/' },
+                { name: 'LinkedIn', href: 'https://www.linkedin.com/' },
+                { name: 'WhatsApp', href: 'https://www.whatsapp.com/' },
+            ]
+        },
+        {
+            name: 'News',
+            links: [
+                { name: 'Times of India', href: 'https://timesofindia.indiatimes.com/' },
+                { name: 'Hindustan Times', href: 'https://www.hindustantimes.com/' },
+                { name: 'The Hindu', href: 'https://www.thehindu.com/' },
+                { name: 'NDTV', href: 'https://www.ndtv.com/' },
+            ]
+        }
     ]
   },
   {
-    name: 'News',
-    icon: Newspaper,
-    color: '#B91C1C',
+    name: 'Search Engines',
+    icon: SearchIcon,
+    color: '#4285F4',
     links: [
-      { name: 'Times of India', href: 'https://timesofindia.indiatimes.com/' },
-      { name: 'Hindustan Times', href: 'https://www.hindustantimes.com/' },
-      { name: 'The Hindu', href: 'https://www.thehindu.com/' },
-      { name: 'NDTV', href: 'https://www.ndtv.com/' },
+        { name: 'Google', href: 'https://www.google.com' },
+        { name: 'Bing', href: 'https://www.bing.com' },
+        { name: 'DuckDuckGo', href: 'https://www.duckduckgo.com' },
     ]
   },
   {
-    name: 'Market',
-    icon: LineChart,
-    color: '#0288D1',
+    name: 'Emails',
+    icon: Mail,
+    color: '#DB4437',
     links: [
-      { name: 'Moneycontrol', href: 'https://www.moneycontrol.com/' },
-      { name: 'ET Markets', href: 'https://economictimes.indiatimes.com/markets' },
-      { name: 'Zerodha', href: 'https://zerodha.com/' },
-      { name: 'Groww', href: 'https://groww.in/' },
-      { name: 'Angel Broking', href: 'https://www.angelone.in/' },
-      { name: 'Sharekhan', href: 'https://www.sharekhan.com/' },
-      { name: 'ICICI Securities', href: 'https://www.icicidirect.com/' },
+        { name: 'Gmail', href: 'https://mail.google.com' },
+        { name: 'Outlook', href: 'https://outlook.live.com' },
+        { name: 'Yahoo Mail', href: 'https://mail.yahoo.com' },
     ]
   }
 ];
