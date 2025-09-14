@@ -123,11 +123,10 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     newLinks[index][field] = value;
     setLinks(newLinks);
 
-    if (field === 'href' && value) {
+    if (field === 'name' && value) {
         const allLinks = getAllLinks();
         const filteredSuggestions = allLinks.filter(link => 
-            link.name.toLowerCase().includes(value.toLowerCase()) || 
-            link.href.toLowerCase().includes(value.toLowerCase())
+            link.name.toLowerCase().includes(value.toLowerCase())
         );
         setSuggestions(filteredSuggestions as Suggestion[]);
         setActiveSuggestionBox(index);
@@ -142,8 +141,8 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     newLinks[index] = { name: suggestion.name, href: suggestion.href };
     setLinks(newLinks);
 
-    // If this is the first link, populate the main tile details too
-    if (index === 0 && !name) {
+    // If this is the first link, and the main tile details are empty, populate them
+    if (index === 0 && !name && !icon && color === '#000000') {
         setName(suggestion.name);
         setIcon(typeof suggestion.icon === 'string' ? suggestion.icon : 'Globe');
         setColor(suggestion.color);
@@ -292,17 +291,7 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
                                 value={link.name}
                                 onChange={(e) => handleLinkChange(index, 'name', e.target.value)}
                                 className="col-span-3 h-8"
-                                placeholder="e.g., Google Drive"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor={`link-href-${index}`} className="text-right text-xs">URL</Label>
-                            <Input
-                                id={`link-href-${index}`}
-                                value={link.href}
-                                onChange={(e) => handleLinkChange(index, 'href', e.target.value)}
-                                className="col-span-3 h-8"
-                                placeholder="e.g., https://drive.google.com"
+                                placeholder="e.g., HDFC"
                                 autoComplete="off"
                             />
                         </div>
@@ -322,6 +311,17 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
                                 </div>
                             </ScrollArea>
                         )}
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor={`link-href-${index}`} className="text-right text-xs">URL</Label>
+                            <Input
+                                id={`link-href-${index}`}
+                                value={link.href}
+                                onChange={(e) => handleLinkChange(index, 'href', e.target.value)}
+                                className="col-span-3 h-8"
+                                placeholder="e.g., https://netbanking.hdfcbank.com"
+                                autoComplete="off"
+                            />
+                        </div>
                     </div>
                 ))}
                 <Button variant="outline" size="sm" onClick={addLink}>Add another link</Button>
