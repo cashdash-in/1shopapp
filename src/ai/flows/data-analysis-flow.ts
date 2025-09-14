@@ -9,7 +9,6 @@
 import { ai } from '@/ai/genkit';
 import type { DataAnalysisInput, DataAnalysisOutput } from '../schemas';
 import { DataAnalysisInputSchema, DataAnalysisOutputSchema } from '../schemas';
-import { z } from 'zod';
 
 // The main function that clients will call.
 export async function analyzeData(input: DataAnalysisInput): Promise<DataAnalysisOutput> {
@@ -17,32 +16,13 @@ export async function analyzeData(input: DataAnalysisInput): Promise<DataAnalysi
     return result;
 }
 
-// This tool defines the structure we want the AI to return.
-// By providing this tool, we are telling the AI to use it to format its answer.
-const analysisTool = ai.defineTool(
-    {
-        name: 'dataAnalysisTool',
-        description: 'Analyzes data to answer a question and provides a summary and optional data table.',
-        inputSchema: DataAnalysisOutputSchema,
-        outputSchema: z.void(), // The tool itself doesn't return anything, it's just for structured output.
-    },
-    async () => {} // The tool's function is a no-op.
-);
-
-// Define the Genkit flow
-const dataAnalysisFlow = ai.defineFlow(
-  {
-    name: 'dataAnalysisFlow',
-    inputSchema: DataAnalysisInputSchema,
-    outputSchema: DataAnalysisOutputSchema,
-  },
-  async (input) => {
-    const { output } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash-preview',
-        tools: [analysisTool],
-        toolChoice: 'tool', // Force the model to use the specified tool.
-        prompt: `You are an expert data analyst. Your task is to analyze the provided dataset based on the user's question.
-Call the dataAnalysisTool with your answer.
+// Define the prompt for the AI model, specifying JSON as the output format.
+const analysisPrompt = ai.definePrompt({
+    name: 'dataAnalysisPrompt',
+    input: { schema: DataAnalysisInputSchema },
+    output: { schema: DataAnalysisOutputSchema, format: 'json' },
+    model: 'googleai/gemini-2.5-flash-preview',
+    prompt: `You are an expert data analyst. Your task is to analyze the provided dataset based on the user's question and return the answer in the specified JSON format.
 
 ### Instructions:
 1.  Analyze the data to answer the user's question.
@@ -51,24 +31,29 @@ Call the dataAnalysisTool with your answer.
 
 ### Dataset:
 \`\`\`
-${input.data}
+{{{data}}}
 \`\`\`
 
 ### User's Question:
-"${input.question}"
+"{{{question}}}"
 `,
-    });
+});
 
-    const analysis = output?.toolRequest?.input;
+// Define the Genkit flow, now simplified to just call the prompt.
+const dataAnalysisFlow = ai.defineFlow(
+  {
+    name: 'dataAnalysisFlow',
+    inputSchema: DataAnalysisInputSchema,
+    outputSchema: DataAnalysisOutputSchema,
+  },
+  async (input) => {
+    const { output } = await analysisPrompt(input);
 
-    if (!analysis) {
+    if (!output) {
         throw new Error("The AI model did not return a valid analysis structure.");
     }
     
-    // The model output needs to be parsed if it's a string, which can happen.
-    const finalResult = typeof analysis === 'string' ? JSON.parse(analysis) : analysis;
-    
-    // Validate the final result against the Zod schema before returning.
-    return DataAnalysisOutputSchema.parse(finalResult);
+    // The output is now guaranteed by the prompt definition to be a valid JSON object.
+    return output;
   }
 );
