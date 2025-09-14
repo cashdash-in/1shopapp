@@ -19,8 +19,7 @@ export async function generateBiReport(input: BiReportInput): Promise<BiReportOu
 const biReportPrompt = ai.definePrompt({
   name: 'biReportPrompt',
   input: { schema: BiReportInputSchema },
-  output: { schema: BiReportOutputSchema, format: 'json' },
-  model: 'googleai/gemini-2.5-flash-preview',
+  output: { schema: BiReportOutputSchema },
   prompt: `You are an expert BI (Business Intelligence) analyst. Your task is to analyze the provided dataset based on the user's request and generate a BI report with a title, a brief summary, and data formatted for a chart.
 
 ### Instructions:
@@ -49,7 +48,14 @@ const biReportFlow = ai.defineFlow(
     outputSchema: BiReportOutputSchema,
   },
   async (input) => {
-    const { output } = await biReportPrompt(input);
+    const { output } = await ai.generate({
+        prompt: await biReportPrompt.render(input),
+        model: 'googleai/gemini-2.5-flash-preview',
+        output: {
+            schema: BiReportOutputSchema,
+        }
+    });
+
     if (!output) {
       throw new Error("The AI model did not return a valid BI report structure.");
     }
