@@ -65,7 +65,8 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
 
   const setTileName = (newName: string) => {
     setName(newName);
-    if (links.length > 0) {
+    // If it's a new tile, also update the first link's name to match the tile name initially.
+    if (mode === 'add' && links.length > 0 && links[0].name === (originalName || '')) {
       const newLinks = [...links];
       newLinks[0].name = newName;
       setLinks(newLinks);
@@ -88,12 +89,12 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
   }
 
   useEffect(() => {
+    if (!open) return; // Don't run logic if dialog is closed
+
     if (selectedTile === '__new__') {
-        setMode('add');
-        // Clear fields for new tile entry, but keep URL if user was analyzing
         const currentUrl = url;
         resetLocalState();
-        setUrl(currentUrl);
+        setUrl(currentUrl); // Keep URL if user was analyzing
     } else {
         const tileToEdit = services.find(s => s.name === selectedTile);
         if (tileToEdit) {
@@ -102,11 +103,21 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
             setName(tileToEdit.name);
             setIcon(typeof tileToEdit.icon === 'string' ? tileToEdit.icon : 'Globe');
             setColor(tileToEdit.color);
-            const allLinks = tileToEdit.links || (tileToEdit.href ? [{ name: tileToEdit.name, href: tileToEdit.href }] : []);
-            setLinks(allLinks.length > 0 ? allLinks : [{ name: '', href: '' }]);
+            
+            // Consolidate all possible links into one array
+            const allLinks = [
+                ...(tileToEdit.href ? [{ name: tileToEdit.name, href: tileToEdit.href }] : []),
+                ...(tileToEdit.links || []),
+                ...(tileToEdit.categories?.flatMap(c => c.links) || [])
+            ];
+
+            // Remove duplicates
+            const uniqueLinks = Array.from(new Map(allLinks.map(item => [item.name, item])).values());
+            
+            setLinks(uniqueLinks.length > 0 ? uniqueLinks : [{ name: '', href: '' }]);
         }
     }
-  }, [selectedTile, services, url]);
+  }, [selectedTile, services, open]);
 
   const handleAnalyzeUrl = async () => {
     if (!url || !url.startsWith('http://') && !url.startsWith('https://')) {
@@ -137,10 +148,13 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
 
   const getAllLinks = useCallback(() => {
     let allLinks: Suggestion[] = [];
+    // Combine default services and user-stored services for suggestions
     const storedServicesRaw = typeof window !== 'undefined' ? localStorage.getItem('userServices') : null;
-    const allServices = storedServicesRaw ? JSON.parse(storedServicesRaw) as Service[] : ALL_SERVICES_DATA;
+    const userServices = storedServicesRaw ? JSON.parse(storedServicesRaw) as Service[] : [];
+    const combinedServices = [...ALL_SERVICES_DATA, ...userServices];
+    const uniqueServices = Array.from(new Map(combinedServices.map(item => [item.name, item])).values());
 
-    allServices.forEach(service => {
+    uniqueServices.forEach(service => {
         if (service.href) {
             allLinks.push({ name: service.name, href: service.href, icon: service.icon, color: service.color });
         }
@@ -164,7 +178,8 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
     if (field === 'name' && value.trim()) {
         const allLinks = getAllLinks();
         const filteredSuggestions = allLinks.filter(link => 
-            link.name.toLowerCase().includes(value.toLowerCase())
+            link.name.toLowerCase().includes(value.toLowerCase()) &&
+            !links.some(l => l.name.toLowerCase() === link.name.toLowerCase()) // Don't suggest already added links
         );
         setSuggestions(filteredSuggestions);
         setActiveSuggestionBox(index);
@@ -173,7 +188,8 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
         setActiveSuggestionBox(null);
     }
     
-    if (index === 0 && field === 'name') {
+    // If it's a new tile and the user is editing the first link's name, update the tile name too.
+    if (mode === 'add' && index === 0 && field === 'name') {
         setName(value);
     }
   };
@@ -183,7 +199,8 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
     newLinks[index] = { name: suggestion.name, href: suggestion.href };
     setLinks(newLinks);
 
-    if (mode === 'add' && index === 0 && !name && !icon && color === '#000000') {
+    // If it's a new tile and we are filling the first link, pre-fill the tile details.
+    if (mode === 'add' && index === 0) {
         setName(suggestion.name);
         setIcon(typeof suggestion.icon === 'string' ? suggestion.icon : 'Globe');
         setColor(suggestion.color);
@@ -215,6 +232,7 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
         const newLinks = links.filter((_, i) => i !== index);
         setLinks(newLinks);
     } else {
+        // If it's the last link, just clear it instead of removing the row.
         setLinks([{ name: '', href: '' }]);
     }
   };
@@ -231,7 +249,8 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
         name,
         icon: icon as any,
         color,
-        links: filledLinks,
+        // If there's only one link and its name matches the tile name, use the simpler `href` property.
+        ...(filledLinks.length === 1 && filledLinks[0].name === name ? { href: filledLinks[0].href } : { links: filledLinks }),
       };
 
       if (mode === 'edit') {
@@ -245,6 +264,7 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
+        // Reset state after a short delay to allow the dialog to close smoothly
         setTimeout(resetLocalState, 300);
     }
   }
