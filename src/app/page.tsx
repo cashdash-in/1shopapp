@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import React, { useState, useEffect } from 'react';
 import { trackPWAInstall } from '@/lib/analytics';
 import { services as defaultServices } from '@/lib/default-services';
-import { Download, Search as SearchIcon, Pencil } from 'lucide-react';
+import { Download, Search as SearchIcon, Pencil, Home as HomeIcon } from 'lucide-react';
 import { EditBar } from '@/components/edit-bar';
 
 

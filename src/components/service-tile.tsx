@@ -7,8 +7,7 @@ import * as LucideIcons from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MultiLinkDialog } from './multi-link-dialog';
 import { trackLinkClick } from '@/lib/analytics';
-import { Globe, X } from 'lucide-react';
-import { Button } from './ui/button';
+import { Globe } from 'lucide-react';
 
 interface ServiceLink {
   name: string;
@@ -51,35 +50,32 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   const handleLinkClick = () => {
     trackLinkClick(name, name); // For single links, service name is the link name
   }
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (isEditMode) {
+      e.preventDefault(); // Prevent the default browser context menu
+      if (window.confirm(`Are you sure you want to delete the "${name}" tile?`)) {
+        onDelete?.();
+      }
+    }
+  };
   
   if (isEditMode) {
       return (
-         <div className="relative group">
-             <Button
-                variant="destructive"
-                size="icon"
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full z-10"
-                style={{ opacity: 1 }}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    onDelete?.();
-                }}
-             >
-                <X className="w-4 h-4"/>
-                <span className="sr-only">Delete {name}</span>
-             </Button>
-            <div className="block group cursor-pointer border-dashed border-2 rounded-lg">
-                <Card
-                    className="h-full border-transparent"
-                    style={{ backgroundColor: `${color}80` }} // 50% opacity
-                >
-                    <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
-                    <Icon className="w-8 h-8 mb-2" />
-                    <p className="text-sm font-semibold text-center">{name}</p>
-                    </CardContent>
-                </Card>
-            </div>
+         <div 
+            className="relative group h-full cursor-pointer border-2 border-dashed border-muted-foreground/50 rounded-lg p-1"
+            onContextMenu={handleContextMenu}
+            title={`Right-click to delete ${name}`}
+          >
+            <Card
+                className="h-full border-transparent"
+                style={{ backgroundColor: `${color}80` }} // 50% opacity
+            >
+                <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
+                <Icon className="w-8 h-8 mb-2" />
+                <p className="text-sm font-semibold text-center">{name}</p>
+                </CardContent>
+            </Card>
         </div>
       )
   }
