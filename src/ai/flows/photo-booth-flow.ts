@@ -43,7 +43,7 @@ const photoBoothFlow = ai.defineFlow(
             { text: `Transform this image into ${styleInstruction}` },
         ],
         config: {
-            responseModalities: ['TEXT', 'IMAGE'],
+            responseModalities: ['IMAGE'],
         },
     });
 
