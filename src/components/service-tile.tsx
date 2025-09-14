@@ -37,13 +37,12 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   const { name, color, href, links, categories } = service;
 
   let Icon: ElementType;
-  // If the icon is a string (from user-added tiles), look it up in the LucideIcons library.
-  if (typeof service.icon === 'string') {
-    Icon = LucideIcons[service.icon as keyof typeof LucideIcons] || Globe;
-  } 
-  // Otherwise, it's already a component (from default services).
-  else {
-    Icon = service.icon || Globe;
+  if (typeof service.icon === 'string' && LucideIcons[service.icon as keyof typeof LucideIcons]) {
+    Icon = LucideIcons[service.icon as keyof typeof LucideIcons] as ElementType;
+  } else if (typeof service.icon !== 'string') {
+    Icon = service.icon;
+  } else {
+    Icon = Globe;
   }
 
 
