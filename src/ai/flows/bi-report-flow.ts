@@ -20,7 +20,6 @@ const biReportPrompt = ai.definePrompt({
   name: 'biReportPrompt',
   input: { schema: BiReportInputSchema },
   output: { schema: BiReportOutputSchema },
-  model: 'googleai/gemini-2.5-flash-preview',
   prompt: `You are an expert BI (Business Intelligence) analyst. Your task is to analyze the provided dataset based on the user's request and generate a BI report with a title, a brief summary, and data formatted for a chart.
 
 ### Instructions:
@@ -49,7 +48,18 @@ const biReportFlow = ai.defineFlow(
     outputSchema: BiReportOutputSchema,
   },
   async (input) => {
-    const { output } = await biReportPrompt(input);
+    const llmResponse = await ai.generate({
+      model: 'googleai/gemini-2.5-flash-preview',
+      prompt: {
+        ...biReportPrompt,
+        input: input,
+      },
+      output: {
+        schema: BiReportOutputSchema,
+      }
+    });
+
+    const output = llmResponse.output();
 
     if (!output) {
       throw new Error("The AI model did not return a valid BI report structure.");
@@ -57,12 +67,15 @@ const biReportFlow = ai.defineFlow(
     
     // Ensure all chart values are numbers, as the model may sometimes return them as strings.
     const sanitizedChartData = output.chartData.map(d => {
+        // The value can come back as a string (e.g., "1,200") or a number.
+        // We need to handle both cases to prevent crashes.
         const numericValue = typeof d.value === 'string' 
-            ? parseFloat(d.value.replace(/[^0-9.-]+/g,"")) 
+            ? parseFloat(d.value.replace(/[^0-9.-]+/g,"")) // Remove commas, symbols, etc.
             : d.value;
         
         return {
             ...d,
+            // If parsing fails (e.g., for an empty string), default to 0.
             value: isNaN(numericValue) ? 0 : numericValue,
         };
     });
