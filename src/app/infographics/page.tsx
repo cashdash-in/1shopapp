@@ -1,14 +1,16 @@
 
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft, Download, Search } from 'lucide-react';
 import Link from 'next/link';
+import { Input } from '@/components/ui/input';
 import {
   Bar,
   BarChart,
+  ComposedChart,
   Line,
   LineChart,
   Pie,
@@ -24,6 +26,7 @@ import {
   YAxis,
   Legend,
   Cell,
+  CartesianGrid,
 } from 'recharts';
 
 const barChartData = [
@@ -32,7 +35,7 @@ const barChartData = [
   { name: 'Mar', revenue: 5890, expenses: 9800 },
   { name: 'Apr', revenue: 4780, expenses: 3908 },
   { name: 'May', revenue: 6189, expenses: 4800 },
-  { name: 'Jun', revenue: 5390, expenses: 3800 },
+  { name: 'Jun', revenue: 2390, expenses: 3800 },
 ];
 
 const lineChartData = [
@@ -54,9 +57,27 @@ const pieChartData = [
 const radarChartData = [
   { subject: 'Marketing', A: 120, B: 110, fullMark: 150 },
   { subject: 'Sales', A: 98, B: 130, fullMark: 150 },
-  { subject: 'Customer Support', A: 86, B: 130, fullMark: 150 },
+  { subject: 'Support', A: 86, B: 130, fullMark: 150 },
   { subject: 'Engineering', A: 99, B: 100, fullMark: 150 },
   { subject: 'Design', A: 85, B: 90, fullMark: 150 },
+];
+
+const stackedBarData = [
+    { month: 'Jan', productA: 400, productB: 240, productC: 220 },
+    { month: 'Feb', productA: 300, productB: 139, productC: 250 },
+    { month: 'Mar', productA: 200, productB: 980, productC: 200 },
+    { month: 'Apr', productA: 278, productB: 390, productC: 280 },
+    { month: 'May', productA: 189, productB: 480, productC: 218 },
+    { month: 'Jun', productA: 239, productB: 380, productC: 250 },
+];
+
+const composedChartData = [
+  { name: 'Page A', uv: 590, pv: 800, amt: 1400 },
+  { name: 'Page B', uv: 868, pv: 967, amt: 1506 },
+  { name: 'Page C', uv: 1397, pv: 1098, amt: 989 },
+  { name: 'Page D', uv: 1480, pv: 1200, amt: 1228 },
+  { name: 'Page E', uv: 1520, pv: 1108, amt: 1100 },
+  { name: 'Page F', uv: 1400, pv: 680, amt: 1700 },
 ];
 
 const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -133,6 +154,16 @@ const ChartCard = ({
 
 
 export default function InfographicsPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      const url = `https://www.google.com/search?tbm=isch&q=infographics+${encodeURIComponent(searchQuery.trim())}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
       <div className="w-full max-w-7xl">
@@ -142,8 +173,24 @@ export default function InfographicsPage() {
                 <span className="sr-only">Back to Home</span>
             </Link>
             <h1 className="text-3xl font-bold tracking-tight">Infographics & Charts</h1>
-            <p className="text-muted-foreground">A gallery of sample charts for your projects.</p>
+            <p className="text-muted-foreground">Search for infographics online or use the sample charts below.</p>
         </div>
+
+        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-10 w-full relative">
+            <Input
+                name="search"
+                id="search"
+                placeholder="Search for any infographic on the internet..."
+                className="h-12 text-lg pl-4 pr-12 rounded-full shadow-md border-primary/20"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button type="submit" size="icon" className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full w-9 h-9">
+                <Search className="h-5 w-5" />
+                <span className="sr-only">Search</span>
+            </Button>
+        </form>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChartCard title="Revenue vs Expenses" description="A bar chart comparing monthly revenue and expenses." chartId="bar-chart">
@@ -153,8 +200,8 @@ export default function InfographicsPage() {
                     <YAxis stroke="hsl(var(--foreground))" />
                     <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
                     <Legend />
-                    <Bar dataKey="revenue" fill="#8884d8" name="Revenue" />
-                    <Bar dataKey="expenses" fill="#82ca9d" name="Expenses" />
+                    <Bar dataKey="revenue" fill="hsl(var(--chart-1))" name="Revenue" />
+                    <Bar dataKey="expenses" fill="hsl(var(--chart-2))" name="Expenses" />
                     </BarChart>
                 </ResponsiveContainer>
             </ChartCard>
@@ -166,12 +213,12 @@ export default function InfographicsPage() {
                     <YAxis stroke="hsl(var(--foreground))" />
                      <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
                     <Legend />
-                    <Line type="monotone" dataKey="users" stroke="#8884d8" name="Active Users" />
+                    <Line type="monotone" dataKey="users" stroke="hsl(var(--chart-1))" name="Active Users" />
                     </LineChart>
                 </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Sales by Region" description="A pie chart showing the distribution of sales across regions." chartId="pie-chart">
+             <ChartCard title="Sales by Region" description="A pie chart showing the distribution of sales." chartId="pie-chart">
                 <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                     <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
@@ -184,8 +231,8 @@ export default function InfographicsPage() {
                     </PieChart>
                 </ResponsiveContainer>
             </ChartCard>
-
-            <ChartCard title="Team Skill Comparison" description="A radar chart comparing the skills of two teams." chartId="radar-chart">
+            
+            <ChartCard title="Team Skill Comparison" description="A radar chart comparing team competencies." chartId="radar-chart">
                 <ResponsiveContainer width="100%" height={300}>
                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarChartData}>
                     <PolarGrid />
@@ -193,9 +240,38 @@ export default function InfographicsPage() {
                     <PolarRadiusAxis />
                     <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
                     <Legend />
-                    <Radar name="Team A" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                    <Radar name="Team B" dataKey="B" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+                    <Radar name="Team A" dataKey="A" stroke="hsl(var(--chart-1))" fill="hsl(var(--chart-1))" fillOpacity={0.6} />
+                    <Radar name="Team B" dataKey="B" stroke="hsl(var(--chart-2))" fill="hsl(var(--chart-2))" fillOpacity={0.6} />
                     </RadarChart>
+                </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Monthly Product Sales" description="A stacked bar chart showing sales per product." chartId="stacked-bar-chart">
+                <ResponsiveContainer width="100%" height={300}>
+                   <BarChart data={stackedBarData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
+                        <Legend />
+                        <Bar dataKey="productA" stackId="a" fill="hsl(var(--chart-1))" name="Product A" />
+                        <Bar dataKey="productB" stackId="a" fill="hsl(var(--chart-2))" name="Product B" />
+                        <Bar dataKey="productC" stackId="a" fill="hsl(var(--chart-3))" name="Product C" />
+                    </BarChart>
+                </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Combined Data View" description="A composed chart with bar and line data." chartId="composed-chart">
+                 <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={composedChartData}>
+                        <CartesianGrid stroke="#f5f5f5" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
+                        <Legend />
+                        <Bar dataKey="pv" barSize={20} fill="hsl(var(--chart-4))" />
+                        <Line type="monotone" dataKey="uv" stroke="hsl(var(--chart-5))" />
+                    </ComposedChart>
                 </ResponsiveContainer>
             </ChartCard>
         </div>
