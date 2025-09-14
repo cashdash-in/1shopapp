@@ -20,6 +20,7 @@ const biReportPrompt = ai.definePrompt({
   name: 'biReportPrompt',
   input: { schema: BiReportInputSchema },
   output: { schema: BiReportOutputSchema },
+  model: 'googleai/gemini-2.5-flash-preview',
   prompt: `You are an expert BI (Business Intelligence) analyst. Your task is to analyze the provided dataset based on the user's request and generate a BI report with a title, a brief summary, and data formatted for a chart.
 
 ### Instructions:
@@ -48,24 +49,27 @@ const biReportFlow = ai.defineFlow(
     outputSchema: BiReportOutputSchema,
   },
   async (input) => {
-    const { output } = await ai.generate({
-        prompt: biReportPrompt,
-        input: input,
-        model: 'googleai/gemini-2.5-flash-preview',
-        output: {
-            schema: BiReportOutputSchema,
-        }
-    });
+    const output = await ai.run(biReportPrompt, input);
 
     if (!output) {
       throw new Error("The AI model did not return a valid BI report structure.");
     }
-    // Ensure all chart values are numbers
-    output.chartData.forEach(d => {
-        if (typeof d.value === 'string') {
-            d.value = parseFloat(d.value.replace(/[^0-9.-]+/g,"")) || 0;
-        }
+    
+    // Ensure all chart values are numbers, as the model may sometimes return them as strings.
+    const sanitizedChartData = output.chartData.map(d => {
+        const numericValue = typeof d.value === 'string' 
+            ? parseFloat(d.value.replace(/[^0-9.-]+/g,"")) 
+            : d.value;
+        
+        return {
+            ...d,
+            value: isNaN(numericValue) ? 0 : numericValue,
+        };
     });
-    return output;
+
+    return {
+        ...output,
+        chartData: sanitizedChartData,
+    };
   }
 );
