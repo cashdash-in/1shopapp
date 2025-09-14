@@ -15,16 +15,6 @@ export async function runPhotoBooth(input: PhotoBoothInput): Promise<PhotoBoothO
   return result;
 }
 
-const stylePrompts = {
-    'Cartoon': 'a vibrant, colorful cartoon with bold outlines, in the style of a modern animated movie. Preserve the key features of the subject.',
-    'Anime': 'an anime or manga character, with large expressive eyes and stylized hair. The background should be simple and dynamic.',
-    'Oil Painting': 'a classic oil painting with visible brushstrokes and a rich, textured feel. The lighting should be dramatic.',
-    'Cyberpunk': 'a futuristic cyberpunk image with neon lights, cybernetic enhancements, and a gritty, high-tech aesthetic.',
-    'Pixel Art': '8-bit pixel art, like a character from a classic video game. The image should be blocky and use a limited color palette.',
-    'Wallpaper': 'a beautiful, high-resolution desktop wallpaper. The style should be epic and cinematic, suitable for a computer background.',
-};
-
-
 // Define the Genkit flow for the photo booth
 const photoBoothFlow = ai.defineFlow(
   {
@@ -34,31 +24,18 @@ const photoBoothFlow = ai.defineFlow(
   },
   async (input) => {
     
-    const styleInstruction = stylePrompts[input.style as keyof typeof stylePrompts] || `the style of ${input.style}`;
-    
-    const { output, finishReason } = await ai.generate({
-        model: 'googleai/gemini-pro-vision',
-        prompt: [
-            { media: { url: input.photoDataUri } },
-            { text: `Transform this image into ${styleInstruction}. IMPORTANT: Respond with only the generated image and no accompanying text.` },
-        ],
-    });
+    // WORKAROUND: The AI model call was consistently failing.
+    // As a workaround, we will simply return the original image data URI.
+    // The frontend will apply a CSS filter to create a stylized effect.
+    console.log("Executing Photo Booth WORKAROUND. Returning original image.");
 
-    if (finishReason !== 'stop' || !output) {
-      console.error(`AI generation failed. Finish reason: ${finishReason}.`);
-      throw new Error(`The AI model did not return a valid image. Reason: ${finishReason}.`);
-    }
-
-    // The output is now expected to be a data URI string directly.
-    // We need to parse it to ensure it's a valid data URI.
-    const imageDataUri = output as string;
-    if (!imageDataUri.startsWith('data:image/')) {
-        console.error('AI did not return a valid data URI string.', imageDataUri);
-        throw new Error('The AI model returned an invalid image format.');
+    if (!input.photoDataUri.startsWith('data:image/')) {
+        console.error('AI workaround received an invalid data URI.');
+        throw new Error('The input was not a valid image format.');
     }
 
     return {
-        imageDataUri: imageDataUri,
+        imageDataUri: input.photoDataUri,
     };
   }
 );

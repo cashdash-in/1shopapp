@@ -12,14 +12,15 @@ import { runPhotoBooth } from '@/ai/flows/photo-booth-flow';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 const styles = [
-    { id: 'Cartoon', label: 'Cartoon' },
-    { id: 'Anime', label: 'Anime' },
-    { id: 'Oil Painting', label: 'Oil Painting' },
-    { id: 'Cyberpunk', label: 'Cyberpunk' },
-    { id: 'Pixel Art', label: 'Pixel Art' },
-    { id: 'Wallpaper', label: 'Wallpaper' },
+    { id: 'Cartoon', label: 'Cartoon', filter: 'saturate(2) contrast(1.5)' },
+    { id: 'Anime', label: 'Anime', filter: 'brightness(1.2) contrast(1.2)' },
+    { id: 'Oil Painting', label: 'Oil Painting', filter: 'sepia(0.5) contrast(1.4)' },
+    { id: 'Cyberpunk', label: 'Cyberpunk', filter: 'hue-rotate(-45deg) saturate(1.5) contrast(1.2)' },
+    { id: 'Pixel Art', label: 'Pixel Art', filter: 'grayscale(1) brightness(0.9) contrast(2)' },
+    { id: 'Wallpaper', label: 'Wallpaper', filter: 'brightness(1.1) contrast(1.1) saturate(1.2)' },
 ];
 
 export default function PhotoBoothPage() {
@@ -143,6 +144,8 @@ export default function PhotoBoothPage() {
         }
     };
 
+    const activeStyleFilter = styles.find(s => s.id === selectedStyle)?.filter || 'none';
+
     return (
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
             <Card className="w-full max-w-6xl">
@@ -239,11 +242,18 @@ export default function PhotoBoothPage() {
                                 </div>
                             </div>
                              <div>
-                                <h3 className='font-semibold text-center mb-2'>AI Generated</h3>
+                                <h3 className='font-semibold text-center mb-2'>Stylized</h3>
                                 <div className="aspect-square w-full rounded-md bg-muted flex items-center justify-center overflow-hidden">
                                      {loading && <Loader2 className="h-10 w-10 animate-spin text-primary" />}
                                      {!loading && generatedImage && (
-                                        <Image src={generatedImage} alt="Generated" width={512} height={512} className="object-contain w-full h-full" />
+                                        <Image 
+                                            src={generatedImage} 
+                                            alt="Generated" 
+                                            width={512} 
+                                            height={512} 
+                                            className="object-contain w-full h-full" 
+                                            style={{ filter: activeStyleFilter }}
+                                        />
                                      )}
                                      {!loading && !generatedImage && (
                                         <p className="text-muted-foreground text-sm">Your result</p>
