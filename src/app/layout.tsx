@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { trackPWAInstall } from "@/lib/analytics";
-import { Camera, BarChart3, Presentation } from "lucide-react";
+import { Camera, BarChart3, Presentation, LayoutGrid } from "lucide-react";
 
 export default function RootLayout({
   children,
@@ -55,6 +55,11 @@ export default function RootLayout({
             <Link href="/presentation-generator" passHref>
                 <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI Presentation Generator">
                     <Presentation className="h-6 w-6" />
+                </div>
+            </Link>
+            <Link href="/bi-reporting" passHref>
+                <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI BI Reporting">
+                    <LayoutGrid className="h-6 w-6" />
                 </div>
             </Link>
         </div>
