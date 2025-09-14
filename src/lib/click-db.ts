@@ -87,6 +87,11 @@ export let FAKE_CLICK_DB: Record<string, { category: string; brand: string; clic
     "Angel Broking_Angel Broking": {
         "category": "Angel Broking",
         "brand": "Angel Broking",
-        "clicks": 10
+        "clicks": 11
+    },
+    "Shopping_Croma": {
+        "category": "Shopping",
+        "brand": "Croma",
+        "clicks": 1
     }
 };

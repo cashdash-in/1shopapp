@@ -39,13 +39,16 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
 
   // Handle both string names and component types for icons
   let Icon: ElementType;
-  if (typeof service.icon === 'string' && LucideIcons[service.icon as keyof typeof LucideIcons]) {
-      Icon = LucideIcons[service.icon as keyof typeof LucideIcons] as ElementType;
-  } else if (typeof service.icon === 'function') {
-      Icon = service.icon;
+  const iconOrName = service.icon;
+
+  if (typeof iconOrName === 'string' && LucideIcons[iconOrName as keyof typeof LucideIcons]) {
+    Icon = LucideIcons[iconOrName as keyof typeof LucideIcons];
+  } else if (typeof iconOrName === 'function') {
+    Icon = iconOrName;
   } else {
-      Icon = Globe; // Default icon if not found
+    Icon = Globe; // Default icon
   }
+
 
   const handleLinkClick = () => {
     trackLinkClick(name, name); // For single links, service name is the link name
@@ -63,13 +66,18 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   if (isEditMode) {
       return (
          <div 
-            className="relative group h-full cursor-pointer border-2 border-dashed border-muted-foreground/50 rounded-lg p-1"
+            className="relative group h-full cursor-pointer rounded-lg p-1"
             onContextMenu={handleContextMenu}
             title={`Right-click to delete ${name}`}
           >
+           <div className="absolute top-0 right-0 z-10 p-0.5 bg-background rounded-full translate-x-1/2 -translate-y-1/2">
+                <div className="w-5 h-5 bg-red-500 text-white flex items-center justify-center rounded-full text-xs font-bold">
+                    &times;
+                </div>
+            </div>
             <Card
-                className="h-full border-transparent"
-                style={{ backgroundColor: `${color}80` }} // 50% opacity
+                className="h-full border-2 border-dashed border-muted-foreground/50 opacity-70"
+                style={{ backgroundColor: color }}
             >
                 <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
                 <Icon className="w-8 h-8 mb-2" />
