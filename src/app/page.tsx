@@ -98,6 +98,10 @@ export default function Home() {
         setServices(prevServices => [...prevServices, newService]);
     };
 
+    const updateService = (updatedService: Service, originalName: string) => {
+        setServices(prevServices => prevServices.map(s => s.name === originalName ? updatedService : s));
+    }
+
     const deleteService = (serviceNameToDelete: string) => {
         setServices(prevServices => prevServices.filter(s => s.name !== serviceNameToDelete));
     };
@@ -174,7 +178,12 @@ export default function Home() {
              </div>
         </footer>
       </main>
-      <EditBar isVisible={editMode} onAddService={addService} />
+      <EditBar 
+        isVisible={editMode} 
+        services={services}
+        onAddService={addService} 
+        onUpdateService={updateService} 
+      />
     </>
   );
 }

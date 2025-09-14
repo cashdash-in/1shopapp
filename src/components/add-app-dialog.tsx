@@ -16,7 +16,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import type { Service } from './service-tile';
 import { generateTileMetadata } from '@/ai/flows/tile-creation-flow';
-import { Loader2, Wand2, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2, Wand2, PlusCircle, Trash2, Pencil } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@/lib/utils';
@@ -27,7 +27,9 @@ import { ScrollArea } from './ui/scroll-area';
 
 interface AddAppDialogProps {
   children: React.ReactNode;
+  services: Service[];
   onAddService: (service: Service) => void;
+  onUpdateService: (service: Service, originalName: string) => void;
 }
 
 const iconOptions = [
@@ -41,11 +43,15 @@ interface Suggestion {
     color: string;
 }
 
-export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
+export function AddAppDialog({ children, services, onAddService, onUpdateService }: AddAppDialogProps) {
   const [url, setUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState('');
   const [open, setOpen] = useState(false);
+  
+  const [mode, setMode] = useState<'add' | 'edit'>('add');
+  const [selectedTile, setSelectedTile] = useState<string>('__new__');
+  const [originalName, setOriginalName] = useState('');
 
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('');
@@ -57,7 +63,6 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
   
   const suggestionBoxRef = useRef<HTMLDivElement>(null);
 
-  // Name state with a custom setter to update the first link name as well
   const setTileName = (newName: string) => {
     setName(newName);
     if (links.length > 0) {
@@ -67,8 +72,10 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     }
   }
 
-
   const resetLocalState = () => {
+    setMode('add');
+    setSelectedTile('__new__');
+    setOriginalName('');
     setUrl('');
     setIsAnalyzing(false);
     setAnalysisError('');
@@ -79,6 +86,27 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     setSuggestions([]);
     setActiveSuggestionBox(null);
   }
+
+  useEffect(() => {
+    if (selectedTile === '__new__') {
+        setMode('add');
+        // Clear fields for new tile entry, but keep URL if user was analyzing
+        const currentUrl = url;
+        resetLocalState();
+        setUrl(currentUrl);
+    } else {
+        const tileToEdit = services.find(s => s.name === selectedTile);
+        if (tileToEdit) {
+            setMode('edit');
+            setOriginalName(tileToEdit.name);
+            setName(tileToEdit.name);
+            setIcon(typeof tileToEdit.icon === 'string' ? tileToEdit.icon : 'Globe');
+            setColor(tileToEdit.color);
+            const allLinks = tileToEdit.links || (tileToEdit.href ? [{ name: tileToEdit.name, href: tileToEdit.href }] : []);
+            setLinks(allLinks.length > 0 ? allLinks : [{ name: '', href: '' }]);
+        }
+    }
+  }, [selectedTile, services, url]);
 
   const handleAnalyzeUrl = async () => {
     if (!url || !url.startsWith('http://') && !url.startsWith('https://')) {
@@ -133,7 +161,6 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     newLinks[index][field] = value;
     setLinks(newLinks);
 
-    // If typing in the name field, show suggestions
     if (field === 'name' && value.trim()) {
         const allLinks = getAllLinks();
         const filteredSuggestions = allLinks.filter(link => 
@@ -146,7 +173,6 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
         setActiveSuggestionBox(null);
     }
     
-    // If this is the first link, update the main tile name
     if (index === 0 && field === 'name') {
         setName(value);
     }
@@ -157,8 +183,7 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     newLinks[index] = { name: suggestion.name, href: suggestion.href };
     setLinks(newLinks);
 
-    // If this is the first link, and the main tile details are empty, populate them
-    if (index === 0 && !name && !icon && color === '#000000') {
+    if (mode === 'add' && index === 0 && !name && !icon && color === '#000000') {
         setName(suggestion.name);
         setIcon(typeof suggestion.icon === 'string' ? suggestion.icon : 'Globe');
         setColor(suggestion.color);
@@ -189,10 +214,12 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     if (links.length > 1) {
         const newLinks = links.filter((_, i) => i !== index);
         setLinks(newLinks);
+    } else {
+        setLinks([{ name: '', href: '' }]);
     }
   };
 
-  const handleAddService = () => {
+  const handleSubmit = () => {
     const filledLinks = links.filter(link => link.name.trim() !== '' && link.href.trim() !== '');
 
     if (!name || !icon || !color || filledLinks.length === 0) {
@@ -207,8 +234,12 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
         links: filledLinks,
       };
 
-      onAddService(newService);
-      setOpen(false); // This will trigger the onOpenChange and reset state.
+      if (mode === 'edit') {
+        onUpdateService(newService, originalName);
+      } else {
+        onAddService(newService);
+      }
+      setOpen(false);
   }
   
   const handleOpenChange = (isOpen: boolean) => {
@@ -223,34 +254,52 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add a New App or Website</DialogTitle>
+          <DialogTitle>Add or Edit an App</DialogTitle>
           <DialogDescription>
-            Enter a URL to get AI suggestions, or start typing in the link fields to find existing brands.
+            Create a new tile, or select an existing one to modify it.
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-2 max-h-[70vh] overflow-y-auto pr-4">
-            {/* URL Input for AI */}
             <div className="space-y-2">
-                <Label htmlFor="url">Analyze Website URL (Optional)</Label>
-                <div className="flex items-center gap-2">
-                    <Input
-                        id="url"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="https://example.com"
-                        disabled={isAnalyzing}
-                    />
-                    <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url} size="icon" variant="outline">
-                        {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                        <span className="sr-only">Analyze</span>
-                    </Button>
-                </div>
+                <Label>Mode</Label>
+                <Select value={selectedTile} onValueChange={setSelectedTile}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Create a new tile or edit..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="__new__">Create a new tile</SelectItem>
+                        {services.map(service => (
+                            <SelectItem key={service.name} value={service.name}>
+                                Edit "{service.name}"
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
+
+            {mode === 'add' && (
+              <div className="space-y-2 pt-4 border-t">
+                  <Label htmlFor="url">Analyze Website URL (Optional)</Label>
+                  <div className="flex items-center gap-2">
+                      <Input
+                          id="url"
+                          value={url}
+                          onChange={(e) => setUrl(e.target.value)}
+                          placeholder="https://example.com"
+                          disabled={isAnalyzing}
+                      />
+                      <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url} size="icon" variant="outline">
+                          {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                          <span className="sr-only">Analyze</span>
+                      </Button>
+                  </div>
+              </div>
+            )}
 
             <div className="space-y-4 pt-4 border-t">
                 <p className={cn("text-sm text-center", analysisError ? "text-destructive" : "text-muted-foreground")}>
-                    {analysisError || "Fill in the details for your new custom tile."}
+                    {analysisError || `You are now ${mode === 'add' ? 'creating a new' : 'editing the'} tile.`}
                 </p>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">Tile Name</Label>
@@ -263,9 +312,11 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
                             <SelectValue placeholder="Select an icon" />
                         </SelectTrigger>
                         <SelectContent>
-                            {iconOptions.map((iconName) => (
-                                <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
-                            ))}
+                            <ScrollArea className="h-72">
+                                {iconOptions.map((iconName) => (
+                                    <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
+                                ))}
+                            </ScrollArea>
                         </SelectContent>
                     </Select>
                 </div>
@@ -347,9 +398,9 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
 
         <DialogFooter className="border-t pt-4">
           <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddService} disabled={isAnalyzing || !name}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Tile
+          <Button onClick={handleSubmit} disabled={isAnalyzing || !name}>
+            {mode === 'add' ? <PlusCircle className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
+            {mode === 'add' ? 'Add Tile' : 'Update Tile'}
           </Button>
         </DialogFooter>
       </DialogContent>
