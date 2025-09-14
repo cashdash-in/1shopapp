@@ -146,8 +146,8 @@ export default function Home() {
                <FeedbackDialog>
                     <Button variant="link" className="text-xs text-muted-foreground hover:text-foreground underline p-0 h-auto">Feedback</Button>
                </FeedbackDialog>
-                <Button variant="link" className="text-xs text-muted-foreground hover:text-foreground underline p-0 h-auto" onClick={() => setEditMode(prev => !prev)}>
-                    <Pencil className="w-3 h-3 mr-1"/> {editMode ? 'Done Editing' : 'Customize'}
+                <Button variant="outline" size="sm" onClick={() => setEditMode(prev => !prev)}>
+                    <Pencil className="w-3 h-3 mr-1"/> {editMode ? 'Done' : 'Customize'}
                 </Button>
                {installPrompt && !editMode && (
                  <Button variant="link" className="text-xs text-muted-foreground hover:text-foreground underline p-0 h-auto" onClick={handleInstallClick}>

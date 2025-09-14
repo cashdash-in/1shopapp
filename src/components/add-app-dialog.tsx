@@ -30,15 +30,18 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
   const [open, setOpen] = useState(false);
 
   const handleAddApp = async () => {
-    if (!url) {
-      setError('Please enter a website URL.');
+    setError('');
+
+    // More robust client-side validation
+    if (!url || !url.startsWith('http://') && !url.startsWith('https://')) {
+      setError('Please enter a full and valid URL (e.g., https://example.com).');
       return;
     }
-    setError('');
+
     setLoading(true);
 
     try {
-      // Validate URL format on the client
+      // This is for format validation, although the check above is more user-friendly.
       new URL(url);
 
       const metadata = await generateTileMetadata({ url });
