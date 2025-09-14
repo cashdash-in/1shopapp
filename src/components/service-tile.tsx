@@ -41,12 +41,14 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   const iconOrName = service.icon;
 
   if (typeof iconOrName === 'string' && LucideIcons[iconOrName as keyof typeof LucideIcons]) {
+    // If it's a string, look it up in the LucideIcons object
     Icon = LucideIcons[iconOrName as keyof typeof LucideIcons];
   } else if (typeof iconOrName === 'function' || (typeof iconOrName === 'object' && iconOrName && 'render' in iconOrName)) {
-    // This handles React components passed directly (as functions or forwardRef objects)
+    // If it's already a component (function or forwardRef object), use it directly
     Icon = iconOrName as ElementType;
   } else {
-    Icon = Globe; // Default icon
+    // Fallback to a default icon if neither of the above
+    Icon = Globe;
   }
 
 
