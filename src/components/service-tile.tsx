@@ -31,9 +31,13 @@ interface ServiceTileProps {
   service: Service;
   isEditMode?: boolean;
   onDelete?: () => void;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
 }
 
-export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps) {
+export function ServiceTile({ service, isEditMode, onDelete, onDragStart, onDragEnd, onDragOver, onDrop }: ServiceTileProps) {
   const { name, color, href, links, categories } = service;
 
   let Icon: ElementType;
@@ -63,12 +67,17 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   if (isEditMode) {
       return (
          <div 
-            className="relative group h-full cursor-pointer rounded-lg p-1"
+            className="relative group h-full cursor-move rounded-lg p-1 transition-all"
             onContextMenu={handleContextMenu}
-            title={`Right-click to delete ${name}`}
+            title={`Drag to reorder. Right-click to delete ${name}.`}
+            draggable="true"
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
           >
            <Card
-                className="h-full border-2 border-dashed border-muted-foreground/50 opacity-70"
+                className="h-full border-2 border-dashed border-muted-foreground/50 opacity-70 pointer-events-none" // pointer-events-none on children
             >
                 <CardContent className="flex flex-col items-center justify-center p-4 h-full text-foreground aspect-square">
                 <Icon className="w-8 h-8 mb-2" style={{ color }} />

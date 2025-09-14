@@ -31,6 +31,8 @@ export default function Home() {
     const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [services, setServices] = useState<Service[]>([]);
     const [editMode, setEditMode] = useState(false);
+    const [draggedService, setDraggedService] = useState<Service | null>(null);
+
 
     useEffect(() => {
         // Load services from localStorage or use defaults
@@ -106,6 +108,43 @@ export default function Home() {
         setServices(prevServices => prevServices.filter(s => s.name !== serviceNameToDelete));
     };
 
+    // --- Drag and Drop Handlers ---
+    const handleDragStart = (e: React.DragEvent, service: Service) => {
+        setDraggedService(service);
+        // Make the dragged element semi-transparent
+        e.currentTarget.classList.add('opacity-50');
+    };
+
+    const handleDragEnd = (e: React.DragEvent) => {
+        // Clean up styles and state
+        e.currentTarget.classList.remove('opacity-50');
+        setDraggedService(null);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        // This is necessary to allow a drop
+        e.preventDefault();
+    };
+
+    const handleDrop = (e: React.DragEvent, targetService: Service) => {
+        e.preventDefault();
+        if (!draggedService || draggedService.name === targetService.name) {
+            return; // No drop if it's the same tile or no tile is being dragged
+        }
+
+        const fromIndex = services.findIndex(s => s.name === draggedService.name);
+        const toIndex = services.findIndex(s => s.name === targetService.name);
+        
+        if (fromIndex !== -1 && toIndex !== -1) {
+            const newServices = [...services];
+            // Remove the dragged service from its original position
+            const [movedService] = newServices.splice(fromIndex, 1);
+            // Insert it at the new position
+            newServices.splice(toIndex, 0, movedService);
+            setServices(newServices);
+        }
+    };
+
   return (
     <>
       <main className="min-h-screen bg-background flex flex-col p-4">
@@ -138,6 +177,10 @@ export default function Home() {
                 service={service}
                 isEditMode={editMode}
                 onDelete={() => deleteService(service.name)}
+                onDragStart={(e) => handleDragStart(e, service)}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, service)}
               />
             ))}
           </div>
