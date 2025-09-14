@@ -43,14 +43,15 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
     Icon = service.icon as ElementType || Globe;
   }
 
-
   const handleLinkClick = () => {
-    trackLinkClick(name, name); // For single links, service name is the link name
+    // For single links, service name is the link name
+    trackLinkClick(name, name); 
   }
 
   const handleContextMenu = (e: React.MouseEvent) => {
     if (isEditMode) {
-      e.preventDefault(); // Prevent the default browser context menu
+      // Prevent the default browser context menu
+      e.preventDefault(); 
       if (window.confirm(`Are you sure you want to delete the "${name}" tile?`)) {
         onDelete?.();
       }
