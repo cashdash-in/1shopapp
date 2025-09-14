@@ -49,7 +49,7 @@ const biReportFlow = ai.defineFlow(
     outputSchema: BiReportOutputSchema,
   },
   async (input) => {
-    const output = await ai.run(biReportPrompt, input);
+    const { output } = await biReportPrompt(input);
 
     if (!output) {
       throw new Error("The AI model did not return a valid BI report structure.");
