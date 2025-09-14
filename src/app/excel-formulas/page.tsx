@@ -64,6 +64,38 @@ const formulaCategories = [
     }
 ];
 
+const shortcutCategories = [
+    {
+        category: "General Shortcuts",
+        shortcuts: [
+            { name: "Ctrl + C", description: "Copy selected cells." },
+            { name: "Ctrl + V", description: "Paste content from clipboard." },
+            { name: "Ctrl + X", description: "Cut selected cells." },
+            { name: "Ctrl + Z", description: "Undo the last action." },
+            { name: "Ctrl + Y", description: "Redo the last action." },
+            { name: "Ctrl + S", description: "Save the workbook." },
+        ]
+    },
+    {
+        category: "Navigation Shortcuts",
+        shortcuts: [
+            { name: "Arrow Keys", description: "Move one cell up, down, left, or right." },
+            { name: "Ctrl + Arrow Keys", description: "Move to the edge of the current data region." },
+            { name: "Ctrl + Home", description: "Move to the beginning of the worksheet (cell A1)." },
+            { name: "Ctrl + End", description: "Move to the last cell on the worksheet." },
+        ]
+    },
+    {
+        category: "Formatting Shortcuts",
+        shortcuts: [
+            { name: "Ctrl + B", description: "Apply or remove bold formatting." },
+            { name: "Ctrl + I", description: "Apply or remove italic formatting." },
+            { name: "Ctrl + U", description: "Apply or remove an underline." },
+            { name: "Ctrl + 1", description: "Open the Format Cells dialog box." },
+        ]
+    }
+];
+
 const FormulaRow = ({ formula }: { formula: (typeof formulaCategories)[0]['formulas'][0] }) => {
     const { toast } = useToast();
 
@@ -89,6 +121,15 @@ const FormulaRow = ({ formula }: { formula: (typeof formulaCategories)[0]['formu
     )
 }
 
+const ShortcutRow = ({ shortcut }: { shortcut: { name: string; description: string } }) => {
+    return (
+        <div className="flex items-center justify-between gap-2 p-3 border-t">
+            <p className="text-sm text-muted-foreground">{shortcut.description}</p>
+            <code className="text-sm bg-muted px-2 py-1 rounded-sm font-semibold">{shortcut.name}</code>
+        </div>
+    )
+}
+
 export default function ExcelFormulasPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
@@ -99,28 +140,57 @@ export default function ExcelFormulasPage() {
                 <span className="sr-only">Back to Home</span>
             </Link>
           <div className="text-center pt-8">
-            <CardTitle className="text-3xl font-bold tracking-tight">Excel Formula Guide</CardTitle>
-            <CardDescription>A quick reference for common Excel formulas. Click to copy.</CardDescription>
+            <CardTitle className="text-3xl font-bold tracking-tight">Excel Formula & Shortcut Guide</CardTitle>
+            <CardDescription>A quick reference for common Excel functions and keyboard shortcuts.</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
             <Separator />
-            <Accordion type="single" collapsible className="w-full" defaultValue={formulaCategories[0].category}>
-                {formulaCategories.map(category => (
-                    <AccordionItem value={category.category} key={category.category}>
-                        <AccordionTrigger className="text-lg font-medium">{category.category}</AccordionTrigger>
-                        <AccordionContent className="p-0">
-                            <div className="flex flex-col">
-                                {category.formulas.map(formula => (
-                                    <FormulaRow key={formula.name} formula={formula} />
-                                ))}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                ))}
+            <Accordion type="multiple" className="w-full" defaultValue={[formulaCategories[0].category]}>
+                <AccordionItem value="formulas-main">
+                    <AccordionTrigger className="text-xl font-semibold">Formulas</AccordionTrigger>
+                    <AccordionContent className="p-0 pl-4">
+                        <Accordion type="single" collapsible className="w-full" defaultValue={formulaCategories[0].category}>
+                            {formulaCategories.map(category => (
+                                <AccordionItem value={category.category} key={category.category}>
+                                    <AccordionTrigger className="text-lg font-medium">{category.category}</AccordionTrigger>
+                                    <AccordionContent className="p-0">
+                                        <div className="flex flex-col">
+                                            {category.formulas.map(formula => (
+                                                <FormulaRow key={formula.name} formula={formula} />
+                                            ))}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="shortcuts-main">
+                     <AccordionTrigger className="text-xl font-semibold">Shortcuts</AccordionTrigger>
+                     <AccordionContent className="p-0 pl-4">
+                        <Accordion type="single" collapsible className="w-full">
+                            {shortcutCategories.map(category => (
+                                <AccordionItem value={category.category} key={category.category}>
+                                    <AccordionTrigger className="text-lg font-medium">{category.category}</AccordionTrigger>
+                                    <AccordionContent className="p-0">
+                                        <div className="flex flex-col">
+                                            {category.shortcuts.map(shortcut => (
+                                                <ShortcutRow key={shortcut.name} shortcut={shortcut} />
+                                            ))}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                     </AccordionContent>
+                </AccordionItem>
             </Accordion>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+    
