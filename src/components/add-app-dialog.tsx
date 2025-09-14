@@ -16,7 +16,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import type { Service } from './service-tile';
 import { generateTileMetadata } from '@/ai/flows/tile-creation-flow';
-import { Loader2, Wand2, PlusCircle } from 'lucide-react';
+import { Loader2, Wand2, PlusCircle, Trash2 } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@/lib/utils';
@@ -42,7 +42,8 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
   const [icon, setIcon] = useState('');
   const [color, setColor] = useState('#000000');
   
-  const [manualMode, setManualMode] = useState(false);
+  const [manualMode, setManualMode] = useState(true);
+  const [links, setLinks] = useState([{ name: '', href: '' }]);
 
   const resetLocalState = () => {
     setUrl('');
@@ -51,7 +52,8 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     setName('');
     setIcon('');
     setColor('#000000');
-    setManualMode(false);
+    setManualMode(true);
+    setLinks([{ name: '', href: '' }]);
   }
 
   const handleAnalyzeUrl = async () => {
@@ -61,36 +63,57 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     }
     setAnalysisError('');
     setIsAnalyzing(true);
-    setManualMode(true); // Show manual fields immediately
+    setManualMode(true);
 
     try {
       new URL(url); // Validate URL format
       const metadata = await generateTileMetadata({ url });
       
-      // Pre-fill the manual fields with AI suggestions
       setName(metadata.name);
       setIcon(metadata.icon);
       setColor(metadata.color);
+      // Set the first link with the analyzed data
+      setLinks([{ name: metadata.name, href: url }]);
 
     } catch (err) {
       console.error(err);
       setAnalysisError("AI analysis failed. Please fill in the details manually.");
+       setLinks([{ name: '', href: url }]);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
+  const handleLinkChange = (index: number, field: 'name' | 'href', value: string) => {
+    const newLinks = [...links];
+    newLinks[index][field] = value;
+    setLinks(newLinks);
+  };
+
+  const addLink = () => {
+    setLinks([...links, { name: '', href: '' }]);
+  };
+
+  const removeLink = (index: number) => {
+    if (links.length > 1) {
+        const newLinks = links.filter((_, i) => i !== index);
+        setLinks(newLinks);
+    }
+  };
+
   const handleAddService = () => {
-    if (!name || !icon || !color) {
-        setAnalysisError("Please fill out all fields.");
+    const filledLinks = links.filter(link => link.name.trim() !== '' && link.href.trim() !== '');
+
+    if (!name || !icon || !color || filledLinks.length === 0) {
+        setAnalysisError("Please fill out the Name, Icon, Color, and at least one full Link Name and Link URL.");
         return;
     }
-
+    
      const newService: Service = {
         name,
-        href: url,
         icon: icon as any,
         color,
+        links: filledLinks,
       };
 
       onAddService(newService);
@@ -107,56 +130,43 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add a New App or Website</DialogTitle>
           <DialogDescription>
-            Enter a URL to have AI generate a tile, or fill in the details manually.
+            Enter a URL to get AI suggestions, then add one or more links for this tile.
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 py-2">
-            {/* URL Input */}
-            <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="url" className="text-right">
-                URL
-                </Label>
-                <Input
-                id="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="col-span-3"
-                placeholder="https://example.com"
-                disabled={isAnalyzing}
-                />
+        <div className="space-y-4 py-2 max-h-[70vh] overflow-y-auto pr-4">
+            {/* URL Input for AI */}
+            <div className="space-y-2">
+                <Label htmlFor="url">Analyze URL (Optional)</Label>
+                <div className="flex items-center gap-2">
+                    <Input
+                        id="url"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        placeholder="https://example.com"
+                        disabled={isAnalyzing}
+                    />
+                    <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url} size="icon" variant="outline">
+                        {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                        <span className="sr-only">Analyze</span>
+                    </Button>
+                </div>
             </div>
 
-             {/* Analyze Button */}
-            <div className="flex justify-end">
-                <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url}>
-                    {isAnalyzing ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Analyzing...
-                        </>
-                    ) : (
-                        <>
-                            <Wand2 className="mr-2 h-4 w-4" />
-                            Analyze URL
-                        </>
-                    )}
-                </Button>
-            </div>
 
             {/* Manual Entry Fields */}
             {manualMode && (
                 <div className="space-y-4 pt-4 border-t">
                     <p className={cn("text-sm text-center", analysisError ? "text-destructive" : "text-muted-foreground")}>
-                        {analysisError || "Edit the AI suggestions or enter details for the new tile."}
+                        {analysisError || "Fill in the details for your new custom tile."}
                     </p>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">Name</Label>
-                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" placeholder="e.g., Google Docs"/>
+                        <Label htmlFor="name" className="text-right">Tile Name</Label>
+                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" placeholder="e.g., My Work Tools"/>
                     </div>
                      <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="icon" className="text-right">Icon</Label>
@@ -185,12 +195,53 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
                             </PopoverContent>
                         </Popover>
                     </div>
+
+                    <div className='pt-4 border-t'>
+                        <Label>Links for this Tile</Label>
+                    </div>
+
+                    {links.map((link, index) => (
+                        <div key={index} className="space-y-3 p-3 border rounded-md relative">
+                            {links.length > 1 && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute top-1 right-1 h-6 w-6"
+                                    onClick={() => removeLink(index)}
+                                >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                            )}
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor={`link-name-${index}`} className="text-right text-xs">Name</Label>
+                                <Input
+                                    id={`link-name-${index}`}
+                                    value={link.name}
+                                    onChange={(e) => handleLinkChange(index, 'name', e.target.value)}
+                                    className="col-span-3 h-8"
+                                    placeholder="e.g., Google Drive"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor={`link-href-${index}`} className="text-right text-xs">URL</Label>
+                                <Input
+                                    id={`link-href-${index}`}
+                                    value={link.href}
+                                    onChange={(e) => handleLinkChange(index, 'href', e.target.value)}
+                                    className="col-span-3 h-8"
+                                    placeholder="https://drive.google.com"
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    <Button variant="outline" size="sm" onClick={addLink}>Add another link</Button>
+
                 </div>
             )}
 
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t pt-4">
           <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={handleAddService} disabled={!manualMode || isAnalyzing || !name}>
             <PlusCircle className="mr-2 h-4 w-4" />
