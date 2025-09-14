@@ -58,7 +58,7 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
              <Button
                 variant="destructive"
                 size="icon"
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full z-10"
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full z-10 opacity-100"
                 onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -68,15 +68,17 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
                 <X className="w-4 h-4"/>
                 <span className="sr-only">Delete {name}</span>
              </Button>
-            <Card
-                className="h-full border-dashed border-2"
-                style={{ backgroundColor: `${color}80` }} // 50% opacity
-            >
-                <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
-                <Icon className="w-8 h-8 mb-2" />
-                <p className="text-sm font-semibold text-center">{name}</p>
-                </CardContent>
-            </Card>
+            <div className="block group cursor-pointer border-dashed border-2 rounded-lg">
+                <Card
+                    className="h-full border-transparent"
+                    style={{ backgroundColor: `${color}80` }} // 50% opacity
+                >
+                    <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
+                    <Icon className="w-8 h-8 mb-2" />
+                    <p className="text-sm font-semibold text-center">{name}</p>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
       )
   }
