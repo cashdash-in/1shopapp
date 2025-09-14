@@ -41,11 +41,13 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   const iconOrName = service.icon;
   
   if (typeof iconOrName === 'string') {
-    // If it's a string, look it up in the LucideIcons object
-    Icon = LucideIcons[iconOrName as keyof typeof LucideIcons] || Globe;
+    Icon = LucideIcons[iconOrName as keyof typeof LucideIcons] as ElementType;
   } else {
-    // Otherwise, assume it's already a component
-    Icon = iconOrName || Globe;
+    Icon = iconOrName as ElementType;
+  }
+  
+  if (!Icon) {
+    Icon = Globe; // Fallback icon
   }
 
 
