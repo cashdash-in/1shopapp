@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { trackPWAInstall } from "@/lib/analytics";
-import { Camera } from "lucide-react";
+import { Camera, BarChart3, Presentation } from "lucide-react";
 
 export default function RootLayout({
   children,
@@ -41,11 +41,23 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-body antialiased">
-        <Link href="/photo-booth" passHref>
-            <div className="fixed top-8 left-4 h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer z-50 hover:bg-muted transition-colors">
-                <Camera className="h-6 w-6" />
-            </div>
-        </Link>
+        <div className="fixed top-8 left-4 flex gap-2 z-50">
+            <Link href="/photo-booth" passHref>
+                <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI Photo Booth">
+                    <Camera className="h-6 w-6" />
+                </div>
+            </Link>
+            <Link href="/data-analyst" passHref>
+                <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI Data Analyst">
+                    <BarChart3 className="h-6 w-6" />
+                </div>
+            </Link>
+            <Link href="/presentation-generator" passHref>
+                <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI Presentation Generator">
+                    <Presentation className="h-6 w-6" />
+                </div>
+            </Link>
+        </div>
         <Link href="/" passHref>
             <div className="fixed top-8 right-4 h-12 w-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold cursor-pointer z-50">
                 1

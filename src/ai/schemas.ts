@@ -136,3 +136,33 @@ export const PhotoBoothOutputSchema = z.object({
     imageDataUri: z.string().describe('The newly generated image in data URI format.'),
 });
 export type PhotoBoothOutput = z.infer<typeof PhotoBoothOutputSchema>;
+
+// Schemas for AI Presentation Generator Flow
+export const PresentationInputSchema = z.object({
+  topic: z.string().describe('The main topic or title of the presentation.'),
+  instructions: z.string().optional().describe('Optional specific instructions, like number of slides or key points to include.'),
+});
+export type PresentationInput = z.infer<typeof PresentationInputSchema>;
+
+const SlideSchema = z.object({
+  title: z.string().describe('The title of the slide.'),
+  content: z.array(z.string()).describe('An array of bullet points for the slide content.'),
+});
+
+export const PresentationOutputSchema = z.object({
+  slides: z.array(SlideSchema).describe('An array of slide objects, each containing a title and content.'),
+});
+export type PresentationOutput = z.infer<typeof PresentationOutputSchema>;
+
+// Schemas for AI Data Analyst Flow
+export const DataAnalysisInputSchema = z.object({
+  data: z.string().describe('The dataset to be analyzed, typically in CSV or plain text format.'),
+  question: z.string().describe('The user\'s question about the data.'),
+});
+export type DataAnalysisInput = z.infer<typeof DataAnalysisInputSchema>;
+
+export const DataAnalysisOutputSchema = z.object({
+  summary: z.string().describe('A text-based summary answering the user\'s question.'),
+  data: z.string().optional().describe('A string representation of the resulting data, such as a markdown table.'),
+});
+export type DataAnalysisOutput = z.infer<typeof DataAnalysisOutputSchema>;
