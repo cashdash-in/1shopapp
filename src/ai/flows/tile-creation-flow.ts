@@ -20,6 +20,7 @@ const tileCreationPrompt = ai.definePrompt({
   name: 'tileCreationPrompt',
   input: { schema: TileCreationInputSchema },
   output: { schema: TileCreationOutputSchema },
+  model: 'googleai/gemini-2.5-flash-preview',
   prompt: `You are an expert at analyzing web pages to extract key information for creating a visually appealing and informative tile in a user dashboard.
 
 Analyze the content of the website at the given URL: {{{url}}}

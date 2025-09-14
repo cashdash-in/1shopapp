@@ -16,7 +16,10 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import type { Service } from './service-tile';
 import { generateTileMetadata } from '@/ai/flows/tile-creation-flow';
-import { Loader2, Wand2 } from 'lucide-react';
+import { Loader2, Wand2, PlusCircle } from 'lucide-react';
+import { HexColorPicker } from 'react-colorful';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { cn } from '@/lib/utils';
 
 interface AddAppDialogProps {
   children: React.ReactNode;
@@ -25,58 +28,73 @@ interface AddAppDialogProps {
 
 export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
   const [url, setUrl] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState('');
   const [open, setOpen] = useState(false);
 
-  const handleAddApp = async () => {
-    setError('');
+  const [name, setName] = useState('');
+  const [icon, setIcon] = useState('');
+  const [color, setColor] = useState('#000000');
+  
+  const [manualMode, setManualMode] = useState(false);
 
-    // More robust client-side validation
+  const resetLocalState = () => {
+    setUrl('');
+    setIsAnalyzing(false);
+    setAnalysisError('');
+    setName('');
+    setIcon('');
+    setColor('#000000');
+    setManualMode(false);
+  }
+
+  const handleAnalyzeUrl = async () => {
     if (!url || !url.startsWith('http://') && !url.startsWith('https://')) {
-      setError('Please enter a full and valid URL (e.g., https://example.com).');
+      setAnalysisError('Please enter a full and valid URL (e.g., https://example.com).');
       return;
     }
-
-    setLoading(true);
+    setAnalysisError('');
+    setIsAnalyzing(true);
+    setManualMode(true); // Show manual fields immediately
 
     try {
-      // This is for format validation, although the check above is more user-friendly.
-      new URL(url);
-
+      new URL(url); // Validate URL format
       const metadata = await generateTileMetadata({ url });
       
-      const newService: Service = {
-        name: metadata.name,
+      // Pre-fill the manual fields with AI suggestions
+      setName(metadata.name);
+      setIcon(metadata.icon);
+      setColor(metadata.color);
+
+    } catch (err) {
+      console.error(err);
+      setAnalysisError("AI analysis failed. Please fill in the details manually.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleAddService = () => {
+    if (!name || !icon || !color) {
+        setAnalysisError("Please fill out all fields.");
+        return;
+    }
+
+     const newService: Service = {
+        name,
         href: url,
-        icon: metadata.icon as any, // Cast because lucide icons are strings
-        color: metadata.color,
+        icon: icon as any,
+        color,
       };
 
       onAddService(newService);
-      setOpen(false); // Close the dialog on success
-      
-    } catch (err) {
-      console.error(err);
-      if (err instanceof TypeError) {
-        setError("Invalid URL format. Please enter a full URL (e.g., https://example.com).");
-      } else {
-        setError("Could not analyze this URL. Please check the link or try another one.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+      setOpen(false); // This will trigger the onOpenChange and reset state.
+  }
   
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
-        // Reset state when dialog closes
-        setTimeout(() => {
-            setUrl('');
-            setError('');
-            setLoading(false);
-        }, 300)
+        setTimeout(resetLocalState, 300);
     }
   }
 
@@ -87,39 +105,81 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
         <DialogHeader>
           <DialogTitle>Add a New App or Website</DialogTitle>
           <DialogDescription>
-            Enter the URL of the website you want to add. We'll use AI to create a tile for it automatically.
+            Enter a URL to have AI generate a tile, or fill in the details manually.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="url" className="text-right">
-              URL
-            </Label>
-            <Input
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="col-span-3"
-              placeholder="https://example.com"
-              disabled={loading}
-            />
-          </div>
-          {error && <p className="text-sm text-center text-destructive col-span-4">{error}</p>}
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>Cancel</Button>
-          <Button onClick={handleAddApp} disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-                <>
-                    <Wand2 className="mr-2 h-4 w-4" />
-                    Create Tile
-                </>
+        
+        <div className="space-y-4 py-2">
+            {/* URL Input */}
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="url" className="text-right">
+                URL
+                </Label>
+                <Input
+                id="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="col-span-3"
+                placeholder="https://example.com"
+                disabled={isAnalyzing}
+                />
+            </div>
+
+             {/* Analyze Button */}
+            <div className="flex justify-end">
+                <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url}>
+                    {isAnalyzing ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Analyzing...
+                        </>
+                    ) : (
+                        <>
+                            <Wand2 className="mr-2 h-4 w-4" />
+                            Analyze URL
+                        </>
+                    )}
+                </Button>
+            </div>
+
+            {/* Manual Entry Fields */}
+            {manualMode && (
+                <div className="space-y-4 pt-4 border-t">
+                    <p className={cn("text-sm text-center", analysisError ? "text-destructive" : "text-muted-foreground")}>
+                        {analysisError || "Edit the AI suggestions or enter details for the new tile."}
+                    </p>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">Name</Label>
+                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" placeholder="e.g., Google Docs"/>
+                    </div>
+                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="icon" className="text-right">Icon</Label>
+                        <Input id="icon" value={icon} onChange={(e) => setIcon(e.target.value)} className="col-span-3" placeholder="A lucide-react icon name"/>
+                    </div>
+                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label className="text-right">Color</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="col-span-3 justify-start">
+                                    <div className="w-5 h-5 rounded-sm border mr-2" style={{backgroundColor: color}}/>
+                                    {color}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 border-0">
+                                 <HexColorPicker color={color} onChange={setColor} />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                </div>
             )}
+
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={handleAddService} disabled={!manualMode || isAnalyzing || !name}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Tile
           </Button>
         </DialogFooter>
       </DialogContent>
