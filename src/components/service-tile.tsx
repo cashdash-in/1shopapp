@@ -42,7 +42,7 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   } else {
     Icon = service.icon as ElementType || Globe;
   }
-
+  
   const handleLinkClick = () => {
     // For single links, service name is the link name
     trackLinkClick(name, name); 
