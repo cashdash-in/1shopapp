@@ -13,6 +13,52 @@ import { generatePresentation } from '@/ai/flows/presentation-flow';
 import type { PresentationOutput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
+const shortcutCategories = [
+    {
+        category: "General Shortcuts",
+        shortcuts: [
+            { name: "Ctrl + N", description: "Create a new presentation." },
+            { name: "Ctrl + M", description: "Insert a new slide." },
+            { name: "Ctrl + D", description: "Duplicate the selected slide." },
+            { name: "Ctrl + S", description: "Save the presentation." },
+            { name: "Ctrl + Z", description: "Undo the last action." },
+            { name: "Ctrl + Y", description: "Redo the last action." },
+        ]
+    },
+    {
+        category: "Formatting Shortcuts",
+        shortcuts: [
+            { name: "Ctrl + B", description: "Apply or remove bold formatting." },
+            { name: "Ctrl + I", description: "Apply or remove italic formatting." },
+            { name: "Ctrl + U", description: "Apply or remove an underline." },
+            { name: "Ctrl + E", description: "Center align text." },
+            { name: "Ctrl + L", description: "Left align text." },
+            { name: "Ctrl + R", description: "Right align text." },
+        ]
+    },
+    {
+        category: "Slideshow Shortcuts",
+        shortcuts: [
+            { name: "F5", description: "Start the presentation from the beginning." },
+            { name: "Shift + F5", description: "Start the presentation from the current slide." },
+            { name: "N or Spacebar", description: "Advance to the next slide or animation." },
+            { name: "P or Backspace", description: "Go back to the previous slide or animation." },
+            { name: "Esc", description: "End the slideshow." },
+            { name: "B", description: "Turn the screen black during a slideshow." },
+        ]
+    }
+];
+
+const ShortcutRow = ({ shortcut }: { shortcut: { name: string; description: string } }) => {
+    return (
+        <div className="flex items-center justify-between gap-2 p-3 border-t">
+            <p className="text-sm text-muted-foreground">{shortcut.description}</p>
+            <code className="text-sm bg-muted px-2 py-1 rounded-sm font-semibold whitespace-nowrap">{shortcut.name}</code>
+        </div>
+    )
+}
 
 export default function PresentationGeneratorPage() {
     const { toast } = useToast();
@@ -70,7 +116,7 @@ export default function PresentationGeneratorPage() {
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Presentation className="h-8 w-8 text-primary" />AI Presentation Generator
                         </CardTitle>
-                        <CardDescription>Get a head start on your next presentation. Just provide a topic and let AI do the heavy lifting.</CardDescription>
+                        <CardDescription>Get a head start on your next presentation, plus a handy list of shortcuts.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -127,6 +173,24 @@ export default function PresentationGeneratorPage() {
                             ))}
                         </div>
                     )}
+
+                    <div className="space-y-6 pt-6 border-t">
+                        <h2 className="text-2xl font-bold text-center">Presentation Shortcuts</h2>
+                         <Accordion type="single" collapsible className="w-full">
+                            {shortcutCategories.map(category => (
+                                <AccordionItem value={category.category} key={category.category}>
+                                    <AccordionTrigger className="text-lg font-medium">{category.category}</AccordionTrigger>
+                                    <AccordionContent className="p-0">
+                                        <div className="flex flex-col">
+                                            {category.shortcuts.map(shortcut => (
+                                                <ShortcutRow key={shortcut.name} shortcut={shortcut} />
+                                            ))}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </div>
                 
                 </CardContent>
             </Card>
