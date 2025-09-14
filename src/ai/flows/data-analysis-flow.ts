@@ -22,19 +22,20 @@ const dataAnalysisPrompt = ai.definePrompt({
   input: { schema: DataAnalysisInputSchema },
   output: { schema: DataAnalysisOutputSchema, format: 'json' },
   model: 'googleai/gemini-2.5-flash-preview',
-  prompt: `You are an expert data analyst. Your task is to analyze the provided dataset based on the user's question.
-
-### Dataset:
-{{{data}}}
-
-### User's Question:
-"{{{question}}}"
+  system: `You are an expert data analyst. Your task is to analyze the provided dataset based on the user's question.
 
 ### Instructions:
 1.  Analyze the data to answer the user's question.
 2.  Provide a concise, text-based 'summary' of your findings.
 3.  If the question requires a table of results (e.g., 'total sales per region', 'top 5 products'), create a 'data' field containing the result as a markdown table. If the answer is just text, you can omit the 'data' field.
 4.  Ensure your entire output is in the specified JSON format.
+`,
+  prompt: `
+### Dataset:
+{{{data}}}
+
+### User's Question:
+"{{{question}}}"
 `,
 });
 
