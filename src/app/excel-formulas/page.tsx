@@ -93,6 +93,16 @@ const shortcutCategories = [
             { name: "Ctrl + U", description: "Apply or remove an underline." },
             { name: "Ctrl + 1", description: "Open the Format Cells dialog box." },
         ]
+    },
+    {
+        category: "Macros & VBA Shortcuts",
+        shortcuts: [
+            { name: "Alt + F11", description: "Open the Visual Basic for Applications (VBA) Editor." },
+            { name: "Alt + F8", description: "Display the Macro dialog box to run, edit, or delete a macro." },
+            { name: "F5", description: "Run the current procedure or macro in the VBA Editor." },
+            { name: "F8", description: "Step through code one line at a time in the VBA Editor." },
+            { name: "Ctrl + Break", description: "Stop the execution of a running macro." },
+        ]
     }
 ];
 
@@ -192,5 +202,7 @@ export default function ExcelFormulasPage() {
     </div>
   );
 }
+
+    
 
     
