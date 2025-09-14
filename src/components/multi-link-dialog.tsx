@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import * as LucideIcons from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -11,10 +12,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import type { Service } from './service-tile';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Globe } from 'lucide-react';
 import { trackLinkClick } from '@/lib/analytics';
-import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
+import type { ElementType } from 'react';
 
 
 interface MultiLinkDialogProps {
@@ -23,7 +24,16 @@ interface MultiLinkDialogProps {
 }
 
 export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
-  const { name, links, categories, icon: Icon } = service;
+  const { name, links, categories } = service;
+
+  let Icon: ElementType;
+  if (typeof service.icon === 'string' && LucideIcons[service.icon as keyof typeof LucideIcons]) {
+      Icon = LucideIcons[service.icon as keyof typeof LucideIcons] as ElementType;
+  } else if (typeof service.icon === 'function') {
+      Icon = service.icon;
+  } else {
+      Icon = Globe;
+  }
 
   const handleLinkClick = (linkName: string) => {
     trackLinkClick(name, linkName);
@@ -57,14 +67,14 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
                                 className="justify-between h-auto min-h-10 text-base whitespace-normal"
                                 onClick={() => handleLinkClick(link.name)}
                                 >
-                                <Link
+                                <a
                                     href={link.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
                                     <span className="flex-1 text-left">{link.name}</span>
                                     <ArrowUpRight className="h-4 w-4 ml-2" />
-                                </Link>
+                                </a>
                                 </Button>
                             ))}
                         </div>
@@ -84,14 +94,14 @@ export function MultiLinkDialog({ service, children }: MultiLinkDialogProps) {
                 className="justify-between h-auto min-h-12 text-base whitespace-normal"
                 onClick={() => handleLinkClick(link.name)}
                 >
-                <Link
+                <a
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
                 >
                     <span className='flex-1 text-left'>{link.name}</span>
                     <ArrowUpRight className="h-4 w-4 ml-2" />
-                </Link>
+                </a>
                 </Button>
             ))}
             </div>

@@ -10,7 +10,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { trackLinkClick } from '@/lib/analytics';
-import { services as ALL_SERVICES_DATA } from '@/app/page';
+import { services as ALL_SERVICES_DATA } from '@/lib/default-services';
+import type { Service } from '@/components/service-tile';
 
 function SearchPageComponent() {
   const router = useRouter();
@@ -33,11 +34,18 @@ function SearchPageComponent() {
     setError('');
     
     const lowerCaseQuery = searchQuery.toLowerCase();
+    
+    // Also search user-added services from localStorage
+    const storedServicesRaw = typeof window !== 'undefined' ? localStorage.getItem('userServices') : null;
+    const allServices = storedServicesRaw ? JSON.parse(storedServicesRaw) as Service[] : ALL_SERVICES_DATA;
 
-    const internalResults = ALL_SERVICES_DATA.flatMap(service => {
+    const internalResults = allServices.flatMap(service => {
         const categoryName = service.name;
         let brands: { name: string; href: string }[] = [];
 
+        if (service.href) {
+            brands.push({ name: service.name, href: service.href });
+        }
         if (service.links) {
             brands = brands.concat(service.links);
         }
@@ -123,10 +131,10 @@ function SearchPageComponent() {
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {serviceResults.map(brand => (
                              <Button key={brand.name} asChild variant="secondary" className="justify-between h-12 text-base" onClick={() => trackLinkClick(brand.category, brand.name)}>
-                                <Link href={brand.href} target="_blank" rel="noopener noreferrer">
+                                <a href={brand.href} target="_blank" rel="noopener noreferrer">
                                     <span>{brand.name}</span>
                                     <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                                </Link>
+                                </a>
                             </Button>
                         ))}
                     </CardContent>

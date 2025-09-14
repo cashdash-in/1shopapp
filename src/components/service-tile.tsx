@@ -3,9 +3,11 @@
 
 import type { ElementType } from 'react';
 import Link from 'next/link';
+import * as LucideIcons from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MultiLinkDialog } from './multi-link-dialog';
 import { trackLinkClick } from '@/lib/analytics';
+import { Globe } from 'lucide-react';
 
 interface ServiceLink {
   name: string;
@@ -19,7 +21,7 @@ interface ServiceCategory {
 
 export interface Service {
   name: string;
-  icon: ElementType;
+  icon: keyof typeof LucideIcons | ElementType;
   color: string;
   href?: string;
   links?: ServiceLink[];
@@ -28,13 +30,40 @@ export interface Service {
 
 interface ServiceTileProps {
   service: Service;
+  isEditMode?: boolean;
 }
 
-export function ServiceTile({ service }: ServiceTileProps) {
-  const { name, icon: Icon, color, href, links, categories } = service;
+export function ServiceTile({ service, isEditMode }: ServiceTileProps) {
+  const { name, color, href, links, categories } = service;
+
+  // Handle both string names and component types for icons
+  let Icon: ElementType;
+  if (typeof service.icon === 'string' && LucideIcons[service.icon as keyof typeof LucideIcons]) {
+      Icon = LucideIcons[service.icon as keyof typeof LucideIcons] as ElementType;
+  } else if (typeof service.icon === 'function') {
+      Icon = service.icon;
+  } else {
+      Icon = Globe; // Default icon if not found
+  }
 
   const handleLinkClick = () => {
     trackLinkClick(name, name); // For single links, service name is the link name
+  }
+  
+  if (isEditMode) {
+      return (
+         <div className="block group relative">
+            <Card
+                className="h-full border-dashed border-2 animate-pulse"
+                style={{ backgroundColor: `${color}80` }} // 50% opacity
+            >
+                <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
+                <Icon className="w-8 h-8 mb-2" />
+                <p className="text-sm font-semibold text-center">{name}</p>
+                </CardContent>
+            </Card>
+        </div>
+      )
   }
 
   if ((links && links.length > 0) || (categories && categories.length > 0)) {
@@ -59,7 +88,7 @@ export function ServiceTile({ service }: ServiceTileProps) {
   const linkProps = isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
   return (
-    <Link href={href || '#'} {...linkProps} className="block group" onClick={handleLinkClick}>
+    <a href={href || '#'} {...linkProps} className="block group" onClick={handleLinkClick}>
       <Card
         className="h-full transition-all duration-300 ease-in-out group-hover:transform group-hover:-translate-y-1 group-hover:shadow-xl border-transparent"
         style={{ backgroundColor: color }}
@@ -69,8 +98,6 @@ export function ServiceTile({ service }: ServiceTileProps) {
            <p className="text-sm font-semibold text-center">{name}</p>
         </CardContent>
       </Card>
-    </Link>
+    </a>
   );
 }
-
-    

@@ -106,3 +106,17 @@ export const UserCashbackDetailsSchema = z.object({
     transactions: z.array(UserCashbackTransactionSchema),
 });
 export type UserCashbackDetails = z.infer<typeof UserCashbackDetailsSchema>;
+
+
+// Schemas for Tile Creation Flow
+export const TileCreationInputSchema = z.object({
+  url: z.string().url().describe('The URL of the website to create a tile for.'),
+});
+export type TileCreationInput = z.infer<typeof TileCreationInputSchema>;
+
+export const TileCreationOutputSchema = z.object({
+  name: z.string().describe('A concise, user-friendly name for the website, extracted from its title or content.'),
+  icon: z.string().describe('The most relevant icon name from the lucide-react library (e.g., "Briefcase", "ShoppingCart", "Book").'),
+  color: z.string().describe('A hex color code that represents the primary brand color of the website.'),
+});
+export type TileCreationOutput = z.infer<typeof TileCreationOutputSchema>;
