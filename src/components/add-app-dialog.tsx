@@ -20,11 +20,17 @@ import { Loader2, Wand2, PlusCircle } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface AddAppDialogProps {
   children: React.ReactNode;
   onAddService: (service: Service) => void;
 }
+
+const iconOptions = [
+    'ShoppingCart', 'UtensilsCrossed', 'Receipt', 'Plane', 'Shield', 'Landmark', 'Truck', 'Users', 'Newspaper', 'Search', 'Building2', 'Ticket', 'Mail', 'Book', 'Briefcase', 'Film', 'Music', 'PenTool', 'FileText', 'Github', 'Globe', 'Home', 'Heart', 'Headphones', 'Camera', 'Cloud', 'Code', 'CreditCard', 'Database', 'DollarSign', 'Download', 'ExternalLink', 'File', 'Folder', 'Gift', 'Image', 'Instagram', 'Layout', 'Link', 'Lock', 'LogIn', 'LogOut', 'Map', 'MessageCircle', 'Monitor', 'Moon', 'MousePointer', 'Package', 'Palette', 'Phone', 'Play', 'Plus', 'Settings', 'Share2', 'Smile', 'Sun', 'Tag', 'Target', 'ThumbsUp', 'Trash2', 'TrendingUp', 'Twitter', 'Upload', 'Video', 'Wallet', 'Wifi', 'Youtube', 'Zap'
+];
+
 
 export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
   const [url, setUrl] = useState('');
@@ -154,7 +160,16 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
                     </div>
                      <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="icon" className="text-right">Icon</Label>
-                        <Input id="icon" value={icon} onChange={(e) => setIcon(e.target.value)} className="col-span-3" placeholder="A lucide-react icon name"/>
+                        <Select value={icon} onValueChange={setIcon}>
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select an icon" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {iconOptions.map((iconName) => (
+                                    <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                      <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Color</Label>
