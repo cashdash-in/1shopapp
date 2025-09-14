@@ -166,3 +166,22 @@ export const DataAnalysisOutputSchema = z.object({
   data: z.string().optional().describe('A string representation of the resulting data, such as a markdown table.'),
 });
 export type DataAnalysisOutput = z.infer<typeof DataAnalysisOutputSchema>;
+
+// Schemas for AI BI Report Generator Flow
+export const BiReportInputSchema = z.object({
+  data: z.string().describe('The dataset to be analyzed, in CSV or plain text format.'),
+  request: z.string().describe('The user\'s request for the BI report (e.g., "Show monthly sales trends").'),
+});
+export type BiReportInput = z.infer<typeof BiReportInputSchema>;
+
+const ChartDataPointSchema = z.object({
+  name: z.string().describe("The label for the data point on the x-axis."),
+  value: z.number().describe("The numerical value for the data point on the y-axis."),
+});
+
+export const BiReportOutputSchema = z.object({
+  title: z.string().describe("The title of the generated report."),
+  summary: z.string().describe("A brief, one or two-sentence summary of the key insight from the data."),
+  chartData: z.array(ChartDataPointSchema).describe("An array of data points formatted for a chart."),
+});
+export type BiReportOutput = z.infer<typeof BiReportOutputSchema>;
