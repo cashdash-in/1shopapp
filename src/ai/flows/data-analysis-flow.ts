@@ -25,10 +25,10 @@ const dataAnalysisPrompt = ai.definePrompt({
   prompt: `You are an expert data analyst. Your task is to analyze the provided dataset based on the user's question.
 
 ### Dataset:
-{{data}}
+{{{data}}}
 
 ### User's Question:
-"{{question}}"
+"{{{question}}}"
 
 ### Instructions:
 1.  Analyze the data to answer the user's question.
