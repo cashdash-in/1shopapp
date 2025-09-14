@@ -1,6 +1,6 @@
 
 import type { Service } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search as SearchIcon, Building2, Ticket, Mail } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search as SearchIcon, Building2, Ticket, Mail, Camera } from 'lucide-react';
 
 export const services: Service[] = [
   { 
@@ -241,5 +241,11 @@ export const services: Service[] = [
         { name: 'Yahoo Mail', href: 'https://mail.yahoo.com' },
         { name: 'Rediffmail', href: 'https://mail.rediff.com' },
     ]
-  }
+  },
+  {
+    name: 'Photo Booth',
+    icon: Camera,
+    color: '#9c27b0', // A nice purple
+    href: '/photo-booth',
+  },
 ];

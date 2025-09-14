@@ -120,3 +120,19 @@ export const TileCreationOutputSchema = z.object({
   color: z.string().describe('A hex color code that represents the primary brand color of the website.'),
 });
 export type TileCreationOutput = z.infer<typeof TileCreationOutputSchema>;
+
+// Schemas for AI Photo Booth Flow
+export const PhotoBoothInputSchema = z.object({
+  photoDataUri: z
+    .string()
+    .describe(
+      "A photo of a person or object, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+    ),
+  style: z.string().describe('The artistic style to apply to the photo (e.g., "Cartoon", "Anime", "Oil Painting").'),
+});
+export type PhotoBoothInput = z.infer<typeof PhotoBoothInputSchema>;
+
+export const PhotoBoothOutputSchema = z.object({
+    imageDataUri: z.string().describe('The newly generated image in data URI format.'),
+});
+export type PhotoBoothOutput = z.infer<typeof PhotoBoothOutputSchema>;
