@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { trackPWAInstall } from "@/lib/analytics";
+import { Camera } from "lucide-react";
 
 export default function RootLayout({
   children,
@@ -40,6 +41,11 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-body antialiased">
+        <Link href="/photo-booth" passHref>
+            <div className="fixed top-8 left-4 h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer z-50 hover:bg-muted transition-colors">
+                <Camera className="h-6 w-6" />
+            </div>
+        </Link>
         <Link href="/" passHref>
             <div className="fixed top-8 right-4 h-12 w-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold cursor-pointer z-50">
                 1
