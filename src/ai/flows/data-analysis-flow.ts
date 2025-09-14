@@ -17,14 +17,16 @@ export async function analyzeData(input: DataAnalysisInput): Promise<DataAnalysi
     return result;
 }
 
+// This tool defines the structure we want the AI to return.
+// By providing this tool, we are telling the AI to use it to format its answer.
 const analysisTool = ai.defineTool(
     {
         name: 'dataAnalysisTool',
         description: 'Analyzes data to answer a question and provides a summary and optional data table.',
         inputSchema: DataAnalysisOutputSchema,
-        outputSchema: DataAnalysisOutputSchema,
+        outputSchema: z.void(), // The tool itself doesn't return anything, it's just for structured output.
     },
-    async (input) => input
+    async () => {} // The tool's function is a no-op.
 );
 
 // Define the Genkit flow
@@ -38,8 +40,9 @@ const dataAnalysisFlow = ai.defineFlow(
     const { output } = await ai.generate({
         model: 'googleai/gemini-2.5-flash-preview',
         tools: [analysisTool],
+        toolChoice: 'tool', // Force the model to use the specified tool.
         prompt: `You are an expert data analyst. Your task is to analyze the provided dataset based on the user's question.
-Use the dataAnalysisTool to format your answer.
+Call the dataAnalysisTool with your answer.
 
 ### Instructions:
 1.  Analyze the data to answer the user's question.
@@ -47,7 +50,9 @@ Use the dataAnalysisTool to format your answer.
 3.  If the question requires a table of results (e.g., 'total sales per region', 'top 5 products'), create a 'data' field containing the result as a markdown table. If the answer is just text, you can omit the 'data' field.
 
 ### Dataset:
+\`\`\`
 ${input.data}
+\`\`\`
 
 ### User's Question:
 "${input.question}"
@@ -60,7 +65,10 @@ ${input.data}
         throw new Error("The AI model did not return a valid analysis structure.");
     }
     
-    // The model output needs to be parsed if it's a string
-    return typeof analysis === 'string' ? JSON.parse(analysis) : analysis;
+    // The model output needs to be parsed if it's a string, which can happen.
+    const finalResult = typeof analysis === 'string' ? JSON.parse(analysis) : analysis;
+    
+    // Validate the final result against the Zod schema before returning.
+    return DataAnalysisOutputSchema.parse(finalResult);
   }
 );
