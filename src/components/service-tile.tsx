@@ -14,7 +14,7 @@ interface ServiceLink {
 }
 
 interface ServiceCategory {
-  name: string;
+  name:string;
   links: ServiceLink[];
 }
 
@@ -38,12 +38,10 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
 
   // Handle both string names and component types for icons
   let Icon: ElementType;
-  const iconOrName = service.icon;
-  
-  if (typeof iconOrName === 'string') {
-    Icon = LucideIcons[iconOrName as keyof typeof LucideIcons] || Globe;
+  if (typeof service.icon === 'string') {
+    Icon = LucideIcons[service.icon as keyof typeof LucideIcons] || Globe;
   } else {
-    Icon = iconOrName as ElementType;
+    Icon = service.icon || Globe;
   }
 
 
