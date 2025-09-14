@@ -15,6 +15,29 @@ export async function generateBiReport(input: BiReportInput): Promise<BiReportOu
   return result;
 }
 
+// Define the prompt for the AI model
+const biReportPrompt = ai.definePrompt({
+  name: 'biReportPrompt',
+  input: { schema: BiReportInputSchema },
+  output: { schema: BiReportOutputSchema },
+  prompt: `You are an expert BI (Business Intelligence) analyst. Your task is to create a report based on a user's request and a provided dataset.
+
+User's Request:
+"{{{request}}}"
+
+Dataset:
+\`\`\`
+{{{data}}}
+\`\`\`
+
+Generate a report that includes:
+1. A concise, one or two-sentence summary of the key insight.
+2. A clear title for the report.
+3. The data for a chart, formatted as an array of objects with 'name' (string) and 'value' (number) fields. The 'value' field in chartData MUST be a number, not a string.
+`,
+});
+
+
 // Define the Genkit flow
 const biReportFlow = ai.defineFlow(
   {
@@ -23,22 +46,28 @@ const biReportFlow = ai.defineFlow(
     outputSchema: BiReportOutputSchema,
   },
   async (input) => {
-    // WORKAROUND: The AI model call was consistently failing.
-    // As a workaround, we will return a hard-coded report structure.
-    // This demonstrates the UI and charting functionality without a live AI call.
-    console.log("Executing BI Reporting WORKAROUND. Returning static report.");
+    const { output } = await ai.generate({
+        model: 'googleai/gemini-2.5-flash-preview',
+        prompt: biReportPrompt,
+        input: input,
+        output: {
+            schema: BiReportOutputSchema,
+        }
+    });
 
-    const staticChartData = [
-        { name: 'North', value: 1375 },
-        { name: 'South', value: 1485 },
-        { name: 'West', value: 1450 },
-        { name: 'East', value: 110 },
-    ];
-    
+    if (!output) {
+        throw new Error("The AI model did not return a valid report structure.");
+    }
+
+    // Data sanitation to ensure chart values are numbers
+    const sanitizedChartData = output.chartData.map(item => ({
+        ...item,
+        value: typeof item.value === 'string' ? parseFloat(item.value) : item.value,
+    }));
+
     return {
-      title: "Static Report: Total Sales per Region",
-      summary: "This is a statically generated report as a workaround. It shows a summary of sales across different regions based on the example data.",
-      chartData: staticChartData
+        ...output,
+        chartData: sanitizedChartData,
     };
   }
 );

@@ -16,6 +16,26 @@ export async function analyzeData(input: DataAnalysisInput): Promise<DataAnalysi
     return result;
 }
 
+// Define the prompt for the AI model
+const dataAnalysisPrompt = ai.definePrompt({
+  name: 'dataAnalysisPrompt',
+  input: { schema: DataAnalysisInputSchema },
+  output: { schema: DataAnalysisOutputSchema },
+  prompt: `You are an expert data analyst. Your task is to analyze the provided dataset and answer the user's question about it.
+
+User's Question:
+"{{{question}}}"
+
+Dataset:
+\`\`\`
+{{{data}}}
+\`\`\`
+
+Based on the data and the question, provide a text-based summary that directly answers the question.
+If the answer involves a subset of the data or a calculation, also provide the resulting data as a markdown table in the 'data' field of the output.
+`,
+});
+
 
 // Define the Genkit flow to call the prompt correctly.
 const dataAnalysisFlow = ai.defineFlow(
@@ -25,18 +45,19 @@ const dataAnalysisFlow = ai.defineFlow(
     outputSchema: DataAnalysisOutputSchema,
   },
   async (input) => {
-    
-    // WORKAROUND: The AI model call was consistently failing.
-    // As a workaround, we will return a hard-coded analysis result.
-    // This ensures the page is functional and demonstrates the UI.
-    console.log("Executing Data Analyst WORKAROUND. Returning static analysis.");
+    const { output } = await ai.generate({
+      model: 'googleai/gemini-2.5-flash-preview',
+      prompt: dataAnalysisPrompt,
+      input: input,
+      output: {
+        schema: DataAnalysisOutputSchema,
+      }
+    });
 
-    return {
-        summary: "This is a static summary generated as a workaround. The original question was: '" + input.question + "'",
-        data: `| Region | Total Sales |
-|---|---|
-| North | 5000 |
-| South | 1200 |`
+    if (!output) {
+      throw new Error("AI could not analyze your data. The model did not return a valid response.");
     }
+    
+    return output;
   }
 );
