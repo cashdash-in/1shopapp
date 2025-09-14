@@ -19,7 +19,10 @@ export async function analyzeData(input: DataAnalysisInput): Promise<DataAnalysi
 const dataAnalysisPrompt = ai.definePrompt({
   name: 'dataAnalysisPrompt',
   input: { schema: DataAnalysisInputSchema },
-  output: { schema: DataAnalysisOutputSchema },
+  output: { 
+    schema: DataAnalysisOutputSchema,
+    format: 'json' // This was the missing configuration
+  },
   model: 'googleai/gemini-2.5-flash-preview',
   prompt: `You are an expert data analyst. Your task is to analyze the provided dataset and answer the user's question about it.
 
@@ -31,7 +34,7 @@ Data:
 User's Question:
 "{{{question}}}"
 
-Analyze the data to answer the question. Provide a concise, text-based summary of your findings. If your analysis produces a table of data, provide it in the 'data' field as a markdown-formatted string.
+Analyze the data to answer the question. Provide a concise, text-based summary of your findings in the 'summary' field. If your analysis produces a table of data, provide it in the 'data' field as a markdown-formatted string.
 `,
 });
 
