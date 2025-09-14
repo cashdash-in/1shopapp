@@ -7,7 +7,8 @@ import * as LucideIcons from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MultiLinkDialog } from './multi-link-dialog';
 import { trackLinkClick } from '@/lib/analytics';
-import { Globe } from 'lucide-react';
+import { Globe, X } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface ServiceLink {
   name: string;
@@ -31,9 +32,10 @@ export interface Service {
 interface ServiceTileProps {
   service: Service;
   isEditMode?: boolean;
+  onDelete?: () => void;
 }
 
-export function ServiceTile({ service, isEditMode }: ServiceTileProps) {
+export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps) {
   const { name, color, href, links, categories } = service;
 
   // Handle both string names and component types for icons
@@ -53,8 +55,21 @@ export function ServiceTile({ service, isEditMode }: ServiceTileProps) {
   if (isEditMode) {
       return (
          <div className="block group relative">
+             <Button
+                variant="destructive"
+                size="icon"
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onDelete?.();
+                }}
+             >
+                <X className="w-4 h-4"/>
+                <span className="sr-only">Delete {name}</span>
+             </Button>
             <Card
-                className="h-full border-dashed border-2 animate-pulse"
+                className="h-full border-dashed border-2"
                 style={{ backgroundColor: `${color}80` }} // 50% opacity
             >
                 <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">

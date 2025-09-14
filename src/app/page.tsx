@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -97,6 +98,10 @@ export default function Home() {
         setServices(prevServices => [...prevServices, newService]);
     };
 
+    const deleteService = (serviceNameToDelete: string) => {
+        setServices(prevServices => prevServices.filter(s => s.name !== serviceNameToDelete));
+    };
+
   return (
     <>
       <main className="min-h-screen bg-background flex flex-col p-4">
@@ -128,6 +133,7 @@ export default function Home() {
                 key={service.name}
                 service={service}
                 isEditMode={editMode}
+                onDelete={() => deleteService(service.name)}
               />
             ))}
           </div>
