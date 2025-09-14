@@ -36,25 +36,29 @@ const photoBoothFlow = ai.defineFlow(
     
     const styleInstruction = stylePrompts[input.style as keyof typeof stylePrompts] || `the style of ${input.style}`;
     
-    // The prompt must be an array containing an object for the media and an object for the text.
-    const { media, text, finishReason } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash-image-preview',
+    const { output, finishReason } = await ai.generate({
+        model: 'googleai/gemini-pro-vision',
         prompt: [
             { media: { url: input.photoDataUri } },
             { text: `Transform this image into ${styleInstruction}. IMPORTANT: Respond with only the generated image and no accompanying text.` },
         ],
-        config: {
-            responseModalities: ['IMAGE', 'TEXT'], // MUST provide both TEXT and IMAGE
-        },
     });
 
-    if (finishReason !== 'stop' || !media || !media.url) {
-      console.error(`AI generation failed. Finish reason: ${finishReason}. Response text: ${text}`);
+    if (finishReason !== 'stop' || !output) {
+      console.error(`AI generation failed. Finish reason: ${finishReason}.`);
       throw new Error(`The AI model did not return a valid image. Reason: ${finishReason}.`);
     }
 
+    // The output is now expected to be a data URI string directly.
+    // We need to parse it to ensure it's a valid data URI.
+    const imageDataUri = output as string;
+    if (!imageDataUri.startsWith('data:image/')) {
+        console.error('AI did not return a valid data URI string.', imageDataUri);
+        throw new Error('The AI model returned an invalid image format.');
+    }
+
     return {
-        imageDataUri: media.url,
+        imageDataUri: imageDataUri,
     };
   }
 );
