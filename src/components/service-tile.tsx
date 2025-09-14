@@ -37,12 +37,10 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   const { name, color, href, links, categories } = service;
 
   let Icon: ElementType;
-  if (typeof service.icon === 'string' && LucideIcons[service.icon as keyof typeof LucideIcons]) {
-    Icon = LucideIcons[service.icon as keyof typeof LucideIcons] as ElementType;
-  } else if (typeof service.icon !== 'string') {
-    Icon = service.icon;
+  if (typeof service.icon === 'string') {
+    Icon = LucideIcons[service.icon as keyof typeof LucideIcons] || Globe;
   } else {
-    Icon = Globe;
+    Icon = service.icon as ElementType;
   }
 
 
