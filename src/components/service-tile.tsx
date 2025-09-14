@@ -2,7 +2,6 @@
 'use client';
 
 import type { ElementType } from 'react';
-import Link from 'next/link';
 import * as LucideIcons from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MultiLinkDialog } from './multi-link-dialog';
@@ -43,8 +42,8 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
 
   if (typeof iconOrName === 'string' && LucideIcons[iconOrName as keyof typeof LucideIcons]) {
     Icon = LucideIcons[iconOrName as keyof typeof LucideIcons];
-  } else if (typeof iconOrName === 'object' || typeof iconOrName === 'function') {
-    // This handles React components passed directly
+  } else if (typeof iconOrName === 'function' || (typeof iconOrName === 'object' && iconOrName && 'render' in iconOrName)) {
+    // This handles React components passed directly (as functions or forwardRef objects)
     Icon = iconOrName as ElementType;
   } else {
     Icon = Globe; // Default icon
