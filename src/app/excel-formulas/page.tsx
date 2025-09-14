@@ -74,6 +74,10 @@ const shortcutCategories = [
             { name: "Ctrl + Z", description: "Undo the last action." },
             { name: "Ctrl + Y", description: "Redo the last action." },
             { name: "Ctrl + S", description: "Save the workbook." },
+            { name: "Ctrl + O", description: "Open a workbook." },
+            { name: "Ctrl + N", description: "Create a new workbook." },
+            { name: "Ctrl + P", description: "Print the current sheet." },
+            { name: "F1", description: "Open the Help pane." },
         ]
     },
     {
@@ -82,7 +86,9 @@ const shortcutCategories = [
             { name: "Arrow Keys", description: "Move one cell up, down, left, or right." },
             { name: "Ctrl + Arrow Keys", description: "Move to the edge of the current data region." },
             { name: "Ctrl + Home", description: "Move to the beginning of the worksheet (cell A1)." },
-            { name: "Ctrl + End", description: "Move to the last cell on the worksheet." },
+            { name: "Ctrl + End", description: "Move to the last cell with content on the worksheet." },
+            { name: "Ctrl + PageDown", description: "Move to the next sheet in the workbook." },
+            { name: "Ctrl + PageUp", description: "Move to the previous sheet in the workbook." },
         ]
     },
     {
@@ -92,6 +98,39 @@ const shortcutCategories = [
             { name: "Ctrl + I", description: "Apply or remove italic formatting." },
             { name: "Ctrl + U", description: "Apply or remove an underline." },
             { name: "Ctrl + 1", description: "Open the Format Cells dialog box." },
+            { name: "Ctrl + 5", description: "Apply or remove strikethrough formatting." },
+            { name: "Alt + H + H", description: "Select a fill color." },
+        ]
+    },
+    {
+        category: "Selection Shortcuts",
+        shortcuts: [
+            { name: "Ctrl + A", description: "Select the entire worksheet or current region." },
+            { name: "Shift + Space", description: "Select the entire row." },
+            { name: "Ctrl + Space", description: "Select the entire column." },
+            { name: "Shift + Arrow Keys", description: "Extend the selection by one cell." },
+            { name: "Ctrl + Shift + Arrow Keys", description: "Extend the selection to the last nonblank cell." },
+        ]
+    },
+    {
+        category: "Data Entry Shortcuts",
+        shortcuts: [
+            { name: "Ctrl + ;", description: "Enter the current date." },
+            { name: "Ctrl + Shift + ;", description: "Enter the current time." },
+            { name: "Ctrl + '", description: "Copy the formula from the cell above." },
+            { name: "Ctrl + D", description: "Fill down from the cell above." },
+            { name: "Ctrl + R", description: "Fill right from the cell to the left." },
+            { name: "Alt + Enter", description: "Start a new line in the same cell." },
+        ]
+    },
+    {
+        category: "Formula Shortcuts",
+        shortcuts: [
+            { name: "F2", description: "Edit the active cell." },
+            { name: "Shift + F3", description: "Open the Insert Function dialog box." },
+            { name: "Ctrl + Shift + Enter", description: "Enter a formula as an array formula." },
+            { name: "F4", description: "Toggle between absolute, relative, and mixed references." },
+            { name: "Ctrl + `", description: "Toggle displaying formulas and their results." },
         ]
     },
     {
@@ -156,7 +195,7 @@ export default function ExcelFormulasPage() {
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
             <Separator />
-            <Accordion type="multiple" className="w-full" defaultValue={[formulaCategories[0].category]}>
+            <Accordion type="multiple" className="w-full" defaultValue={["formulas-main"]}>
                 <AccordionItem value="formulas-main">
                     <AccordionTrigger className="text-xl font-semibold">Formulas</AccordionTrigger>
                     <AccordionContent className="p-0 pl-4">
@@ -180,7 +219,7 @@ export default function ExcelFormulasPage() {
                 <AccordionItem value="shortcuts-main">
                      <AccordionTrigger className="text-xl font-semibold">Shortcuts</AccordionTrigger>
                      <AccordionContent className="p-0 pl-4">
-                        <Accordion type="single" collapsible className="w-full">
+                        <Accordion type="single" collapsible className="w-full" defaultValue={shortcutCategories[0].category}>
                             {shortcutCategories.map(category => (
                                 <AccordionItem value={category.category} key={category.category}>
                                     <AccordionTrigger className="text-lg font-medium">{category.category}</AccordionTrigger>
