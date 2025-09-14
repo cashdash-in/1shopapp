@@ -36,19 +36,21 @@ const photoBoothFlow = ai.defineFlow(
     
     const styleInstruction = stylePrompts[input.style as keyof typeof stylePrompts] || `the style of ${input.style}`;
     
-    const { media } = await ai.generate({
+    // The prompt must be an array containing an object for the media and an object for the text.
+    const { media, text, finishReason } = await ai.generate({
         model: 'googleai/gemini-2.5-flash-image-preview',
         prompt: [
             { media: { url: input.photoDataUri } },
-            { text: `Transform this image into ${styleInstruction}` },
+            { text: `Transform this image into ${styleInstruction}. IMPORTANT: Respond with only the generated image and no accompanying text.` },
         ],
         config: {
             responseModalities: ['IMAGE', 'TEXT'], // MUST provide both TEXT and IMAGE
         },
     });
 
-    if (!media || !media.url) {
-      throw new Error('The AI model did not return a valid image.');
+    if (finishReason !== 'stop' || !media || !media.url) {
+      console.error(`AI generation failed. Finish reason: ${finishReason}. Response text: ${text}`);
+      throw new Error(`The AI model did not return a valid image. Reason: ${finishReason}.`);
     }
 
     return {

@@ -30,6 +30,7 @@ export default function PhotoBoothPage() {
     const [loading, setLoading] = useState(false);
     
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+    const [isCameraReady, setIsCameraReady] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,10 +47,19 @@ export default function PhotoBoothPage() {
     
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
+              // Add an event listener to know when the video is ready to be played.
+              videoRef.current.onloadedmetadata = () => {
+                setIsCameraReady(true);
+              };
             }
           } catch (error) {
             console.error('Error accessing camera:', error);
             setHasCameraPermission(false);
+            toast({
+              variant: 'destructive',
+              title: 'Camera Access Denied',
+              description: 'Please enable camera permissions in your browser settings to use this feature.',
+            });
           }
         };
     
@@ -61,7 +71,7 @@ export default function PhotoBoothPage() {
                 (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
             }
         }
-      }, []);
+      }, [toast]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -76,7 +86,7 @@ export default function PhotoBoothPage() {
     };
     
     const handleCapture = () => {
-        if (videoRef.current && canvasRef.current) {
+        if (videoRef.current && canvasRef.current && isCameraReady) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
             const context = canvas.getContext('2d');
@@ -158,20 +168,20 @@ export default function PhotoBoothPage() {
                                      <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
                                      <canvas ref={canvasRef} className="hidden" />
                                      {hasCameraPermission === false && (
-                                        <div className='absolute inset-0 flex flex-col items-center justify-center text-center p-4'>
+                                        <div className='absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-background/80'>
                                              <Alert variant="destructive">
                                                 <Camera className='h-4 w-4'/>
                                                 <AlertTitle>Camera Access Required</AlertTitle>
                                                 <AlertDescription>
-                                                    Please allow camera access in your browser to use this feature.
+                                                    Please allow camera access to use this feature. You may need to reload the page after granting permission.
                                                 </AlertDescription>
                                             </Alert>
                                         </div>
                                      )}
-                                     {hasCameraPermission === null && <Loader2 className="h-8 w-8 animate-spin"/>}
+                                     {hasCameraPermission === null && <Loader2 className="h-8 w-8 animate-spin text-primary"/>}
                                 </div>
                                 <div className="flex gap-2">
-                                     <Button onClick={handleCapture} disabled={!hasCameraPermission} className="w-full">
+                                     <Button onClick={handleCapture} disabled={!hasCameraPermission || !isCameraReady} className="w-full">
                                         <Camera className="mr-2 h-4 w-4" />
                                         Capture Photo
                                     </Button>
@@ -251,4 +261,3 @@ export default function PhotoBoothPage() {
         </div>
     );
 }
-
