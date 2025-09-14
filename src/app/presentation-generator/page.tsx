@@ -28,7 +28,7 @@ const shortcutCategories = [
         ]
     },
     {
-        category: "Formatting Shortcuts",
+        category: "Editing & Formatting Shortcuts",
         shortcuts: [
             { name: "Ctrl + B", description: "Apply or remove bold formatting." },
             { name: "Ctrl + I", description: "Apply or remove italic formatting." },
@@ -36,6 +36,22 @@ const shortcutCategories = [
             { name: "Ctrl + E", description: "Center align text." },
             { name: "Ctrl + L", description: "Left align text." },
             { name: "Ctrl + R", description: "Right align text." },
+            { name: "Ctrl + K", description: "Insert a hyperlink." },
+            { name: "Ctrl + Shift + >", description: "Increase font size." },
+            { name: "Ctrl + Shift + <", description: "Decrease font size." },
+        ]
+    },
+    {
+        category: "Objects & Media Shortcuts",
+        shortcuts: [
+            { name: "Alt + N, P", description: "Insert a picture from your device." },
+            { name: "Alt + N, S, H", description: "Insert a shape." },
+            { name: "Ctrl + G", description: "Group selected objects." },
+            { name: "Ctrl + Shift + G", description: "Ungroup selected objects." },
+            { name: "Ctrl + Shift + C", description: "Copy formatting of an object (Format Painter)." },
+            { name: "Ctrl + Shift + V", description: "Paste formatting to an object (Format Painter)." },
+            { name: "Alt + Shift + D", description: "Insert the current date." },
+            { name: "Alt + Shift + T", description: "Insert the current time." },
         ]
     },
     {
@@ -47,6 +63,14 @@ const shortcutCategories = [
             { name: "P or Backspace", description: "Go back to the previous slide or animation." },
             { name: "Esc", description: "End the slideshow." },
             { name: "B", description: "Turn the screen black during a slideshow." },
+        ]
+    },
+    {
+        category: "Animation & Transitions",
+        shortcuts: [
+            { name: "Alt + K, A", description: "Open the Animations Pane." },
+            { name: "Alt + K, T", description: "Open the Transitions tab." },
+            { name: "Shift + F9", description: "Toggle the grid and guides." },
         ]
     }
 ];
@@ -176,7 +200,7 @@ export default function PresentationGeneratorPage() {
 
                     <div className="space-y-6 pt-6 border-t">
                         <h2 className="text-2xl font-bold text-center">Presentation Shortcuts</h2>
-                         <Accordion type="single" collapsible className="w-full">
+                         <Accordion type="single" collapsible className="w-full" defaultValue={shortcutCategories[0].category}>
                             {shortcutCategories.map(category => (
                                 <AccordionItem value={category.category} key={category.category}>
                                     <AccordionTrigger className="text-lg font-medium">{category.category}</AccordionTrigger>
