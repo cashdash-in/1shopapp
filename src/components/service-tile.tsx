@@ -54,11 +54,11 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   
   if (isEditMode) {
       return (
-         <div className="block group relative">
+         <div className="relative group">
              <Button
                 variant="destructive"
                 size="icon"
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full z-10 transition-opacity"
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full z-10"
                 onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
