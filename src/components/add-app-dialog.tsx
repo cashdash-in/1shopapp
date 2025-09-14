@@ -57,6 +57,16 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
   
   const suggestionBoxRef = useRef<HTMLDivElement>(null);
 
+  // Name state with a custom setter to update the first link name as well
+  const setTileName = (newName: string) => {
+    setName(newName);
+    if (links.length > 0) {
+      const newLinks = [...links];
+      newLinks[0].name = newName;
+      setLinks(newLinks);
+    }
+  }
+
 
   const resetLocalState = () => {
     setUrl('');
@@ -97,8 +107,8 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
     }
   };
 
-  const getAllLinks = () => {
-    let allLinks: {name: string, href: string, icon: any, color: string}[] = [];
+  const getAllLinks = useCallback(() => {
+    let allLinks: Suggestion[] = [];
     const storedServicesRaw = typeof window !== 'undefined' ? localStorage.getItem('userServices') : null;
     const allServices = storedServicesRaw ? JSON.parse(storedServicesRaw) as Service[] : ALL_SERVICES_DATA;
 
@@ -115,24 +125,30 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
             });
         }
     });
-    return Array.from(new Map(allLinks.map(item => [item.name, item])).values());
-  };
+    return Array.from(new Map(allLinks.map(item => [item.name.toLowerCase(), item])).values());
+  }, []);
 
   const handleLinkChange = (index: number, field: 'name' | 'href', value: string) => {
     const newLinks = [...links];
     newLinks[index][field] = value;
     setLinks(newLinks);
 
-    if (field === 'name' && value) {
+    // If typing in the name field, show suggestions
+    if (field === 'name' && value.trim()) {
         const allLinks = getAllLinks();
         const filteredSuggestions = allLinks.filter(link => 
             link.name.toLowerCase().includes(value.toLowerCase())
         );
-        setSuggestions(filteredSuggestions as Suggestion[]);
+        setSuggestions(filteredSuggestions);
         setActiveSuggestionBox(index);
     } else {
         setSuggestions([]);
         setActiveSuggestionBox(null);
+    }
+    
+    // If this is the first link, update the main tile name
+    if (index === 0 && field === 'name') {
+        setName(value);
     }
   };
 
@@ -238,7 +254,7 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
                 </p>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">Tile Name</Label>
-                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" placeholder="e.g., My Work Tools"/>
+                    <Input id="name" value={name} onChange={(e) => setTileName(e.target.value)} className="col-span-3" placeholder="e.g., My Work Tools"/>
                 </div>
                  <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="icon" className="text-right">Icon</Label>
@@ -296,7 +312,7 @@ export function AddAppDialog({ children, onAddService }: AddAppDialogProps) {
                             />
                         </div>
                         {activeSuggestionBox === index && suggestions.length > 0 && (
-                             <ScrollArea className="h-40 w-full rounded-md border absolute z-10 bg-background shadow-md">
+                             <ScrollArea className="h-40 w-full rounded-md border absolute z-10 bg-background shadow-md mt-1">
                                 <div className="p-2">
                                     {suggestions.map((s, i) => (
                                         <div
