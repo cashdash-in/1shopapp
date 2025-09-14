@@ -39,16 +39,13 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
   // Handle both string names and component types for icons
   let Icon: ElementType;
   const iconOrName = service.icon;
-
-  if (typeof iconOrName === 'string' && LucideIcons[iconOrName as keyof typeof LucideIcons]) {
+  
+  if (typeof iconOrName === 'string') {
     // If it's a string, look it up in the LucideIcons object
-    Icon = LucideIcons[iconOrName as keyof typeof LucideIcons];
-  } else if (typeof iconOrName === 'function' || (typeof iconOrName === 'object' && iconOrName && 'render' in iconOrName)) {
-    // If it's already a component (function or forwardRef object), use it directly
-    Icon = iconOrName as ElementType;
+    Icon = LucideIcons[iconOrName as keyof typeof LucideIcons] || Globe;
   } else {
-    // Fallback to a default icon if neither of the above
-    Icon = Globe;
+    // Otherwise, assume it's already a component
+    Icon = iconOrName || Globe;
   }
 
 
