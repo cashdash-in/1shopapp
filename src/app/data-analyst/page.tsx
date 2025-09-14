@@ -47,30 +47,49 @@ export default function DataAnalystPage() {
         }
     };
     
-    // A simple function to render markdown tables
+    // A more robust function to render markdown tables
     const renderMarkdownTable = (markdown: string) => {
-        const rows = markdown.trim().split('\n');
-        const header = rows[0].split('|').map(h => h.trim());
-        const body = rows.slice(2).map(row => row.split('|').map(c => c.trim()));
+        try {
+            const rows = markdown.trim().split('\n').filter(row => row.includes('|'));
+            if (rows.length < 2) return <p>Could not render table from AI output.</p>;
 
-        return (
-            <div className="overflow-x-auto rounded-md border">
-                <table className="min-w-full text-sm">
-                    <thead className="bg-muted">
-                        <tr>
-                            {header.map((col, i) => col && <th key={i} className="p-2 text-left font-semibold">{col}</th>)}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {body.map((row, i) => (
-                            <tr key={i} className="border-t">
-                                {row.map((cell, j) => header[j] && <td key={j} className="p-2">{cell}</td>)}
+            const headerCells = rows[0].split('|').map(h => h.trim()).filter(h => h);
+            // The separator line is not needed for rendering, so we skip it (rows[1]).
+            const bodyRows = rows.slice(2).map(row => {
+                const cells = row.split('|').map(c => c.trim());
+                // Remove the first and last empty cells caused by leading/trailing pipes
+                return cells.slice(1, -1);
+            });
+
+            if (headerCells.length === 0 || bodyRows.length === 0) return null;
+
+            return (
+                <div className="overflow-x-auto rounded-md border">
+                    <table className="min-w-full text-sm">
+                        <thead className="bg-muted">
+                            <tr>
+                                {headerCells.map((col, i) => <th key={i} className="p-2 text-left font-semibold">{col}</th>)}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
+                        </thead>
+                        <tbody>
+                            {bodyRows.map((row, i) => (
+                                <tr key={i} className="border-t">
+                                    {row.map((cell, j) => <td key={j} className="p-2">{cell}</td>)}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        } catch (error) {
+            console.error("Failed to render markdown table:", error);
+            // If rendering fails, just show the raw markdown data.
+            return (
+                <pre className="text-xs bg-muted p-4 rounded-md whitespace-pre-wrap font-mono">
+                    <code>{markdown}</code>
+                </pre>
+            )
+        }
     }
 
     return (
@@ -96,7 +115,7 @@ export default function DataAnalystPage() {
                                 id="data"
                                 value={data}
                                 onChange={(e) => setData(e.target.value)}
-                                placeholder="Example:\nProduct,Sales,Region\nLaptop,5000,North\nMouse,1200,South"
+                                placeholder="Example:&#10;Product,Sales,Region&#10;Laptop,5000,North&#10;Mouse,1200,South"
                                 disabled={loading}
                                 rows={8}
                             />

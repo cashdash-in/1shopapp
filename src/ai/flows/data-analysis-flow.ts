@@ -21,9 +21,9 @@ const dataAnalysisPrompt = ai.definePrompt({
   input: { schema: DataAnalysisInputSchema },
   output: { 
     schema: DataAnalysisOutputSchema,
-    format: 'json' // This was the missing configuration
+    format: 'json' // Ensure the output is JSON
   },
-  model: 'googleai/gemini-2.5-flash-preview',
+  model: 'googleai/gemini-2.5-flash-preview', // Use the correct text-based model
   prompt: `You are an expert data analyst. Your task is to analyze the provided dataset and answer the user's question about it.
 
 Data:
