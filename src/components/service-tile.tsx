@@ -43,8 +43,9 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
 
   if (typeof iconOrName === 'string' && LucideIcons[iconOrName as keyof typeof LucideIcons]) {
     Icon = LucideIcons[iconOrName as keyof typeof LucideIcons];
-  } else if (typeof iconOrName === 'function') {
-    Icon = iconOrName;
+  } else if (typeof iconOrName === 'object' || typeof iconOrName === 'function') {
+    // This handles React components passed directly
+    Icon = iconOrName as ElementType;
   } else {
     Icon = Globe; // Default icon
   }
@@ -70,18 +71,12 @@ export function ServiceTile({ service, isEditMode, onDelete }: ServiceTileProps)
             onContextMenu={handleContextMenu}
             title={`Right-click to delete ${name}`}
           >
-           <div className="absolute top-0 right-0 z-10 p-0.5 bg-background rounded-full translate-x-1/2 -translate-y-1/2">
-                <div className="w-5 h-5 bg-red-500 text-white flex items-center justify-center rounded-full text-xs font-bold">
-                    &times;
-                </div>
-            </div>
-            <Card
+           <Card
                 className="h-full border-2 border-dashed border-muted-foreground/50 opacity-70"
-                style={{ backgroundColor: color }}
             >
-                <CardContent className="flex flex-col items-center justify-center p-4 h-full text-white aspect-square">
-                <Icon className="w-8 h-8 mb-2" />
-                <p className="text-sm font-semibold text-center">{name}</p>
+                <CardContent className="flex flex-col items-center justify-center p-4 h-full text-foreground aspect-square">
+                <Icon className="w-8 h-8 mb-2" style={{ color }} />
+                <p className="text-sm font-semibold text-center" style={{ color }}>{name}</p>
                 </CardContent>
             </Card>
         </div>
