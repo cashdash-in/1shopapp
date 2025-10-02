@@ -19,7 +19,7 @@ export async function generatePresentation(input: PresentationInput): Promise<Pr
 const presentationPrompt = ai.definePrompt({
   name: 'presentationPrompt',
   input: { schema: PresentationInputSchema },
-  output: { schema: PresentationOutputSchema, format: 'json' },
+  output: { schema: PresentationOutputSchema },
   model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert presentation creator. Your task is to generate a slide deck based on a given topic.
 
@@ -30,7 +30,7 @@ Specific Instructions: {{{instructions}}}
 {{/if}}
 
 Please generate a series of slides. For each slide, provide a concise title and a list of bullet points for the content.
-Ensure the output is in the specified JSON format, with an array of slides, where each slide is an object with "title" and "content" (as an array of strings).
+Ensure the output is in JSON format, with an array of slides, where each slide is an object with "title" and "content" (as an array of strings).
 `,
 });
 

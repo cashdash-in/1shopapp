@@ -32,8 +32,9 @@ Dataset:
 {{{data}}}
 \`\`\`
 
-Based on the data and the question, provide a text-based summary that directly answers the question.
-If the answer involves a subset of the data or a calculation, also provide the resulting data as a markdown table in the 'data' field of the output.
+Based on the data and the question, provide the output in JSON format with two fields:
+- "summary": A text-based summary that directly answers the question.
+- "data": If the answer involves a subset of the data or a calculation, also provide the resulting data as a markdown table in this field.
 `,
 });
 

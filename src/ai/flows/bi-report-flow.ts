@@ -19,7 +19,7 @@ export async function generateBiReport(input: BiReportInput): Promise<BiReportOu
 const biReportPrompt = ai.definePrompt({
   name: 'biReportPrompt',
   input: { schema: BiReportInputSchema },
-  output: { schema: BiReportOutputSchema, format: 'json' },
+  output: { schema: BiReportOutputSchema },
   model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert BI (Business Intelligence) analyst. Your task is to create a report based on a user's request and a provided dataset.
 
@@ -31,7 +31,7 @@ Dataset:
 {{{data}}}
 \`\`\`
 
-Generate a report that includes:
+Generate a report in JSON format that includes:
 1. A concise, one or two-sentence summary of the key insight.
 2. A clear title for the report.
 3. The data for a chart, formatted as an array of objects with 'name' (string) and 'value' (number) fields. The 'value' field in chartData MUST be a number, not a string.
