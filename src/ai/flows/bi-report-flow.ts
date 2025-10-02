@@ -47,7 +47,7 @@ const biReportFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash-preview',
+        model: 'googleai/gemini-1.5-flash-latest',
         prompt: biReportPrompt,
         input: input,
         output: {
