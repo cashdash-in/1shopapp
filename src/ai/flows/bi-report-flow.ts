@@ -19,7 +19,7 @@ export async function generateBiReport(input: BiReportInput): Promise<BiReportOu
 const biReportPrompt = ai.definePrompt({
   name: 'biReportPrompt',
   input: { schema: BiReportInputSchema },
-  output: { schema: BiReportOutputSchema },
+  output: { schema: BiReportOutputSchema, format: 'json' },
   model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert BI (Business Intelligence) analyst. Your task is to create a report based on a user's request and a provided dataset.
 

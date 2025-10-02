@@ -23,7 +23,7 @@ const iconOptions = [
 const tileCreationPrompt = ai.definePrompt({
   name: 'tileCreationPrompt',
   input: { schema: TileCreationInputSchema },
-  output: { schema: TileCreationOutputSchema },
+  output: { schema: TileCreationOutputSchema, format: 'json' },
   model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert at analyzing web pages to extract key information for creating a visually appealing and informative tile in a user dashboard.
 
