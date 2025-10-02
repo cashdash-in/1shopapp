@@ -7,11 +7,10 @@
  * - getPartners - A function to retrieve all partners.
  */
 
-import { ai } from '@/ai/genkit';
 import { FAKE_PARTNER_DB } from '@/lib/db';
 import fs from 'fs/promises';
 import path from 'path';
-import { PartnerSignupInputSchema, type PartnerSignupInput, PartnerSignupOutputSchema, type PartnerSignupOutput } from '../schemas';
+import type { PartnerSignupInput, PartnerSignupOutput } from '../schemas';
 
 // Helper function to stringify a partner object for file writing
 function stringifyPartner(partner: PartnerSignupInput): string {
@@ -69,16 +68,6 @@ export async function getPartners(): Promise<PartnerSignupInput[]> {
 }
 
 export async function partnerSignup(input: PartnerSignupInput): Promise<PartnerSignupOutput> {
-  return partnerSignupFlow(input);
-}
-
-const partnerSignupFlow = ai.defineFlow(
-  {
-    name: 'partnerSignupFlow',
-    inputSchema: PartnerSignupInputSchema,
-    outputSchema: PartnerSignupOutputSchema,
-  },
-  async (input) => {
     
     // Check for duplicate partners based on email (case-insensitive) or phone number
     const existingPartner = FAKE_PARTNER_DB.find(
@@ -109,5 +98,4 @@ const partnerSignupFlow = ai.defineFlow(
       message: 'Thank you for registering!',
       referralCode: referralCode,
     };
-  }
-);
+}

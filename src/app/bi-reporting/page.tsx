@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ResponsiveContainer, BarChart, XAxis, YAxis, Bar } from 'recharts';
 import { generateBiReport } from '@/ai/flows/bi-report-flow';
 import type { BiReportOutput } from '@/ai/schemas';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const exampleData = `Date,Product,Category,SalePrice,Region
 2024-01-15,Laptop,Electronics,1200,North
@@ -31,6 +32,8 @@ export default function BiReportingPage() {
     const [request, setRequest] = useState('What are the total sales per region?');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<BiReportOutput | null>(null);
+    const [aiError, setAiError] = useState('');
+
 
     const handleGenerate = async () => {
         if (!data.trim() || !request.trim()) {
@@ -44,17 +47,14 @@ export default function BiReportingPage() {
 
         setLoading(true);
         setResult(null);
+        setAiError('');
 
         try {
             const response = await generateBiReport({ data, request });
             setResult(response);
-        } catch (error) {
+        } catch (error: any) {
             console.error('AI report generation failed:', error);
-            toast({
-                variant: 'destructive',
-                title: 'Report Generation Failed',
-                description: 'The AI could not generate your report. Please try again.',
-            });
+            setAiError(error.message || 'The AI could not generate your report. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -77,6 +77,12 @@ export default function BiReportingPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                    {aiError && (
+                        <Alert variant="destructive">
+                            <AlertTitle>AI Feature Unavailable</AlertTitle>
+                            <AlertDescription>{aiError}</AlertDescription>
+                        </Alert>
+                    )}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="data">1. Paste your data (CSV or text)</Label>

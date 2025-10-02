@@ -29,6 +29,7 @@ export default function PhotoBoothPage() {
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [selectedStyle, setSelectedStyle] = useState<string>(styles[0].id);
     const [loading, setLoading] = useState(false);
+    const [aiError, setAiError] = useState('');
     
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
@@ -114,6 +115,7 @@ export default function PhotoBoothPage() {
 
         setLoading(true);
         setGeneratedImage(null);
+        setAiError('');
 
         try {
             const result = await runPhotoBooth({
@@ -121,13 +123,9 @@ export default function PhotoBoothPage() {
                 style: selectedStyle,
             });
             setGeneratedImage(result.imageDataUri);
-        } catch (error) {
+        } catch (error: any) {
             console.error('AI generation failed:', error);
-            toast({
-                variant: 'destructive',
-                title: 'Generation Failed',
-                description: 'The AI could not process the image. Please try again or use a different image.',
-            });
+            setAiError(error.message || 'The AI could not process the image. Please try again or use a different image.');
         } finally {
             setLoading(false);
         }
@@ -162,6 +160,12 @@ export default function PhotoBoothPage() {
                 <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Left Column: Input */}
                     <div className="space-y-6">
+                        {aiError && (
+                            <Alert variant="destructive">
+                                <AlertTitle>AI Feature Unavailable</AlertTitle>
+                                <AlertDescription>{aiError}</AlertDescription>
+                            </Alert>
+                        )}
                         <Card>
                             <CardHeader>
                                 <CardTitle>1. Provide an Image</CardTitle>

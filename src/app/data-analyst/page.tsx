@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { analyzeData } from '@/ai/flows/data-analysis-flow';
 import type { DataAnalysisOutput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function DataAnalystPage() {
     const { toast } = useToast();
@@ -18,6 +19,7 @@ export default function DataAnalystPage() {
     const [question, setQuestion] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<DataAnalysisOutput | null>(null);
+    const [aiError, setAiError] = useState('');
 
     const handleAnalyze = async () => {
         if (!data.trim() || !question.trim()) {
@@ -31,17 +33,14 @@ export default function DataAnalystPage() {
 
         setLoading(true);
         setResult(null);
+        setAiError('');
 
         try {
             const response = await analyzeData({ data, question });
             setResult(response);
-        } catch (error) {
+        } catch (error: any) {
             console.error('AI analysis failed:', error);
-            toast({
-                variant: 'destructive',
-                title: 'Analysis Failed',
-                description: 'The AI could not analyze your data. Please try again.',
-            });
+            setAiError(error.message || 'The AI could not analyze your data. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -108,6 +107,12 @@ export default function DataAnalystPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                    {aiError && (
+                        <Alert variant="destructive">
+                            <AlertTitle>AI Feature Unavailable</AlertTitle>
+                            <AlertDescription>{aiError}</AlertDescription>
+                        </Alert>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="data">1. Paste your data (CSV or text)</Label>

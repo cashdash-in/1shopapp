@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { services as ALL_SERVICES_DATA } from '@/lib/default-services';
 import { ScrollArea } from './ui/scroll-area';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 
 interface AddAppDialogProps {
@@ -137,9 +138,9 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
       // Set the first link with the analyzed data
       setLinks([{ name: metadata.name, href: url }]);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setAnalysisError("AI analysis failed. Please fill in the details manually.");
+      setAnalysisError(err.message || "AI analysis failed. Please fill in the details manually.");
        setLinks([{ name: '', href: url }]);
     } finally {
       setIsAnalyzing(false);
@@ -281,6 +282,12 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
         </DialogHeader>
         
         <div className="space-y-4 py-2 max-h-[70vh] overflow-y-auto pr-4">
+            {analysisError.includes("AI functionality is temporarily disabled") && (
+                <Alert variant="destructive">
+                    <AlertTitle>AI Feature Unavailable</AlertTitle>
+                    <AlertDescription>{analysisError}</AlertDescription>
+                </Alert>
+            )}
             <div className="space-y-2">
                 <Label>Mode</Label>
                 <Select value={selectedTile} onValueChange={setSelectedTile}>
@@ -318,8 +325,8 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
             )}
 
             <div className="space-y-4 pt-4 border-t">
-                <p className={cn("text-sm text-center", analysisError ? "text-destructive" : "text-muted-foreground")}>
-                    {analysisError || `You are now ${mode === 'add' ? 'creating a new' : 'editing the'} tile.`}
+                <p className={cn("text-sm text-center", analysisError && !analysisError.includes("AI functionality is temporarily disabled") ? "text-destructive" : "text-muted-foreground")}>
+                    {(analysisError && !analysisError.includes("AI functionality is temporarily disabled")) || `You are now ${mode === 'add' ? 'creating a new' : 'editing the'} tile.`}
                 </p>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">Tile Name</Label>

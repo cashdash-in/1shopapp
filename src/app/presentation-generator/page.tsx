@@ -14,6 +14,7 @@ import type { PresentationOutput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const shortcutCategories = [
     {
@@ -90,6 +91,7 @@ export default function PresentationGeneratorPage() {
     const [instructions, setInstructions] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<PresentationOutput | null>(null);
+    const [aiError, setAiError] = useState('');
 
     const handleGenerate = async () => {
         if (!topic.trim()) {
@@ -103,17 +105,14 @@ export default function PresentationGeneratorPage() {
 
         setLoading(true);
         setResult(null);
+        setAiError('');
 
         try {
             const response = await generatePresentation({ topic, instructions });
             setResult(response);
-        } catch (error) {
+        } catch (error: any) {
             console.error('AI generation failed:', error);
-            toast({
-                variant: 'destructive',
-                title: 'Generation Failed',
-                description: 'The AI could not generate the presentation. Please try again.',
-            });
+            setAiError(error.message || 'The AI could not generate the presentation. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -144,6 +143,12 @@ export default function PresentationGeneratorPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                     {aiError && (
+                        <Alert variant="destructive">
+                            <AlertTitle>AI Feature Unavailable</AlertTitle>
+                            <AlertDescription>{aiError}</AlertDescription>
+                        </Alert>
+                    )}
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="topic">Presentation Topic</Label>
