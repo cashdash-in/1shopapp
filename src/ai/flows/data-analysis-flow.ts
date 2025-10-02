@@ -21,6 +21,7 @@ const dataAnalysisPrompt = ai.definePrompt({
   name: 'dataAnalysisPrompt',
   input: { schema: DataAnalysisInputSchema },
   output: { schema: DataAnalysisOutputSchema },
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert data analyst. Your task is to analyze the provided dataset and answer the user's question about it.
 
 User's Question:
@@ -45,14 +46,7 @@ const dataAnalysisFlow = ai.defineFlow(
     outputSchema: DataAnalysisOutputSchema,
   },
   async (input) => {
-    const { output } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash-latest',
-      prompt: dataAnalysisPrompt,
-      input: input,
-      output: {
-        schema: DataAnalysisOutputSchema,
-      }
-    });
+    const { output } = await dataAnalysisPrompt(input);
 
     if (!output) {
       throw new Error("AI could not analyze your data. The model did not return a valid response.");

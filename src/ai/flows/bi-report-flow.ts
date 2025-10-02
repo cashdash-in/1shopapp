@@ -20,6 +20,7 @@ const biReportPrompt = ai.definePrompt({
   name: 'biReportPrompt',
   input: { schema: BiReportInputSchema },
   output: { schema: BiReportOutputSchema },
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert BI (Business Intelligence) analyst. Your task is to create a report based on a user's request and a provided dataset.
 
 User's Request:
@@ -46,14 +47,7 @@ const biReportFlow = ai.defineFlow(
     outputSchema: BiReportOutputSchema,
   },
   async (input) => {
-    const { output } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash-latest',
-        prompt: biReportPrompt,
-        input: input,
-        output: {
-            schema: BiReportOutputSchema,
-        }
-    });
+    const { output } = await biReportPrompt(input);
 
     if (!output) {
         throw new Error("The AI model did not return a valid report structure.");
