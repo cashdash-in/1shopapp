@@ -4,6 +4,9 @@
  */
 import type { SentimentAnalysisInput, SentimentOutput } from '../schemas';
 
+const errorMessage = "AI functionality is temporarily disabled due to a package installation issue. Please contact support.";
+
 export async function runSentimentAnalysis(input: SentimentAnalysisInput): Promise<SentimentOutput> {
-    throw new Error("AI functionality is temporarily disabled due to a package installation issue.");
+  console.error(errorMessage);
+  throw new Error(errorMessage);
 }
