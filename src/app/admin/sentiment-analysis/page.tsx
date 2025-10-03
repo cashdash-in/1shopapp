@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Frown, Meh, Smile, Tag, Bot, Sparkles, BrainCircuit, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import { getFeedback, updateFeedback } from '@/ai/flows/feedback-submission-flow';
-import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
+// import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
 import type { Feedback, SentimentOutput } from '@/ai/schemas';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -87,23 +87,24 @@ export default function SentimentAnalysisPage() {
      const handleAnalyze = (feedbackItem: Feedback) => {
         startAnalyzing(async () => {
             try {
-                setAiError('');
-                const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
+                setAiError('AI functionality is temporarily disabled due to a package installation issue.');
+                // setAiError('');
+                // const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
 
-                const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
+                // const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
 
-                // Optimistically update the UI
-                setFeedbackList(prevList =>
-                    prevList.map(item => item.id === updatedItem.id ? updatedItem : item)
-                );
+                // // Optimistically update the UI
+                // setFeedbackList(prevList =>
+                //     prevList.map(item => item.id === updatedItem.id ? updatedItem : item)
+                // );
 
-                // Persist the change
-                await updateFeedback(updatedItem);
+                // // Persist the change
+                // await updateFeedback(updatedItem);
 
-                toast({
-                    title: "Analysis Complete",
-                    description: "Sentiment analysis has been successfully performed.",
-                });
+                // toast({
+                //     title: "Analysis Complete",
+                //     description: "Sentiment analysis has been successfully performed.",
+                // });
 
             } catch (error: any) {
                  setAiError(error.message || "Could not analyze the feedback. Please try again.");
