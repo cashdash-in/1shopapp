@@ -1,3 +1,4 @@
+
 'use client'
 
 import React, { useState, useEffect, useMemo, useTransition } from 'react';
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Frown, Meh, Smile, Tag, Bot, Sparkles, BrainCircuit, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import { getFeedback, updateFeedback } from '@/ai/flows/feedback-submission-flow';
-import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
+// import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
 import type { Feedback, SentimentOutput } from '@/ai/schemas';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,6 +16,11 @@ import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+async function runSentimentAnalysis(input: any): Promise<any> {
+    throw new Error("AI functionality is temporarily disabled due to a package installation issue.");
+}
+
 
 const COLORS = {
     Positive: '#22c55e', // green-500
@@ -49,7 +55,7 @@ export default function SentimentAnalysisPage() {
     const [loading, setLoading] = useState(true);
     const [isAnalyzing, startAnalyzing] = useTransition();
     const { toast } = useToast();
-    const [aiError, setAiError] = useState('');
+    const [aiError, setAiError] = useState('AI functionality is temporarily disabled due to a package installation issue. The "Analyze" buttons are disabled.');
 
     const fetchFeedback = async () => {
         try {
@@ -87,23 +93,23 @@ export default function SentimentAnalysisPage() {
      const handleAnalyze = (feedbackItem: Feedback) => {
         startAnalyzing(async () => {
             try {
-                setAiError('');
-                const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
+                setAiError('AI functionality is temporarily disabled due to a package installation issue.');
+                // const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
 
-                const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
+                // const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
 
-                // Optimistically update the UI
-                setFeedbackList(prevList =>
-                    prevList.map(item => item.id === updatedItem.id ? updatedItem : item)
-                );
+                // // Optimistically update the UI
+                // setFeedbackList(prevList =>
+                //     prevList.map(item => item.id === updatedItem.id ? updatedItem : item)
+                // );
 
-                // Persist the change
-                await updateFeedback(updatedItem);
+                // // Persist the change
+                // await updateFeedback(updatedItem);
 
-                toast({
-                    title: "Analysis Complete",
-                    description: "Sentiment analysis has been successfully performed.",
-                });
+                // toast({
+                //     title: "Analysis Complete",
+                //     description: "Sentiment analysis has been successfully performed.",
+                // });
 
             } catch (error: any) {
                  setAiError(error.message || "Could not analyze the feedback. Please try again.");
@@ -222,7 +228,7 @@ export default function SentimentAnalysisPage() {
                                                     <Button 
                                                         size="sm" 
                                                         onClick={() => handleAnalyze(item)}
-                                                        disabled={isAnalyzing}
+                                                        disabled={true}
                                                     >
                                                         <Sparkles className="mr-2 h-4 w-4"/>
                                                         Analyze
