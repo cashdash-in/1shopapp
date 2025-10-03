@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Frown, Meh, Smile, Tag, Bot, Sparkles, BrainCircuit, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import { getFeedback, updateFeedback } from '@/ai/flows/feedback-submission-flow';
-import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
+// import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
 import type { Feedback, SentimentOutput } from '@/ai/schemas';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,6 +15,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+const runSentimentAnalysis = async (input: any): Promise<SentimentOutput> => {
+  throw new Error("AI functionality is temporarily disabled due to a package installation issue.");
+}
 
 const COLORS = {
     Positive: '#22c55e', // green-500
@@ -49,22 +54,23 @@ export default function SentimentAnalysisPage() {
     const [loading, setLoading] = useState(true);
     const [isAnalyzing, startAnalyzing] = useTransition();
     const { toast } = useToast();
+    const [aiError, setAiError] = useState('');
 
+    const fetchFeedback = async () => {
+        try {
+            setLoading(true);
+            const data = await getFeedback();
+            // Sort by date descending
+            const sortedData = data.sort((a, b) => parseISO(b.submittedAt).getTime() - parseISO(a.submittedAt).getTime());
+            setFeedbackList(sortedData);
+        } catch (error) {
+            console.error("Failed to fetch sentiment feedback", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchFeedback = async () => {
-            try {
-                setLoading(true);
-                const data = await getFeedback();
-                // Sort by date descending
-                const sortedData = data.sort((a, b) => parseISO(b.submittedAt).getTime() - parseISO(a.submittedAt).getTime());
-                setFeedbackList(sortedData);
-            } catch (error) {
-                console.error("Failed to fetch sentiment feedback", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchFeedback();
     }, []);
 
@@ -86,7 +92,12 @@ export default function SentimentAnalysisPage() {
      const handleAnalyze = (feedbackItem: Feedback) => {
         startAnalyzing(async () => {
             try {
+                setAiError('');
                 const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
+
+                if (!analysisResult) {
+                    throw new Error("The AI returned an empty analysis. Please try again.");
+                }
 
                 const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
 
@@ -103,14 +114,9 @@ export default function SentimentAnalysisPage() {
                     description: "Sentiment analysis has been successfully performed.",
                 });
 
-            } catch (error) {
-                 toast({
-                    title: "Analysis Failed",
-                    description: "Could not analyze the feedback. Please try again.",
-                    variant: 'destructive'
-                });
+            } catch (error: any) {
+                 setAiError(error.message || "Could not analyze the feedback. Please try again.");
                 console.error("Failed to analyze feedback:", error);
-                // Revert optimistic update on failure if necessary, though in this case it might not be a bad user experience to leave it.
             }
         });
     };
@@ -121,6 +127,12 @@ export default function SentimentAnalysisPage() {
             <div className="flex items-center">
                 <h1 className="text-lg font-semibold md:text-2xl">AI-Powered Sentiment Analysis</h1>
             </div>
+             {aiError && (
+                <Alert variant="destructive">
+                    <AlertTitle>AI Analysis Failed</AlertTitle>
+                    <AlertDescription>{aiError}</AlertDescription>
+                </Alert>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <Card className="lg:col-span-2">
                     <CardHeader>
