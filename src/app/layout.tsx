@@ -1,4 +1,3 @@
-
 'use client';
 
 import "./globals.css";
@@ -41,9 +40,9 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-body antialiased">
-        <div className="fixed top-1/2 -translate-y-1/2 left-4 flex flex-col gap-2 z-50">
+        {/* <div className="fixed top-1/2 -translate-y-1/2 left-4 flex flex-col gap-2 z-50">
             
-            {/* <Link href="/photo-booth" passHref>
+            <Link href="/photo-booth" passHref>
                 <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI Photo Booth">
                     <Camera className="h-6 w-6" />
                 </div>
@@ -62,7 +61,7 @@ export default function RootLayout({
                 <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI BI Reporting">
                     <LayoutGrid className="h-6 w-6" />
                 </div>
-            </Link> */}
+            </Link>
             
              <Link href="/infographics" passHref>
                 <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="Infographics & Charts">
@@ -79,7 +78,7 @@ export default function RootLayout({
                     <FileText className="h-6 w-6" />
                 </div>
             </Link>
-        </div>
+        </div> */}
         <Link href="/" passHref>
             <div className="fixed top-8 right-4 h-12 w-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold cursor-pointer z-50">
                 1

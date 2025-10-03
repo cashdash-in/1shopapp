@@ -1,4 +1,3 @@
-
 'use client'
 
 import React, { useState, useEffect, useMemo, useTransition } from 'react';
@@ -89,17 +88,17 @@ export default function SentimentAnalysisPage() {
         startAnalyzing(async () => {
             try {
                 setAiError('');
-                // const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
+                const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
 
-                // const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
+                const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
 
-                // // Optimistically update the UI
-                // setFeedbackList(prevList =>
-                //     prevList.map(item => item.id === updatedItem.id ? updatedItem : item)
-                // );
+                // Optimistically update the UI
+                setFeedbackList(prevList =>
+                    prevList.map(item => item.id === updatedItem.id ? updatedItem : item)
+                );
 
-                // // Persist the change
-                // await updateFeedback(updatedItem);
+                // Persist the change
+                await updateFeedback(updatedItem);
 
                 toast({
                     title: "Analysis Complete",
@@ -121,7 +120,7 @@ export default function SentimentAnalysisPage() {
             </div>
              {aiError && (
                 <Alert variant="destructive">
-                    <AlertTitle>AI Feature Error</AlertTitle>
+                    <AlertTitle>AI Feature Unavailable</AlertTitle>
                     <AlertDescription>{aiError}</AlertDescription>
                 </Alert>
             )}
