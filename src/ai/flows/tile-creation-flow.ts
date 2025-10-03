@@ -1,10 +1,9 @@
-
 'use server';
 /**
  * @fileOverview A flow for generating tile metadata from a URL.
  */
 
-import { ai } from '@/ai/genkit';
+// import { ai } from '@/ai/genkit';
 import {
   TileCreationInputSchema,
   TileCreationOutputSchema,
@@ -14,6 +13,11 @@ import {
 import * as LucideIcons from 'lucide-react';
 
 
+export async function generateTileMetadata(input: TileCreationInput): Promise<TileCreationOutput> {
+    throw new Error("AI functionality is temporarily disabled due to installation issues.");
+}
+
+/*
 const iconOptions = [
     'ShoppingCart', 'UtensilsCrossed', 'Receipt', 'Plane', 'Shield', 'Landmark', 'Truck', 'Users', 'Newspaper', 'Search', 'Building2', 'Ticket', 'Mail', 'Book', 'Briefcase', 'Film', 'Music', 'PenTool', 'FileText', 'Github', 'Globe', 'Home', 'Heart', 'Headphones', 'Camera', 'Cloud', 'Code', 'CreditCard', 'Database', 'DollarSign', 'Download', 'ExternalLink', 'File', 'Folder', 'Gift', 'Image', 'Instagram', 'Layout', 'Link', 'Lock', 'LogIn', 'LogOut', 'Map', 'MessageCircle', 'Monitor', 'Moon', 'MousePointer', 'Package', 'Palette', 'Phone', 'Play', 'Plus', 'Settings', 'Share2', 'Smile', 'Sun', 'Tag', 'Target', 'ThumbsUp', 'Trash2', 'TrendingUp', 'Twitter', 'Upload', 'Video', 'Wallet', 'Wifi', 'Youtube', 'Zap'
 ].join(', ');
@@ -51,3 +55,4 @@ const tileCreationFlow = ai.defineFlow(
 export async function generateTileMetadata(input: TileCreationInput): Promise<TileCreationOutput> {
     return tileCreationFlow(input);
 }
+*/

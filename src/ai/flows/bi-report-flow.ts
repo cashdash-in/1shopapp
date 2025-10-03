@@ -1,10 +1,9 @@
-
 'use server';
 /**
  * @fileOverview A flow for generating Business Intelligence reports.
  */
 
-import { ai } from '@/ai/genkit';
+// import { ai } from '@/ai/genkit';
 import {
   BiReportInputSchema,
   BiReportOutputSchema,
@@ -12,6 +11,11 @@ import {
   type BiReportOutput,
 } from '../schemas';
 
+export async function generateBiReport(input: BiReportInput): Promise<BiReportOutput> {
+    throw new Error("AI functionality is temporarily disabled due to installation issues.");
+}
+
+/*
 const biReportPrompt = ai.definePrompt({
     name: 'biReportPrompt',
     input: { schema: BiReportInputSchema },
@@ -50,3 +54,4 @@ const biReportFlow = ai.defineFlow(
 export async function generateBiReport(input: BiReportInput): Promise<BiReportOutput> {
     return biReportFlow(input);
 }
+*/

@@ -1,10 +1,9 @@
-
 'use server';
 /**
  * @fileOverview A sentiment analysis flow that uses Genkit.
  */
 
-import { ai } from '@/ai/genkit';
+// import { ai } from '@/ai/genkit';
 import {
   SentimentAnalysisInputSchema,
   SentimentOutputSchema,
@@ -12,6 +11,11 @@ import {
   type SentimentOutput,
 } from '../schemas';
 
+export async function runSentimentAnalysis(input: SentimentAnalysisInput): Promise<SentimentOutput> {
+  throw new Error("AI functionality is temporarily disabled due to installation issues.");
+}
+
+/*
 const sentimentAnalysisPrompt = ai.definePrompt(
   {
     name: 'sentimentAnalysisPrompt',
@@ -47,3 +51,4 @@ const sentimentAnalysisFlow = ai.defineFlow(
 export async function runSentimentAnalysis(input: SentimentAnalysisInput): Promise<SentimentOutput> {
   return sentimentAnalysisFlow(input);
 }
+*/

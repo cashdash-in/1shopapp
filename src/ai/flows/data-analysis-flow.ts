@@ -1,10 +1,9 @@
-
 'use server';
 /**
  * @fileOverview A flow for analyzing data with an AI.
  */
 
-import { ai } from '@/ai/genkit';
+// import { ai } from '@/ai/genkit';
 import {
   DataAnalysisInputSchema,
   DataAnalysisOutputSchema,
@@ -12,7 +11,11 @@ import {
   type DataAnalysisOutput,
 } from '../schemas';
 
+export async function analyzeData(input: DataAnalysisInput): Promise<DataAnalysisOutput> {
+    throw new Error("AI functionality is temporarily disabled due to installation issues.");
+}
 
+/*
 const dataAnalysisPrompt = ai.definePrompt({
     name: 'dataAnalysisPrompt',
     input: { schema: DataAnalysisInputSchema },
@@ -49,3 +52,4 @@ const dataAnalysisFlow = ai.defineFlow(
 export async function analyzeData(input: DataAnalysisInput): Promise<DataAnalysisOutput> {
     return dataAnalysisFlow(input);
 }
+*/

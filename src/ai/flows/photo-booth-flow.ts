@@ -1,16 +1,19 @@
-
 'use server';
 
-import { ai } from '@/ai/genkit';
+// import { ai } from '@/ai/genkit';
 import {
   PhotoBoothInputSchema,
   PhotoBoothOutputSchema,
   type PhotoBoothInput,
   type PhotoBoothOutput,
 } from '../schemas';
-import { googleAI } from '@genkit-ai/google-genai';
+// import { googleAI } from '@genkit-ai/google-genai';
 
+export async function runPhotoBooth(input: PhotoBoothInput): Promise<PhotoBoothOutput> {
+  throw new Error("AI functionality is temporarily disabled due to installation issues.");
+}
 
+/*
 const photoBoothFlow = ai.defineFlow(
   {
     name: 'photoBoothFlow',
@@ -42,3 +45,4 @@ const photoBoothFlow = ai.defineFlow(
 export async function runPhotoBooth(input: PhotoBoothInput): Promise<PhotoBoothOutput> {
   return photoBoothFlow(input);
 }
+*/

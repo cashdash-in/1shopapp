@@ -1,10 +1,9 @@
-
 'use server';
 /**
  * @fileOverview A flow for generating presentation outlines.
  */
 
-import { ai } from '@/ai/genkit';
+// import { ai } from '@/ai/genkit';
 import {
   PresentationInputSchema,
   PresentationOutputSchema,
@@ -12,6 +11,10 @@ import {
   type PresentationOutput,
 } from '../schemas';
 
+export async function generatePresentation(input: PresentationInput): Promise<PresentationOutput> {
+    throw new Error("AI functionality is temporarily disabled due to installation issues.");
+}
+/*
 const presentationPrompt = ai.definePrompt({
     name: 'presentationPrompt',
     input: { schema: PresentationInputSchema },
@@ -44,3 +47,4 @@ const presentationFlow = ai.defineFlow(
 export async function generatePresentation(input: PresentationInput): Promise<PresentationOutput> {
     return presentationFlow(input);
 }
+*/
