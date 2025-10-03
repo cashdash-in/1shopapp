@@ -15,7 +15,7 @@ import {
 const presentationPrompt = ai.definePrompt({
     name: 'presentationPrompt',
     input: { schema: PresentationInputSchema },
-    output: { schema: PresentationOutputSchema },
+    output: { schema: PresentationOutputSchema, format: 'json' },
     prompt: `
     You are a presentation expert. Your task is to create a slide deck outline based on a given topic and optional instructions.
     For each slide, provide a clear title and a list of 3-5 concise bullet points.

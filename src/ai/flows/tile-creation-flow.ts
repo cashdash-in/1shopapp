@@ -22,7 +22,7 @@ const iconOptions = [
 const tileCreationPrompt = ai.definePrompt({
     name: 'tileCreationPrompt',
     input: { schema: TileCreationInputSchema },
-    output: { schema: TileCreationOutputSchema },
+    output: { schema: TileCreationOutputSchema, format: 'json' },
     prompt: `
     You are a web page analyst. Your task is to extract key information from a website to create a visually appealing tile for a dashboard.
     Analyze the content of the provided URL to determine the following:

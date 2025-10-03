@@ -16,7 +16,7 @@ import {
 const dataAnalysisPrompt = ai.definePrompt({
     name: 'dataAnalysisPrompt',
     input: { schema: DataAnalysisInputSchema },
-    output: { schema: DataAnalysisOutputSchema },
+    output: { schema: DataAnalysisOutputSchema, format: 'json' },
     prompt: `
     You are an expert data analyst.
     Your task is to analyze the provided data to answer the user's question.

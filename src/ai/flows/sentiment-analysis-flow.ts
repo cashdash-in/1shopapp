@@ -16,7 +16,7 @@ const sentimentAnalysisPrompt = ai.definePrompt(
   {
     name: 'sentimentAnalysisPrompt',
     input: { schema: SentimentAnalysisInputSchema },
-    output: { schema: SentimentOutputSchema },
+    output: { schema: SentimentOutputSchema, format: 'json' },
     prompt: `
     You are an expert at analyzing customer feedback.
     Analyze the following feedback text and provide:

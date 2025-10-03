@@ -15,7 +15,7 @@ import {
 const biReportPrompt = ai.definePrompt({
     name: 'biReportPrompt',
     input: { schema: BiReportInputSchema },
-    output: { schema: BiReportOutputSchema },
+    output: { schema: BiReportOutputSchema, format: 'json' },
     prompt: `
     You are a Business Intelligence (BI) Analyst. Your task is to analyze a dataset based on a user's request and generate a structured report suitable for visualization.
 
