@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Frown, Meh, Smile, Tag, Bot, Sparkles, BrainCircuit, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import { getFeedback, updateFeedback } from '@/ai/flows/feedback-submission-flow';
-// import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
+import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
 import type { Feedback, SentimentOutput } from '@/ai/schemas';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,11 +15,6 @@ import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
-const runSentimentAnalysis = async (input: any): Promise<SentimentOutput> => {
-    throw new Error("AI functionality is temporarily disabled due to installation issues.");
-}
-
 
 const COLORS = {
     Positive: '#22c55e', // green-500
@@ -95,10 +90,6 @@ export default function SentimentAnalysisPage() {
                 setAiError('');
                 const analysisResult = await runSentimentAnalysis(feedbackItem.feedback);
 
-                if (!analysisResult) {
-                    throw new Error("The AI returned an empty analysis. Please try again.");
-                }
-
                 const updatedItem: Feedback = { ...feedbackItem, analysis: analysisResult };
 
                 // Optimistically update the UI
@@ -129,7 +120,7 @@ export default function SentimentAnalysisPage() {
             </div>
              {aiError && (
                 <Alert variant="destructive">
-                    <AlertTitle>AI Analysis Failed</AlertTitle>
+                    <AlertTitle>AI Feature Unavailable</AlertTitle>
                     <AlertDescription>{aiError}</AlertDescription>
                 </Alert>
             )}
