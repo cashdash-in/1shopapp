@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -9,12 +8,16 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, Car, Loader2, Sparkles, AlertTriangle, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { findRides } from '@/ai/flows/ride-finder-flow';
+// import { findRides } from '@/ai/flows/ride-finder-flow';
 import type { RideFinderOutput } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+
+const findRides = async (input: any): Promise<any> => {
+  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
+};
 
 const serviceLogos = {
     Uber: '/images/uber-logo.svg',
@@ -67,7 +70,7 @@ export default function RideFinderPage() {
     const groupedResults = result?.options.reduce((acc, option) => {
         (acc[option.service] = acc[option.service] || []).push(option);
         return acc;
-    }, {} as Record<string, (typeof result.options)>);
+    }, {} as Record<string, NonNullable<RideFinderOutput['options']>>);
 
 
     return (

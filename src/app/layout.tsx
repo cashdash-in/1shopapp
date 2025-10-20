@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { trackPWAInstall } from "@/lib/analytics";
-import { Camera, BarChart3, Presentation, LayoutGrid, AreaChart, FileSpreadsheet, FileText } from "lucide-react";
+import { Camera, BarChart3, Presentation, LayoutGrid, AreaChart, FileSpreadsheet, FileText, Car } from "lucide-react";
 
 export default function RootLayout({
   children,

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -9,12 +8,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Loader2, Sparkles, Presentation, Copy } from 'lucide-react';
 import Link from 'next/link';
-import { generatePresentation } from '@/ai/flows/presentation-flow';
+// import { generatePresentation } from '@/ai/flows/presentation-flow';
 import type { PresentationOutput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+const generatePresentation = async (input: any): Promise<any> => {
+  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
+};
 
 const shortcutCategories = [
     {

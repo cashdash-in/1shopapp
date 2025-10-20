@@ -6,20 +6,7 @@
  * directive issues in Next.js where flow files can only export async functions.
  */
 
-// AI features are temporarily disabled. Zod is not installed.
-const z = {
-    object: (obj: any) => ({ infer: {} as any, ...obj }),
-    string: () => ({ describe: (d: string) => ({}) }),
-    number: () => ({ min: (n: number) => ({ max: (m: number) => ({}) }) }),
-    enum: (arr: any) => ({}),
-    array: (arr: any) => ({ describe: (d: string) => ({}) }),
-    boolean: () => ({ describe: (d: string) => ({}) }),
-    optional: () => ({}),
-    infer: {} as any,
-    url: () => ({ describe: (d: string) => ({}) }),
-    email: () => ({ describe: (d: string) => ({}) }),
-    datetime: () => ({})
-};
+import { z } from 'zod';
 
 
 // Schemas for Partner Signup Flow

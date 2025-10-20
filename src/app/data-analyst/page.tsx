@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -8,10 +7,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Loader2, Sparkles, BarChart3, Bot } from 'lucide-react';
 import Link from 'next/link';
-import { analyzeData } from '@/ai/flows/data-analysis-flow';
+// import { analyzeData } from '@/ai/flows/data-analysis-flow';
 import type { DataAnalysisOutput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+const analyzeData = async (input: any): Promise<any> => {
+  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
+};
 
 export default function DataAnalystPage() {
     const { toast } = useToast();

@@ -1,4 +1,3 @@
-
 'use client'
 
 import React, { useState, useEffect, useMemo, useTransition } from 'react';
@@ -7,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Frown, Meh, Smile, Tag, Bot, Sparkles, BrainCircuit, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import { getFeedback, updateFeedback } from '@/ai/flows/feedback-submission-flow';
-import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
+// import { runSentimentAnalysis } from '@/ai/flows/sentiment-analysis-flow';
 import type { Feedback, SentimentOutput } from '@/ai/schemas';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,6 +15,11 @@ import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+const runSentimentAnalysis = async (input: any): Promise<any> => {
+  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
+};
+
 
 const COLORS = {
     Positive: '#22c55e', // green-500
@@ -223,7 +227,7 @@ export default function SentimentAnalysisPage() {
                                                     <Button 
                                                         size="sm" 
                                                         onClick={() => handleAnalyze(item)}
-                                                        disabled={isAnalyzing}
+                                                        disabled={isAnalyzing || !!aiError}
                                                     >
                                                         <Sparkles className="mr-2 h-4 w-4"/>
                                                         Analyze

@@ -14,7 +14,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import type { Service } from './service-tile';
-import { generateTileMetadata } from '@/ai/flows/tile-creation-flow';
+// import { generateTileMetadata } from '@/ai/flows/tile-creation-flow';
 import { Loader2, Wand2, PlusCircle, Trash2, Pencil } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -24,6 +24,9 @@ import { services as ALL_SERVICES_DATA } from '@/lib/default-services';
 import { ScrollArea } from './ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
+const generateTileMetadata = async (input: any): Promise<any> => {
+  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
+};
 
 interface AddAppDialogProps {
   children: React.ReactNode;
