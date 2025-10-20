@@ -225,7 +225,7 @@ export default function PhotoBoothPage() {
                                 </RadioGroup>
                             </CardContent>
                         </Card>
-                        <Button onClick={handleGenerate} disabled={loading || !originalImage || !!aiError} className="w-full text-lg h-12">
+                        <Button onClick={handleGenerate} disabled={loading || !originalImage} className="w-full text-lg h-12">
                             {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
                             {loading ? 'Generating...' : 'Generate Image'}
                         </Button>

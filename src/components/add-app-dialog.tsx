@@ -49,7 +49,7 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
   const [open, setOpen] = useState(false);
   
   const [mode, setMode] = useState<'add' | 'edit'>('add');
-  const [selectedTile, setSelectedTile] = useState<string>('__new__');
+  const [selectedTile, setSelectedTile] = useState('__new__');
   const [originalName, setOriginalName] = useState('');
 
   const [name, setName] = useState('');
@@ -280,7 +280,7 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
         </DialogHeader>
         
         <div className="space-y-4 py-2 max-h-[70vh] overflow-y-auto pr-4">
-            {analysisError.includes("AI functionality") && (
+            {analysisError && (
                 <Alert variant="destructive">
                     <AlertTitle>AI Feature Unavailable</AlertTitle>
                     <AlertDescription>{analysisError}</AlertDescription>
@@ -314,7 +314,7 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
                           placeholder="https://example.com"
                           disabled={isAnalyzing}
                       />
-                      <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url || analysisError.includes("AI functionality")} size="icon" variant="outline">
+                      <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url} size="icon" variant="outline">
                           {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
                           <span className="sr-only">Analyze</span>
                       </Button>
@@ -323,8 +323,8 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
             )}
 
             <div className="space-y-4 pt-4 border-t">
-                <p className={cn("text-sm text-center", analysisError && !analysisError.includes("AI functionality") ? "text-destructive" : "text-muted-foreground")}>
-                    {(analysisError && !analysisError.includes("AI functionality")) || `You are now ${mode === 'add' ? 'creating a new' : 'editing the'} tile.`}
+                <p className="text-sm text-center text-muted-foreground">
+                    {`You are now ${mode === 'add' ? 'creating a new' : 'editing the'} tile.`}
                 </p>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">Tile Name</Label>

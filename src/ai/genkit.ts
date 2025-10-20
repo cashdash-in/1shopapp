@@ -5,4 +5,5 @@
 //   plugins: [googleAI({apiKey: process.env.GEMINI_API_KEY})],
 //   enableTracingAndMetrics: true,
 // });
-export const ai: any = null;
+
+export const ai = null;

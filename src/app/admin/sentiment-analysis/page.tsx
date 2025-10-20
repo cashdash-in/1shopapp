@@ -222,7 +222,7 @@ export default function SentimentAnalysisPage() {
                                                     <Button 
                                                         size="sm" 
                                                         onClick={() => handleAnalyze(item)}
-                                                        disabled={isAnalyzing || !!aiError}
+                                                        disabled={isAnalyzing}
                                                     >
                                                         <Sparkles className="mr-2 h-4 w-4"/>
                                                         Analyze

@@ -1,209 +1,175 @@
-
-
 /**
  * @fileOverview This file contains all the Zod schemas and TypeScript types 
  * for the AI flows. Separating these into their own file prevents "use server"
  * directive issues in Next.js where flow files can only export async functions.
  */
 
-import { z } from 'zod';
+// Note: Zod is removed to prevent build errors. Schemas will be simple types.
+// import { z } from 'zod';
 
 
 // Schemas for Partner Signup Flow
-export const PartnerSignupInputSchema = z.object({
-  partnerType: z.enum(['business', 'individual']),
-  // Business fields
-  shopName: z.string().optional(),
-  ownerName: z.string().optional(),
-  gstNumber: z.string().optional(),
-  // Individual fields
-  fullName: z.string().optional(),
-  panNumber: z.string().optional(),
-  // Common fields
-  phone: z.string().describe("The partner's phone number."),
-  email: z.string().email().describe("The partner's email address."),
-  commission: z.number().optional().describe("The commission percentage for the partner."),
-});
-export type PartnerSignupInput = z.infer<typeof PartnerSignupInputSchema>;
+export type PartnerSignupInput = {
+  partnerType: 'business' | 'individual';
+  shopName?: string;
+  ownerName?: string;
+  gstNumber?: string;
+  fullName?: string;
+  panNumber?: string;
+  phone: string;
+  email: string;
+  commission?: number;
+};
 
-
-export const PartnerSignupOutputSchema = z.object({
-  message: z.string().describe('A success message for the user.'),
-  referralCode: z.string().describe('The unique referral code generated for the partner.'),
-});
-export type PartnerSignupOutput = z.infer<typeof PartnerSignupOutputSchema>;
+export type PartnerSignupOutput = {
+  message: string;
+  referralCode: string;
+};
 
 
 // Schemas for Sentiment Analysis Flow
-export const FeedbackSubmissionInputSchema = z.object({
-  text: z.string().describe('The customer feedback text to be analyzed.'),
-  rating: z.number().min(1).max(5).describe('A star rating from 1 to 5.'),
-});
-export type FeedbackSubmissionInput = z.infer<typeof FeedbackSubmissionInputSchema>;
+export type FeedbackSubmissionInput = {
+  text: string;
+  rating: number;
+};
 
-export const SentimentAnalysisInputSchema = FeedbackSubmissionInputSchema;
-export type SentimentAnalysisInput = z.infer<typeof SentimentAnalysisInputSchema>;
+export type SentimentAnalysisInput = FeedbackSubmissionInput;
 
-export const SentimentOutputSchema = z.object({
-  sentiment: z.enum(['Positive', 'Negative', 'Neutral']).describe('The overall sentiment of the text.'),
-  categories: z.array(z.string()).describe('A list of categories the feedback falls into (e.g., "UI/UX", "App Performance", "Feature Request").'),
-  summary: z.string().describe('A brief summary of the feedback provided.'),
-});
-export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
+export type SentimentOutput = {
+  sentiment: 'Positive' | 'Negative' | 'Neutral';
+  categories: string[];
+  summary: string;
+};
 
-export const FeedbackSchema = z.object({
-  id: z.string(),
-  submittedAt: z.string().datetime(),
-  feedback: FeedbackSubmissionInputSchema,
-  analysis: SentimentOutputSchema.optional(),
-});
-export type Feedback = z.infer<typeof FeedbackSchema>;
+export type Feedback = {
+  id: string;
+  submittedAt: string;
+  feedback: FeedbackSubmissionInput;
+  analysis?: SentimentOutput;
+};
 
 // Schemas for Click Tracking Flow
-export const ClickUpdateInputSchema = z.object({
-  category: z.string(),
-  brand: z.string(),
-});
-export type ClickUpdateInput = z.infer<typeof ClickUpdateInputSchema>;
+export type ClickUpdateInput = {
+  category: string;
+  brand: string;
+};
 
-export const ClickDataSchema = z.object({
-    category: z.string(),
-    brand: z.string(),
-    clicks: z.number(),
-});
-export type ClickData = z.infer<typeof ClickDataSchema>;
+export type ClickData = {
+    category: string;
+    brand: string;
+    clicks: number;
+};
 
 // Schemas for Product Search Flow
-export const ProductSearchInputSchema = z.object({
-  query: z.string().describe('The search query for the product.'),
-});
-export type ProductSearchInput = z.infer<typeof ProductSearchInputSchema>;
+export type ProductSearchInput = {
+  query: string;
+};
 
-export const ProductSearchOutputSchema = z.object({
-  results: z.array(z.string()).describe('A list of product names.'),
-});
-export type ProductSearchOutput = z.infer<typeof ProductSearchOutputSchema>;
+export type ProductSearchOutput = {
+  results: string[];
+};
 
 // Schemas for Cashback Flow
-export const CashbackTransactionSchema = z.object({
-    userId: z.string(),
-    userName: z.string(),
-    totalCashback: z.number(),
-    status: z.enum(['Pending', 'Paid']),
-    lastActivity: z.string(),
-});
-export type CashbackTransaction = z.infer<typeof CashbackTransactionSchema>;
+export type CashbackTransaction = {
+    userId: string;
+    userName: string;
+    totalCashback: number;
+    status: 'Pending' | 'Paid';
+    lastActivity: string;
+};
 
-export const UserCashbackTransactionSchema = z.object({
-    id: z.string(),
-    description: z.string(),
-    amount: z.number(),
-    status: z.enum(['Credited', 'Pending', 'Paid']),
-    date: z.string(),
-});
-export type UserCashbackTransaction = z.infer<typeof UserCashbackTransactionSchema>;
+export type UserCashbackTransaction = {
+    id: string;
+    description: string;
+    amount: number;
+    status: 'Credited' | 'Pending' | 'Paid';
+    date: string;
+};
 
-export const UserCashbackDetailsSchema = z.object({
-    totalBalance: z.number(),
-    transactions: z.array(UserCashbackTransactionSchema),
-});
-export type UserCashbackDetails = z.infer<typeof UserCashbackDetailsSchema>;
+export type UserCashbackDetails = {
+    totalBalance: number;
+    transactions: UserCashbackTransaction[];
+};
 
 
 // Schemas for Tile Creation Flow
-export const TileCreationInputSchema = z.object({
-  url: z.string().url().describe('The URL of the website to create a tile for.'),
-});
-export type TileCreationInput = z.infer<typeof TileCreationInputSchema>;
+export type TileCreationInput = {
+  url: string;
+};
 
-export const TileCreationOutputSchema = z.object({
-  name: z.string().describe('A concise, user-friendly name for the website, extracted from its title or content.'),
-  icon: z.string().describe('The most relevant icon name from the lucide-react library (e.g., "Briefcase", "ShoppingCart", "Book").'),
-  color: z.string().describe('A hex color code that represents the primary brand color of the website.'),
-});
-export type TileCreationOutput = z.infer<typeof TileCreationOutputSchema>;
+export type TileCreationOutput = {
+  name: string;
+  icon: string;
+  color: string;
+};
 
 // Schemas for AI Photo Booth Flow
-export const PhotoBoothInputSchema = z.object({
-  photoDataUri: z
-    .string()
-    .describe(
-      "A photo of a person or object, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
-    ),
-  style: z.string().describe('The artistic style to apply to the photo (e.g., "Cartoon", "Anime", "Oil Painting").'),
-});
-export type PhotoBoothInput = z.infer<typeof PhotoBoothInputSchema>;
+export type PhotoBoothInput = {
+  photoDataUri: string;
+  style: string;
+};
 
-export const PhotoBoothOutputSchema = z.object({
-    imageDataUri: z.string().describe('The newly generated image in data URI format.'),
-});
-export type PhotoBoothOutput = z.infer<typeof PhotoBoothOutputSchema>;
+export type PhotoBoothOutput = {
+    imageDataUri: string;
+};
 
 // Schemas for AI Presentation Generator Flow
-export const PresentationInputSchema = z.object({
-  topic: z.string().describe('The main topic or title of the presentation.'),
-  instructions: z.string().optional().describe('Optional specific instructions, like number of slides or key points to include.'),
-});
-export type PresentationInput = z.infer<typeof PresentationInputSchema>;
+export type PresentationInput = {
+  topic: string;
+  instructions?: string;
+};
 
-const SlideSchema = z.object({
-  title: z.string().describe('The title of the slide.'),
-  content: z.array(z.string()).describe('An array of bullet points for the slide content.'),
-});
+type SlideSchema = {
+  title: string;
+  content: string[];
+};
 
-export const PresentationOutputSchema = z.object({
-  slides: z.array(SlideSchema).describe('An array of slide objects, each containing a title and content.'),
-});
-export type PresentationOutput = z.infer<typeof PresentationOutputSchema>;
+export type PresentationOutput = {
+  slides: SlideSchema[];
+};
 
 // Schemas for AI Data Analyst Flow
-export const DataAnalysisInputSchema = z.object({
-  data: z.string().describe('The dataset to be analyzed, typically in CSV or plain text format.'),
-  question: z.string().describe('The user\'s question about the data.'),
-});
-export type DataAnalysisInput = z.infer<typeof DataAnalysisInputSchema>;
+export type DataAnalysisInput = {
+  data: string;
+  question: string;
+};
 
-export const DataAnalysisOutputSchema = z.object({
-  summary: z.string().describe('A text-based summary answering the user\'s question.'),
-  data: z.string().optional().describe('A string representation of the resulting data, such as a markdown table.'),
-});
-export type DataAnalysisOutput = z.infer<typeof DataAnalysisOutputSchema>;
+export type DataAnalysisOutput = {
+  summary: string;
+  data?: string;
+};
 
 // Schemas for AI BI Report Generator Flow
-export const BiReportInputSchema = z.object({
-  data: z.string().describe('The dataset to be analyzed, in CSV or plain text format.'),
-  request: z.string().describe('The user\'s request for the BI report (e.g., "Show monthly sales trends").'),
-});
-export type BiReportInput = z.infer<typeof BiReportInputSchema>;
+export type BiReportInput = {
+  data: string;
+  request: string;
+};
 
-const ChartDataPointSchema = z.object({
-  name: z.string().describe("The label for the data point on the x-axis."),
-  value: z.number().describe("The numerical value for the data point on the y-axis."),
-});
+type ChartDataPointSchema = {
+  name: string;
+  value: number;
+};
 
-export const BiReportOutputSchema = z.object({
-  title: z.string().describe("The title of the generated report."),
-  summary: z.string().describe("A brief, one or two-sentence summary of the key insight from the data."),
-  chartData: z.array(ChartDataPointSchema).describe("An array of data points formatted for a chart."),
-});
-export type BiReportOutput = z.infer<typeof BiReportOutputSchema>;
+export type BiReportOutput = {
+  title: string;
+  summary: string;
+  chartData: ChartDataPointSchema[];
+};
 
 // Schemas for Ride Finder Flow
-export const RideFinderInputSchema = z.object({
-  pickup: z.string().describe('The starting location for the ride.'),
-  dropoff: z.string().describe('The destination for the ride.'),
-});
-export type RideFinderInput = z.infer<typeof RideFinderInputSchema>;
+export type RideFinderInput = {
+  pickup: string;
+  dropoff: string;
+};
 
-const RideOptionSchema = z.object({
-  service: z.enum(['Uber', 'Ola', 'inDrive']).describe('The ride-sharing service provider.'),
-  vehicleType: z.string().describe('The type of vehicle (e.g., "Auto", "Mini", "Sedan", "SUV").'),
-  eta: z.string().describe('The estimated time of arrival for the ride.'),
-  fare: z.string().describe('The estimated fare for the ride, formatted as a string (e.g., "₹150 - ₹180").'),
-  surge: z.boolean().describe('Indicates if surge pricing is active.'),
-});
+type RideOptionSchema = {
+  service: 'Uber' | 'Ola' | 'inDrive';
+  vehicleType: string;
+  eta: string;
+  fare: string;
+  surge: boolean;
+};
 
-export const RideFinderOutputSchema = z.object({
-  options: z.array(RideOptionSchema).describe('A list of available ride options.'),
-});
-export type RideFinderOutput = z.infer<typeof RideFinderOutputSchema>;
+export type RideFinderOutput = {
+  options: RideOptionSchema[];
+};
