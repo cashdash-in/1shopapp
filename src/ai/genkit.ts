@@ -6,4 +6,4 @@
 //   enableTracingAndMetrics: true,
 // });
 
-export const ai = null;
+export const ai: any = null;

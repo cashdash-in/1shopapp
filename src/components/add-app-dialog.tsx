@@ -117,7 +117,7 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
             setLinks(uniqueLinks.length > 0 ? uniqueLinks : [{ name: '', href: '' }]);
         }
     }
-  }, [selectedTile, services, open]);
+  }, [selectedTile, services, open, url]);
 
   const handleAnalyzeUrl = async () => {
     if (!url || !url.startsWith('http://') && !url.startsWith('https://')) {
