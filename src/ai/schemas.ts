@@ -1,4 +1,5 @@
 
+
 /**
  * @fileOverview This file contains all the Zod schemas and TypeScript types 
  * for the AI flows. Separating these into their own file prevents "use server"
@@ -185,3 +186,24 @@ export const BiReportOutputSchema = z.object({
   chartData: z.array(ChartDataPointSchema).describe("An array of data points formatted for a chart."),
 });
 export type BiReportOutput = z.infer<typeof BiReportOutputSchema>;
+
+// Schemas for Ride Finder Flow
+export const RideFinderInputSchema = z.object({
+  pickup: z.string().describe('The starting location for the ride.'),
+  dropoff: z.string().describe('The destination for the ride.'),
+});
+export type RideFinderInput = z.infer<typeof RideFinderInputSchema>;
+
+const RideOptionSchema = z.object({
+  service: z.enum(['Uber', 'Ola', 'inDrive']).describe('The ride-sharing service provider.'),
+  vehicleType: z.string().describe('The type of vehicle (e.g., "Auto", "Mini", "Sedan", "SUV").'),
+  eta: z.string().describe('The estimated time of arrival for the ride.'),
+  fare: z.string().describe('The estimated fare for the ride, formatted as a string (e.g., "₹150 - ₹180").'),
+  surge: z.boolean().describe('Indicates if surge pricing is active.'),
+});
+
+export const RideFinderOutputSchema = z.object({
+  options: z.array(RideOptionSchema).describe('A list of available ride options.'),
+});
+export type RideFinderOutput = z.infer<typeof RideFinderOutputSchema>;
+

@@ -1,6 +1,6 @@
 
 import type { Service } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search as SearchIcon, Building2, Ticket, Mail, Camera } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search as SearchIcon, Building2, Ticket, Mail, Camera, Car } from 'lucide-react';
 
 export const services: Service[] = [
   { 
@@ -54,6 +54,12 @@ export const services: Service[] = [
       { name: 'Swiggy', href: 'https://www.swiggy.com?ref=1shopapp' },
       { name: 'Zomato', href: 'https://www.zomato.com?ref=1shopapp' },
     ] 
+  },
+  { 
+    name: 'Cabs',
+    icon: Car,
+    color: '#FFD700',
+    href: '/ride-finder',
   },
   { 
     name: 'Bill pay and Utilities', 
