@@ -14,7 +14,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import type { Service } from './service-tile';
-// import { generateTileMetadata } from '@/ai/flows/tile-creation-flow';
+import { generateTileMetadata } from '@/ai/flows/tile-creation-flow';
 import { Loader2, Wand2, PlusCircle, Trash2, Pencil } from 'lucide-react';
 import { HexColorPicker } from 'react-colorful';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -23,10 +23,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { services as ALL_SERVICES_DATA } from '@/lib/default-services';
 import { ScrollArea } from './ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
-
-const generateTileMetadata = async (input: any): Promise<any> => {
-  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
-};
 
 interface AddAppDialogProps {
   children: React.ReactNode;
@@ -318,7 +314,7 @@ export function AddAppDialog({ children, services, onAddService, onUpdateService
                           placeholder="https://example.com"
                           disabled={isAnalyzing}
                       />
-                      <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url} size="icon" variant="outline">
+                      <Button onClick={handleAnalyzeUrl} disabled={isAnalyzing || !url || analysisError.includes("AI functionality")} size="icon" variant="outline">
                           {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
                           <span className="sr-only">Analyze</span>
                       </Button>

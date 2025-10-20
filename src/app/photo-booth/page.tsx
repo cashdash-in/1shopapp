@@ -7,15 +7,11 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ArrowLeft, Camera, Download, Loader2, Sparkles, Upload, Wand2 } from 'lucide-react';
 import Link from 'next/link';
-// import { runPhotoBooth } from '@/ai/flows/photo-booth-flow';
+import { runPhotoBooth } from '@/ai/flows/photo-booth-flow';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-
-const runPhotoBooth = async (input: any): Promise<any> => {
-  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
-};
 
 const styles = [
     { id: 'Cartoon', label: 'Cartoon', filter: 'saturate(2) contrast(1.5)' },

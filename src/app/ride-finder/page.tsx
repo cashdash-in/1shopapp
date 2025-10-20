@@ -8,16 +8,12 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, Car, Loader2, Sparkles, AlertTriangle, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-// import { findRides } from '@/ai/flows/ride-finder-flow';
+import { findRides } from '@/ai/flows/ride-finder-flow';
 import type { RideFinderOutput } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-
-const findRides = async (input: any): Promise<any> => {
-  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
-};
 
 const serviceLogos = {
     Uber: '/images/uber-logo.svg',
@@ -56,7 +52,9 @@ export default function RideFinderPage() {
         try {
             const response = await findRides({ pickup, dropoff });
             // Sort results by service
-            response.options.sort((a, b) => a.service.localeCompare(b.service));
+            if (response && response.options) {
+                response.options.sort((a, b) => a.service.localeCompare(b.service));
+            }
             setResult(response);
         } catch (error: any) {
             console.error('AI ride finding failed:', error);
@@ -119,7 +117,7 @@ export default function RideFinderPage() {
                         </div>
                     </div>
 
-                    <Button onClick={handleFindRides} disabled={loading || !!aiError} className="w-full text-lg h-12">
+                    <Button onClick={handleFindRides} disabled={loading} className="w-full text-lg h-12">
                         {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
                         {loading ? 'Finding Best Rates...' : 'Find Best Rates'}
                     </Button>

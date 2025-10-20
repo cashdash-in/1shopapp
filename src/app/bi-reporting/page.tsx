@@ -9,14 +9,9 @@ import { ArrowLeft, Loader2, Sparkles, LayoutGrid, Bot } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { ResponsiveContainer, BarChart, XAxis, YAxis, Bar } from 'recharts';
-// import { generateBiReport } from '@/ai/flows/bi-report-flow';
+import { generateBiReport } from '@/ai/flows/bi-report-flow';
 import type { BiReportOutput } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
-const generateBiReport = async (input: any): Promise<any> => {
-  throw new Error("AI functionality is temporarily disabled due to a package installation issue. Please try again later.");
-};
-
 
 const exampleData = `Date,Product,Category,SalePrice,Region
 2024-01-15,Laptop,Electronics,1200,North
