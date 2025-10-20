@@ -116,7 +116,7 @@ export default function RideFinderPage() {
                         </div>
                     </div>
 
-                    <Button onClick={handleFindRides} disabled={loading} className="w-full text-lg h-12">
+                    <Button onClick={handleFindRides} disabled={loading || !!aiError} className="w-full text-lg h-12">
                         {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
                         {loading ? 'Finding Best Rates...' : 'Find Best Rates'}
                     </Button>

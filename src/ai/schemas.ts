@@ -6,7 +6,21 @@
  * directive issues in Next.js where flow files can only export async functions.
  */
 
-import { z } from 'zod';
+// AI features are temporarily disabled. Zod is not installed.
+const z = {
+    object: (obj: any) => ({ infer: {} as any, ...obj }),
+    string: () => ({ describe: (d: string) => ({}) }),
+    number: () => ({ min: (n: number) => ({ max: (m: number) => ({}) }) }),
+    enum: (arr: any) => ({}),
+    array: (arr: any) => ({ describe: (d: string) => ({}) }),
+    boolean: () => ({ describe: (d: string) => ({}) }),
+    optional: () => ({}),
+    infer: {} as any,
+    url: () => ({ describe: (d: string) => ({}) }),
+    email: () => ({ describe: (d: string) => ({}) }),
+    datetime: () => ({})
+};
+
 
 // Schemas for Partner Signup Flow
 export const PartnerSignupInputSchema = z.object({
@@ -206,4 +220,3 @@ export const RideFinderOutputSchema = z.object({
   options: z.array(RideOptionSchema).describe('A list of available ride options.'),
 });
 export type RideFinderOutput = z.infer<typeof RideFinderOutputSchema>;
-
