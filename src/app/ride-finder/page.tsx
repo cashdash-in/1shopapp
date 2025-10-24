@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -9,7 +10,7 @@ import { ArrowLeft, Car, Loader2, Sparkles, AlertTriangle, ArrowUpRight } from '
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { findRides } from '@/ai/flows/ride-finder-flow';
-import type { RideFinderOutput } from '@/ai/schemas';
+import type { RideFinderOutput, RideOption } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -19,12 +20,14 @@ const serviceLogos = {
     Uber: '/images/uber-logo.svg',
     Ola: '/images/ola-logo.svg',
     inDrive: '/images/indrive-logo.svg',
+    Rapido: '/images/rapido-logo.svg',
 };
 
 const serviceUrls = {
     Uber: 'https://m.uber.com/go/book-a-ride',
     Ola: 'https://book.olacabs.com/',
     inDrive: 'https://www.indrive.com/en/home/',
+    Rapido: 'https://www.rapido.bike/',
 };
 
 export default function RideFinderPage() {
@@ -53,7 +56,10 @@ export default function RideFinderPage() {
             const response = await findRides({ pickup, dropoff });
             // Sort results by service
             if (response && response.options) {
-                response.options.sort((a, b) => a.service.localeCompare(b.service));
+                response.options.sort((a, b) => {
+                    const serviceOrder = ['Uber', 'Ola', 'inDrive', 'Rapido'];
+                    return serviceOrder.indexOf(a.service) - serviceOrder.indexOf(b.service);
+                });
             }
             setResult(response);
         } catch (error: any) {
@@ -73,7 +79,7 @@ export default function RideFinderPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
-            <Card className="w-full max-w-4xl">
+            <Card className="w-full max-w-5xl">
                 <CardHeader className="relative">
                     <Link href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-muted">
                         <ArrowLeft className="h-5 w-5 text-muted-foreground" />
@@ -84,13 +90,13 @@ export default function RideFinderPage() {
                             <Car className="h-8 w-8 text-primary" />
                             Ride Finder
                         </CardTitle>
-                        <CardDescription>Compare cab fares from top services in one place.</CardDescription>
+                        <CardDescription>Compare cab fares from top services in one place. (Simulation)</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {aiError && (
                         <Alert variant="destructive">
-                            <AlertTitle>AI Feature Unavailable</AlertTitle>
+                            <AlertTitle>Feature Unavailable</AlertTitle>
                             <AlertDescription>{aiError}</AlertDescription>
                         </Alert>
                     )}
@@ -125,7 +131,8 @@ export default function RideFinderPage() {
                     {loading && (
                          <div className="space-y-4 pt-6 border-t">
                             <Skeleton className="h-8 w-1/3 mx-auto" />
-                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <Skeleton className="h-48 w-full" />
                                 <Skeleton className="h-48 w-full" />
                                 <Skeleton className="h-48 w-full" />
                                 <Skeleton className="h-48 w-full" />
@@ -136,9 +143,9 @@ export default function RideFinderPage() {
                     {groupedResults && (
                         <div className="space-y-6 pt-6 border-t">
                             <h2 className="text-2xl font-bold text-center">Available Rides</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
                                 {Object.entries(groupedResults).map(([service, options]) => (
-                                    <Card key={service}>
+                                    <Card key={service} className="flex flex-col h-full">
                                         <CardHeader>
                                             <CardTitle className="flex items-center justify-between">
                                                 <Image 
@@ -150,7 +157,7 @@ export default function RideFinderPage() {
                                                 />
                                             </CardTitle>
                                         </CardHeader>
-                                        <CardContent className="space-y-3">
+                                        <CardContent className="space-y-3 flex-grow">
                                             {options.map((opt, i) => (
                                                 <div key={i} className="p-3 rounded-md bg-muted/50 space-y-1">
                                                     <div className="flex justify-between items-center">
@@ -168,13 +175,15 @@ export default function RideFinderPage() {
                                                     </div>
                                                 </div>
                                             ))}
-                                            <Button asChild className="w-full mt-4">
+                                        </CardContent>
+                                        <div className='p-6 pt-0'>
+                                            <Button asChild className="w-full mt-auto">
                                                 <a href={serviceUrls[service as keyof typeof serviceUrls]} target="_blank" rel="noopener noreferrer">
                                                     Book on {service}
                                                     <ArrowUpRight className="ml-2 h-4 w-4" />
                                                 </a>
                                             </Button>
-                                        </CardContent>
+                                        </div>
                                     </Card>
                                 ))}
                             </div>
