@@ -1,47 +1,63 @@
-
 'use server';
 /**
- * @fileOverview A flow for estimating ride-sharing fares.
+ * @fileOverview A flow for estimating ride-sharing fares using a local simulation.
  *
- * - findRides - A function that takes pickup/dropoff locations and returns estimated ride options.
+ * - findRides - A function that takes pickup/dropoff locations and returns simulated ride options.
  */
+
 import type { RideFinderInput, RideFinderOutput, RideOption } from '@/ai/schemas';
 
-// Helper function to generate a random fare within a plausible range
-const generateFare = (base: number, range: number): string => {
-  const fare = base + Math.random() * range;
-  return `₹${fare.toFixed(0)}`;
+// Base fares for different vehicle types to make simulation more realistic
+const baseFares = {
+    'Uber Go': 120,
+    'Uber Premier': 180,
+    'Ola Mini': 110,
+    'Ola Sedan': 170,
+    'inDrive': 100,
+    'Rapido Bike': 60,
+    'Rapido Auto': 90,
 };
 
-// Helper function to generate a random ETA
-const generateEta = (min: number, max: number): string => {
-    return `${Math.floor(min + Math.random() * (max - min))} min`;
-}
+// All possible vehicle types and their services
+const vehicleTypes: { service: 'Uber' | 'Ola' | 'inDrive' | 'Rapido'; type: string }[] = [
+    { service: 'Uber', type: 'Uber Go' },
+    { service: 'Uber', type: 'Uber Premier' },
+    { service: 'Ola', type: 'Ola Mini' },
+    { service: 'Ola', type: 'Ola Sedan' },
+    { service: 'inDrive', type: 'inDrive' },
+    { service: 'Rapido', type: 'Rapido Bike' },
+    { service: 'Rapido', type: 'Rapido Auto' },
+];
 
 export async function findRides(
   input: RideFinderInput
 ): Promise<RideFinderOutput> {
-  // This is a mock implementation and does not call any real service.
-  // It generates realistic-looking data for demonstration purposes.
+    const options: RideOption[] = vehicleTypes.map(vehicle => {
+        const baseFare = baseFares[vehicle.type as keyof typeof baseFares] || 150;
+        
+        // Add a random variation between -20 and +40 to the base fare
+        const fareVariation = Math.floor(Math.random() * 61) - 20;
+        let finalFare = baseFare + fareVariation;
 
-  const isSurge = Math.random() < 0.2; // 20% chance of surge pricing
-  const surgeMultiplier = isSurge ? 1.5 : 1.0;
+        // 20% chance of surge pricing
+        const isSurge = Math.random() < 0.2;
+        if (isSurge) {
+            // Apply a surge multiplier between 1.2x and 1.5x
+            const surgeMultiplier = 1.2 + Math.random() * 0.3;
+            finalFare = Math.round(finalFare * surgeMultiplier);
+        }
 
-  const options: RideOption[] = [
-    // Uber
-    { service: 'Uber', vehicleType: 'Go', fare: generateFare(120 * surgeMultiplier, 30), eta: generateEta(5, 10), surge: isSurge },
-    { service: 'Uber', vehicleType: 'Premier', fare: generateFare(160 * surgeMultiplier, 40), eta: generateEta(6, 12), surge: isSurge },
-    { service: 'Uber', vehicleType: 'XL', fare: generateFare(200 * surgeMultiplier, 50), eta: generateEta(8, 15), surge: isSurge },
-    // Ola
-    { service: 'Ola', vehicleType: 'Mini', fare: generateFare(115 * surgeMultiplier, 30), eta: generateEta(5, 10), surge: isSurge },
-    { service: 'Ola', vehicleType: 'Sedan', fare: generateFare(155 * surgeMultiplier, 40), eta: generateEta(6, 12), surge: isSurge },
-    { service: 'Ola', vehicleType: 'Prime SUV', fare: generateFare(210 * surgeMultiplier, 50), eta: generateEta(8, 15), surge: isSurge },
-    // inDrive
-    { service: 'inDrive', vehicleType: 'Car', fare: generateFare(110 * surgeMultiplier, 25), eta: generateEta(7, 14), surge: isSurge },
-    // Rapido
-    { service: 'Rapido', vehicleType: 'Bike', fare: generateFare(60 * surgeMultiplier, 15), eta: generateEta(3, 8), surge: isSurge },
-    { service: 'Rapido', vehicleType: 'Auto', fare: generateFare(90 * surgeMultiplier, 20), eta: generateEta(4, 9), surge: isSurge },
-  ];
+        // Generate a random ETA between 3 and 15 minutes
+        const eta = `${Math.floor(Math.random() * 13) + 3}-${Math.floor(Math.random() * 5) + 10} min`;
 
-  return Promise.resolve({ options });
+        return {
+            service: vehicle.service,
+            vehicleType: vehicle.type,
+            eta: eta,
+            fare: `₹${finalFare}`,
+            surge: isSurge,
+        };
+    });
+
+    return { options };
 }
