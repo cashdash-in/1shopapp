@@ -14,14 +14,6 @@ import type { RideFinderOutput, RideOption } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
-
-const serviceLogos: Record<string, string | undefined> = {
-    Uber: '/images/uber-logo.svg',
-    Ola: '/images/ola-logo.svg',
-    inDrive: '/images/indrive-logo.svg',
-    // Rapido logo is intentionally omitted as per user request
-};
 
 const serviceUrls = {
     Uber: 'https://m.uber.com/go/book-a-ride',
@@ -145,22 +137,11 @@ export default function RideFinderPage() {
                             <h2 className="text-2xl font-bold text-center">Available Rides</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
                                 {Object.entries(groupedResults).map(([service, options]) => {
-                                    const logoSrc = serviceLogos[service];
                                     return (
                                         <Card key={service} className="flex flex-col h-full">
                                             <CardHeader>
                                                 <CardTitle className="flex items-center justify-between h-[28px]">
-                                                    {logoSrc ? (
-                                                        <Image 
-                                                            src={logoSrc} 
-                                                            alt={`${service} logo`} 
-                                                            width={80} 
-                                                            height={28}
-                                                            className="dark:invert"
-                                                        />
-                                                    ) : (
-                                                        <span className='font-bold text-xl'>{service}</span>
-                                                    )}
+                                                    <span className='font-bold text-xl'>{service}</span>
                                                 </CardTitle>
                                             </CardHeader>
                                             <CardContent className="space-y-3 flex-grow">
