@@ -4,10 +4,6 @@
  * directive issues in Next.js where flow files can only export async functions.
  */
 
-// Note: Zod is removed to prevent build errors. Schemas will be simple types.
-// import { z } from 'zod';
-
-
 // Schemas for Partner Signup Flow
 export type PartnerSignupInput = {
   partnerType: 'business' | 'individual';
@@ -103,6 +99,7 @@ export type TileCreationOutput = {
   color: string;
 };
 
+
 // Schemas for AI Photo Booth Flow
 export type PhotoBoothInput = {
   photoDataUri: string;
@@ -119,13 +116,13 @@ export type PresentationInput = {
   instructions?: string;
 };
 
-type SlideSchema = {
+type Slide = {
   title: string;
   content: string[];
 };
 
 export type PresentationOutput = {
-  slides: SlideSchema[];
+  slides: Slide[];
 };
 
 // Schemas for AI Data Analyst Flow
@@ -145,7 +142,7 @@ export type BiReportInput = {
   request: string;
 };
 
-type ChartDataPointSchema = {
+type ChartDataPoint = {
   name: string;
   value: number;
 };
@@ -153,7 +150,7 @@ type ChartDataPointSchema = {
 export type BiReportOutput = {
   title: string;
   summary: string;
-  chartData: ChartDataPointSchema[];
+  chartData: ChartDataPoint[];
 };
 
 // Schemas for Ride Finder Flow
@@ -162,7 +159,7 @@ export type RideFinderInput = {
   dropoff: string;
 };
 
-type RideOptionSchema = {
+type RideOption = {
   service: 'Uber' | 'Ola' | 'inDrive';
   vehicleType: string;
   eta: string;
@@ -171,5 +168,5 @@ type RideOptionSchema = {
 };
 
 export type RideFinderOutput = {
-  options: RideOptionSchema[];
+  options: RideOption[];
 };
