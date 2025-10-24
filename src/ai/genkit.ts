@@ -1,7 +1,2 @@
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-
-export const ai = genkit({
-  plugins: [googleAI({apiKey: process.env.GEMINI_API_KEY})],
-  enableTracingAndMetrics: true,
-});
+// This file is intentionally left empty to disable AI functionality 
+// and resolve build errors related to missing AI packages.
