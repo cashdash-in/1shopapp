@@ -9,60 +9,42 @@
 import type { RideFinderInput, RideFinderOutput, RideOption } from '@/ai/schemas';
 
 
-// This function now calls a real, public dummy API to get simulated ride data.
-// This demonstrates a complete, working example of fetching data from an external service.
-async function getSimulatedFares(input: RideFinderInput): Promise<RideOption[]> {
-    try {
-        // We use a free, public API designed for testing and prototyping.
-        // We will only use the 'pickup' location for the query to increase the chance of getting results from the dummy product API.
-        const response = await fetch(`https://dummyjson.com/products/search?q=${input.pickup}&limit=8`);
-        
-        if (!response.ok) {
-            throw new Error(`API call failed with status: ${response.status}`);
-        }
+// This function now generates mock data locally to ensure a reliable simulation.
+// It no longer calls an external API.
+function generateMockFares(input: RideFinderInput): RideOption[] {
+    const services: RideOption['service'][] = ['Uber', 'Ola', 'inDrive', 'Rapido'];
+    const vehicleTypes: Record<RideOption['service'], string[]> = {
+        Uber: ['Go', 'Premier', 'XL'],
+        Ola: ['Mini', 'Sedan', 'Prime SUV'],
+        inDrive: ['Car', 'SUV'],
+        Rapido: ['Auto', 'Bike'],
+    };
 
-        const data = await response.json();
+    let allOptions: RideOption[] = [];
 
-        // --- Data Transformation ---
-        // The dummy API returns product data, so we need to transform it into our RideOption format.
-        // This is a common task when working with external APIs.
-        const services: RideOption['service'][] = ['Uber', 'Ola', 'inDrive', 'Rapido'];
-        const vehicleTypes = {
-            Uber: ['Go', 'Premier', 'XL'],
-            Ola: ['Mini', 'Sedan', 'Prime SUV'],
-            inDrive: ['Car', 'SUV'],
-            Rapido: ['Auto', 'Bike'],
-        }
-
-        if (!data.products || data.products.length === 0) {
-             console.log("Dummy API returned no products for the query. Returning empty.");
-             return [];
-        }
-
-        return data.products.map((product: any, index: number): RideOption => {
-            const service = services[index % services.length];
+    services.forEach(service => {
+        const numOptions = Math.floor(Math.random() * 3) + 1; // 1 to 3 options per service
+        for (let i = 0; i < numOptions; i++) {
             const serviceVehicles = vehicleTypes[service];
-            const vehicleType = serviceVehicles[Math.floor(Math.random() * serviceVehicles.length)];
-            
-            // Generate realistic-looking mock data based on the product price from the API.
-            const baseFare = (product.price % 200) + 100; // Fare between 100 and 300
+            const vehicleType = serviceVehicles[i] || serviceVehicles[0];
+
+            // Generate realistic-looking mock data
+            const baseFare = Math.floor(Math.random() * 250) + 100; // Fare between 100 and 350
             const surgeMultiplier = Math.random() < 0.2 ? 1.5 : 1; // 20% chance of surge
             const finalFare = Math.round(baseFare * surgeMultiplier);
+            const eta = Math.floor(Math.random() * 10) + 2; // ETA between 2-12 mins
 
-            return {
+            allOptions.push({
                 service: service,
                 vehicleType: vehicleType,
-                eta: `${Math.floor(Math.random() * 10) + 2} min`, // ETA between 2-12 mins
+                eta: `${eta} min`,
                 fare: `₹${finalFare}`,
                 surge: surgeMultiplier > 1,
-            };
-        });
+            });
+        }
+    });
 
-    } catch (error) {
-        console.error("Failed to fetch simulated fares:", error);
-        // If the API fails, we return an empty array to prevent the app from crashing.
-        return [];
-    }
+    return allOptions;
 }
 
 
@@ -72,14 +54,8 @@ export async function findRides(
   
   console.log(`Finding rides for pickup: "${input.pickup}" and dropoff: "${input.dropoff}"`);
 
-  // Call the function to get data from the live (but simulated) API.
-  const options = await getSimulatedFares(input);
-
-  // If the API call fails or returns no data, we can provide a fallback or simply return empty.
-  if (options.length === 0) {
-      console.log("Could not fetch live simulated data. Returning empty.");
-  }
+  // Generate mock data locally for a reliable user experience.
+  const options = generateMockFares(input);
 
   return { options };
 }
-
