@@ -37,8 +37,8 @@ function stringifyFeedback(feedback: Feedback): string {
 }
 
 // NOTE: This is a hack for the prototype to persist data.
-// In a real app, you would use a proper database like Firestore.
-async function persistFeedback(allFeedback: Feedback[]) {
+// In a real app, this would be a proper database like Firestore.
+function persistFeedback(allFeedback: Feedback[]) {
     const dbPath = path.join(process.cwd(), 'src', 'lib', 'feedback-db.ts');
     
     const allFeedbackString = allFeedback.map(stringifyFeedback).join(',\n');
@@ -54,13 +54,8 @@ ${allFeedbackString}
 ];
 `.trimStart();
     
-    try {
-        await fs.writeFile(dbPath, fileContent, 'utf-8');
-        console.log('Successfully persisted feedback DB by regenerating feedback-db.ts');
-    } catch (error) {
-        console.error("!!! FAILED TO PERSIST FEEDBACK TO FILE !!!", error);
-        // If file write fails, the in-memory update will be lost on next server restart.
-    }
+    // In a real app, this fs.writeFile would be a Firestore SDK call like setDoc() or updateDoc().
+    return fs.writeFile(dbPath, fileContent, 'utf-8');
 }
 
 // The main function that clients will call to submit feedback
@@ -91,10 +86,22 @@ export async function updateFeedback(updatedItem: Feedback): Promise<Feedback> {
     // Update the in-memory array
     FAKE_FEEDBACK_DB[itemIndex] = updatedItem;
 
-    // Persist the change
-    await persistFeedback(FAKE_FEEDBACK_DB);
-    
-    return updatedItem;
+    try {
+        // This is the pattern to use for your Firestore calls.
+        // We await the database call inside a try block.
+        await persistFeedback(FAKE_FEEDBACK_DB);
+        
+        // SUCCESS: If the write succeeds, we return the updated item.
+        return updatedItem;
+    } catch (error) {
+        // FAILURE: If the write fails (e.g., Firestore security rules deny it),
+        // we catch the error here instead of letting the app crash.
+        console.error("!!! FAILED TO PERSIST FEEDBACK (Simulated Firestore Error) !!!", error);
+        
+        // We then throw a new, user-friendly error.
+        // The code that called this function can now handle this error in its own try/catch block.
+        throw new Error("Database update failed. Check permissions or network connection.");
+    }
 }
 
 // Function to retrieve all feedback
