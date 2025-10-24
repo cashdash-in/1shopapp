@@ -132,49 +132,55 @@ export default function RideFinderPage() {
                          </div>
                     )}
                 
-                    {groupedResults && (
+                    {result && (
                         <div className="space-y-6 pt-6 border-t">
                             <h2 className="text-2xl font-bold text-center">Available Rides</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
-                                {Object.entries(groupedResults).map(([service, options]) => {
-                                    return (
-                                        <Card key={service} className="flex flex-col h-full">
-                                            <CardHeader>
-                                                <CardTitle className="flex items-center justify-between h-[28px]">
-                                                    <span className='font-bold text-xl'>{service}</span>
-                                                </CardTitle>
-                                            </CardHeader>
-                                            <CardContent className="space-y-3 flex-grow">
-                                                {options.map((opt, i) => (
-                                                    <div key={i} className="p-3 rounded-md bg-muted/50 space-y-1">
-                                                        <div className="flex justify-between items-center">
-                                                             <h4 className="font-semibold">{opt.vehicleType}</h4>
-                                                             <p className="font-bold text-lg">{opt.fare}</p>
+                             {groupedResults && Object.keys(groupedResults).length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+                                    {Object.entries(groupedResults).map(([service, options]) => {
+                                        return (
+                                            <Card key={service} className="flex flex-col h-full">
+                                                <CardHeader>
+                                                    <CardTitle className="flex items-center justify-between h-[28px]">
+                                                        <span className='font-bold text-xl'>{service}</span>
+                                                    </CardTitle>
+                                                </CardHeader>
+                                                <CardContent className="space-y-3 flex-grow">
+                                                    {options.map((opt, i) => (
+                                                        <div key={i} className="p-3 rounded-md bg-muted/50 space-y-1">
+                                                            <div className="flex justify-between items-center">
+                                                                <h4 className="font-semibold">{opt.vehicleType}</h4>
+                                                                <p className="font-bold text-lg">{opt.fare}</p>
+                                                            </div>
+                                                            <div className="flex justify-between items-center text-sm text-muted-foreground">
+                                                                <span>ETA: {opt.eta}</span>
+                                                                {opt.surge && (
+                                                                    <Badge variant="destructive" className="text-xs">
+                                                                        <AlertTriangle className="h-3 w-3 mr-1" />
+                                                                        Surge
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="flex justify-between items-center text-sm text-muted-foreground">
-                                                            <span>ETA: {opt.eta}</span>
-                                                             {opt.surge && (
-                                                                <Badge variant="destructive" className="text-xs">
-                                                                    <AlertTriangle className="h-3 w-3 mr-1" />
-                                                                    Surge
-                                                                </Badge>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </CardContent>
-                                            <div className='p-6 pt-0'>
-                                                <Button asChild className="w-full mt-auto">
-                                                    <a href={serviceUrls[service as keyof typeof serviceUrls]} target="_blank" rel="noopener noreferrer">
-                                                        Book on {service}
-                                                        <ArrowUpRight className="ml-2 h-4 w-4" />
-                                                    </a>
-                                                </Button>
-                                            </div>
-                                        </Card>
-                                    );
-                                })}
-                            </div>
+                                                    ))}
+                                                </CardContent>
+                                                <div className='p-6 pt-0'>
+                                                    <Button asChild className="w-full mt-auto">
+                                                        <a href={serviceUrls[service as keyof typeof serviceUrls]} target="_blank" rel="noopener noreferrer">
+                                                            Book on {service}
+                                                            <ArrowUpRight className="ml-2 h-4 w-4" />
+                                                        </a>
+                                                    </Button>
+                                                </div>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-muted-foreground text-center py-8">
+                                    No simulated rides could be generated for these locations. Please try different locations.
+                                </p>
+                            )}
                         </div>
                     )}
                 </CardContent>
