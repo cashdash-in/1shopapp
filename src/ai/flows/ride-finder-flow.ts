@@ -1,72 +1,47 @@
 
 'use server';
 /**
- * @fileOverview A flow for finding and comparing ride-sharing options.
+ * @fileOverview A flow for estimating ride-sharing fares.
  *
- * - findRides - A function that takes pickup/dropoff locations and returns ride options.
+ * - findRides - A function that takes pickup/dropoff locations and returns estimated ride options.
  */
-
 import type { RideFinderInput, RideFinderOutput, RideOption } from '@/ai/schemas';
 
+// Helper function to generate a random fare within a plausible range
+const generateFare = (base: number, range: number): string => {
+  const fare = base + Math.random() * range;
+  return `₹${fare.toFixed(0)}`;
+};
 
-// This function now generates more realistic mock data locally.
-function generateMockFares(input: RideFinderInput): RideOption[] {
-    const services: RideOption['service'][] = ['Uber', 'Ola', 'inDrive', 'Rapido'];
-    
-    // Define base fares for different vehicle types to make pricing more realistic
-    const baseFares: Record<string, number> = {
-        'Go': 120, 'Premier': 180, 'XL': 250, // Uber
-        'Mini': 110, 'Sedan': 170, 'Prime SUV': 240, // Ola
-        'Car': 150, 'SUV': 220, // inDrive
-        'Auto': 80, 'Bike': 50, // Rapido
-    };
-    
-    const vehicleTypes: Record<RideOption['service'], string[]> = {
-        Uber: ['Go', 'Premier', 'XL'],
-        Ola: ['Mini', 'Sedan', 'Prime SUV'],
-        inDrive: ['Car', 'SUV'],
-        Rapido: ['Auto', 'Bike'],
-    };
-
-    let allOptions: RideOption[] = [];
-
-    services.forEach(service => {
-        const serviceVehicles = vehicleTypes[service];
-        
-        serviceVehicles.forEach(vehicleType => {
-            // Add a chance for a vehicle type to not be available
-            if (Math.random() < 0.1) return;
-
-            const baseFare = baseFares[vehicleType] || 150;
-            // Add a smaller, more controlled random element to the fare
-            const fareVariation = Math.floor(Math.random() * 30) - 15; // +/- 15
-            
-            const surgeMultiplier = Math.random() < 0.2 ? 1.5 : 1; // 20% chance of surge
-            const finalFare = Math.round((baseFare + fareVariation) * surgeMultiplier);
-            const eta = Math.floor(Math.random() * 10) + 2; // ETA between 2-12 mins
-
-            allOptions.push({
-                service: service,
-                vehicleType: vehicleType,
-                eta: `${eta} min`,
-                fare: `₹${finalFare}`,
-                surge: surgeMultiplier > 1,
-            });
-        });
-    });
-
-    return allOptions;
+// Helper function to generate a random ETA
+const generateEta = (min: number, max: number): string => {
+    return `${Math.floor(min + Math.random() * (max - min))} min`;
 }
-
 
 export async function findRides(
   input: RideFinderInput
 ): Promise<RideFinderOutput> {
-  
-  console.log(`Finding rides for pickup: "${input.pickup}" and dropoff: "${input.dropoff}"`);
+  // This is a mock implementation and does not call any real service.
+  // It generates realistic-looking data for demonstration purposes.
 
-  // Generate mock data locally for a reliable user experience.
-  const options = generateMockFares(input);
+  const isSurge = Math.random() < 0.2; // 20% chance of surge pricing
+  const surgeMultiplier = isSurge ? 1.5 : 1.0;
 
-  return { options };
+  const options: RideOption[] = [
+    // Uber
+    { service: 'Uber', vehicleType: 'Go', fare: generateFare(120 * surgeMultiplier, 30), eta: generateEta(5, 10), surge: isSurge },
+    { service: 'Uber', vehicleType: 'Premier', fare: generateFare(160 * surgeMultiplier, 40), eta: generateEta(6, 12), surge: isSurge },
+    { service: 'Uber', vehicleType: 'XL', fare: generateFare(200 * surgeMultiplier, 50), eta: generateEta(8, 15), surge: isSurge },
+    // Ola
+    { service: 'Ola', vehicleType: 'Mini', fare: generateFare(115 * surgeMultiplier, 30), eta: generateEta(5, 10), surge: isSurge },
+    { service: 'Ola', vehicleType: 'Sedan', fare: generateFare(155 * surgeMultiplier, 40), eta: generateEta(6, 12), surge: isSurge },
+    { service: 'Ola', vehicleType: 'Prime SUV', fare: generateFare(210 * surgeMultiplier, 50), eta: generateEta(8, 15), surge: isSurge },
+    // inDrive
+    { service: 'inDrive', vehicleType: 'Car', fare: generateFare(110 * surgeMultiplier, 25), eta: generateEta(7, 14), surge: isSurge },
+    // Rapido
+    { service: 'Rapido', vehicleType: 'Bike', fare: generateFare(60 * surgeMultiplier, 15), eta: generateEta(3, 8), surge: isSurge },
+    { service: 'Rapido', vehicleType: 'Auto', fare: generateFare(90 * surgeMultiplier, 20), eta: generateEta(4, 9), surge: isSurge },
+  ];
+
+  return Promise.resolve({ options });
 }
