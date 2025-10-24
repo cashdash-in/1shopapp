@@ -159,8 +159,8 @@ export type RideFinderInput = {
   dropoff: string;
 };
 
-type RideOption = {
-  service: 'Uber' | 'Ola' | 'inDrive';
+export type RideOption = {
+  service: 'Uber' | 'Ola' | 'inDrive' | 'Rapido';
   vehicleType: string;
   eta: string;
   fare: string;

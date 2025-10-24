@@ -6,7 +6,7 @@
  * - findRides - A function that takes pickup/dropoff locations and returns simulated ride options.
  */
 
-import type { RideFinderInput, RideFinderOutput } from '@/ai/schemas';
+import type { RideFinderInput, RideFinderOutput, RideOption } from '@/ai/schemas';
 
 // Helper function to generate a random integer within a range
 const getRandomInt = (min: number, max: number) => {
@@ -35,7 +35,7 @@ export async function findRides(
     Ola: [
       { vehicleType: 'Auto', baseFare: 115 },
       { vehicleType: 'Mini', baseFare: 170 },
-      { vehicleTye: 'Sedan', baseFare: 240 },
+      { vehicleType: 'Sedan', baseFare: 240 },
     ],
     inDrive: [
         { vehicleType: 'Auto', baseFare: 110 },
@@ -47,18 +47,18 @@ export async function findRides(
     ]
   };
 
-  const options: RideFinderOutput['options'] = [];
+  const options: RideOption[] = [];
 
   for (const [serviceName, vehicles] of Object.entries(services)) {
     for (const vehicle of vehicles) {
-      // Simulate 1 to 3 options for each service
+      // Simulate 1 to 2 options for each service
       const numberOfOptions = getRandomInt(1,2);
       for (let i = 0; i < numberOfOptions; i++) {
           // Don't add duplicates of the same vehicle type for a service
           if (options.some(o => o.service === serviceName && o.vehicleType === vehicle.vehicleType)) continue;
 
            options.push({
-                service: serviceName as 'Uber' | 'Ola' | 'inDrive',
+                service: serviceName as 'Uber' | 'Ola' | 'inDrive' | 'Rapido',
                 vehicleType: vehicle.vehicleType,
                 eta: `${getRandomInt(2, 15)} min`,
                 fare: generateFare(vehicle.baseFare),
