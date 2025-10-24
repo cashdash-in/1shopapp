@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Car, Loader2, Sparkles, AlertTriangle, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, Car, Loader2, Sparkles, AlertTriangle, ArrowUpRight, Map } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { findRides } from '@/ai/flows/ride-finder-flow';
@@ -14,6 +14,7 @@ import type { RideFinderOutput, RideOption } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 const serviceUrls = {
     Uber: 'https://m.uber.com/go/book-a-ride',
@@ -22,10 +23,13 @@ const serviceUrls = {
     Rapido: 'https://www.rapido.bike/',
 };
 
+// Replace with your Google Maps API Key
+const GOOGLE_MAPS_API_KEY = ''; // IMPORTANT: Add your key here to enable the live map
+
 export default function RideFinderPage() {
     const { toast } = useToast();
-    const [pickup, setPickup] = useState('');
-    const [dropoff, setDropoff] = useState('');
+    const [pickup, setPickup] = useState('Koramangala, Bangalore');
+    const [dropoff, setDropoff] = useState('Indiranagar, Bangalore');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<RideFinderOutput | null>(null);
     const [aiError, setAiError] = useState('');
@@ -46,7 +50,6 @@ export default function RideFinderPage() {
 
         try {
             const response = await findRides({ pickup, dropoff });
-            // Sort results by service
             if (response && response.options) {
                 const serviceOrder = ['Uber', 'Ola', 'inDrive', 'Rapido'];
                 response.options.sort((a, b) => {
@@ -62,12 +65,19 @@ export default function RideFinderPage() {
         }
     };
     
-    // Group results by service
     const groupedResults = result?.options.reduce((acc, option) => {
         (acc[option.service] = acc[option.service] || []).push(option);
         return acc;
     }, {} as Record<string, RideOption[]>);
 
+    const generateMapUrl = () => {
+        if (!GOOGLE_MAPS_API_KEY) return null;
+        const encodedPickup = encodeURIComponent(pickup);
+        const encodedDropoff = encodeURIComponent(dropoff);
+        return `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${encodedPickup}&destination=${encodedDropoff}&mode=driving`;
+    }
+    
+    const mapUrl = generateMapUrl();
 
     return (
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
@@ -82,7 +92,7 @@ export default function RideFinderPage() {
                             <Car className="h-8 w-8 text-primary" />
                             Ride Finder
                         </CardTitle>
-                        <CardDescription>Compare cab fares from top services in one place. (Simulation)</CardDescription>
+                        <CardDescription>Compare cab fares from top services in one place.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -119,6 +129,10 @@ export default function RideFinderPage() {
                         {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
                         {loading ? 'Finding Best Rates...' : 'Find Best Rates'}
                     </Button>
+
+                    <p className="text-xs text-muted-foreground text-center">
+                        Disclaimer: The fares shown are simulated estimates for demonstration purposes and may not reflect real-time pricing.
+                    </p>
                 
                     {loading && (
                          <div className="space-y-4 pt-6 border-t">
@@ -132,10 +146,39 @@ export default function RideFinderPage() {
                          </div>
                     )}
                 
-                    {result && (
+                    {(result || loading) && (
                         <div className="space-y-6 pt-6 border-t">
                             <h2 className="text-2xl font-bold text-center">Available Rides</h2>
-                             {groupedResults && Object.keys(groupedResults).length > 0 ? (
+                            
+                            {/* Map Section */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2"><Map className="h-5 w-5"/> Route & Traffic</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {mapUrl ? (
+                                        <iframe
+                                            className="w-full h-80 rounded-md border"
+                                            loading="lazy"
+                                            allowFullScreen
+                                            src={mapUrl}>
+                                        </iframe>
+                                    ) : (
+                                        <div className="w-full h-80 rounded-md border bg-muted flex flex-col items-center justify-center text-center p-4">
+                                            <Map className="h-10 w-10 text-muted-foreground mb-4"/>
+                                            <p className="font-semibold">Live Map Not Available</p>
+                                            <p className="text-sm text-muted-foreground">To enable the live map, please add your Google Maps API key in the page's source code.</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+
+                            {loading ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+                                    {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-48 w-full" />)}
+                                </div>
+                            ) : groupedResults && Object.keys(groupedResults).length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
                                     {Object.entries(groupedResults).map(([service, options]) => {
                                         return (
