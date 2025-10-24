@@ -14,7 +14,8 @@ import type { RideFinderInput, RideFinderOutput, RideOption } from '@/ai/schemas
 async function getSimulatedFares(input: RideFinderInput): Promise<RideOption[]> {
     try {
         // We use a free, public API designed for testing and prototyping.
-        const response = await fetch(`https://dummyjson.com/products/search?q=${input.pickup}+to+${input.dropoff}&limit=8`);
+        // We will only use the 'pickup' location for the query to increase the chance of getting results from the dummy product API.
+        const response = await fetch(`https://dummyjson.com/products/search?q=${input.pickup}&limit=8`);
         
         if (!response.ok) {
             throw new Error(`API call failed with status: ${response.status}`);
@@ -31,6 +32,11 @@ async function getSimulatedFares(input: RideFinderInput): Promise<RideOption[]> 
             Ola: ['Mini', 'Sedan', 'Prime SUV'],
             inDrive: ['Car', 'SUV'],
             Rapido: ['Auto', 'Bike'],
+        }
+
+        if (!data.products || data.products.length === 0) {
+             console.log("Dummy API returned no products for the query. Returning empty.");
+             return [];
         }
 
         return data.products.map((product: any, index: number): RideOption => {
@@ -76,3 +82,4 @@ export async function findRides(
 
   return { options };
 }
+
