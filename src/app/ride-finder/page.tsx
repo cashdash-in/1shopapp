@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Car, Loader2, Sparkles, AlertTriangle, ArrowUpRight, Map, Activity, Clock, Navigation } from 'lucide-react';
+import { ArrowLeft, Car, Loader2, Sparkles, AlertTriangle, ArrowUpRight, Map, Activity, Clock, Navigation, MapPin, X } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { findRides } from '@/ai/flows/ride-finder-flow';
@@ -14,6 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 const serviceUrls = {
     Uber: 'https://m.uber.com/go/book-a-ride',
@@ -22,27 +23,63 @@ const serviceUrls = {
     Rapido: 'https://www.rapido.bike/',
 };
 
-const GOOGLE_MAPS_API_KEY = ''; 
+// Replace with your actual key if the default one is restricted
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBtlfFMkRfdkVLvq2OXv6dolC0PlnzQsKY'; 
+
+const POPULAR_LOCATIONS = [
+    "Koramangala, Bangalore",
+    "Indiranagar, Bangalore",
+    "Whitefield, Bangalore",
+    "MG Road, Bangalore",
+    "HSR Layout, Bangalore",
+    "Electronic City, Bangalore",
+    "Kempegowda International Airport, Bangalore",
+    "Bandra West, Mumbai",
+    "Andheri East, Mumbai",
+    "Colaba, Mumbai",
+    "Powai, Mumbai",
+    "Juhu, Mumbai",
+    "Chhatrapati Shivaji Maharaj International Airport, Mumbai",
+    "Connaught Place, New Delhi",
+    "Hauz Khas, New Delhi",
+    "Indira Gandhi International Airport, New Delhi",
+    "Cyber City, Gurgaon",
+    "Gachibowli, Hyderabad",
+    "HITEC City, Hyderabad",
+    "Banjara Hills, Hyderabad",
+    "Anna Nagar, Chennai",
+    "Adyar, Chennai",
+    "Salt Lake City, Kolkata",
+    "Park Street, Kolkata"
+];
 
 export default function RideFinderPage() {
     const { toast } = useToast();
-    const [pickup, setPickup] = useState('Koramangala, Bangalore');
-    const [dropoff, setDropoff] = useState('Indiranagar, Bangalore');
+    const [pickup, setPickup] = useState('');
+    const [dropoff, setDropoff] = useState('');
+    const [pickupSuggestions, setPickupSuggestions] = useState<string[]>([]);
+    const [dropoffSuggestions, setDropoffSuggestions] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<RideFinderOutput | null>(null);
     const [aiError, setAiError] = useState('');
     const [trafficAlerts, setTrafficAlerts] = useState<string[]>([]);
     const [lastUpdated, setLastUpdated] = useState<string>('');
+    const [showPickupList, setShowPickupList] = useState(false);
+    const [showDropoffList, setShowDropoffList] = useState(false);
+
+    const pickupRef = useRef<HTMLDivElement>(null);
+    const dropoffRef = useRef<HTMLDivElement>(null);
 
     const generateTrafficAlerts = useCallback(() => {
         const alerts = [
-            `Smooth flow detected on main arterial roads near ${pickup.split(',')[0]}.`,
-            `Minor slowdown reported due to construction near ${dropoff.split(',')[0]}.`,
+            `Smooth flow detected on main arterial roads near ${pickup.split(',')[0] || 'your location'}.`,
+            `Minor slowdown reported due to construction near ${dropoff.split(',')[0] || 'destination'}.`,
             `High demand in your area. Fares may fluctuate.`,
             `Traffic moving at 25km/h on major junctions.`,
-            `Estimated travel time is stable for the next 15 minutes.`
+            `Estimated travel time is stable for the next 15 minutes.`,
+            `Accident reported on flyover near ${pickup.split(',')[0] || 'route'}. Expect 10 min delay.`,
+            `Heavy rain causing waterlogging in low-lying areas. Check route.`
         ];
-        // Shuffle and pick 3
         return alerts.sort(() => 0.5 - Math.random()).slice(0, 3);
     }, [pickup, dropoff]);
 
@@ -51,7 +88,7 @@ export default function RideFinderPage() {
             toast({
                 variant: 'destructive',
                 title: 'Locations Required',
-                description: 'Please enter both a pickup and a drop-off location.',
+                description: 'Please select both a pickup and a drop-off location from the list.',
             });
             return;
         }
@@ -85,14 +122,51 @@ export default function RideFinderPage() {
         }
     };
 
+    // Close suggestions when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (pickupRef.current && !pickupRef.current.contains(event.target as Node)) {
+                setShowPickupList(false);
+            }
+            if (dropoffRef.current && !dropoffRef.current.contains(event.target as Node)) {
+                setShowDropoffList(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Autocomplete Logic
+    const handlePickupChange = (val: string) => {
+        setPickup(val);
+        if (val.length > 1) {
+            const filtered = POPULAR_LOCATIONS.filter(l => l.toLowerCase().includes(val.toLowerCase()));
+            setPickupSuggestions(filtered);
+            setShowPickupList(true);
+        } else {
+            setPickupSuggestions([]);
+            setShowPickupList(false);
+        }
+    };
+
+    const handleDropoffChange = (val: string) => {
+        setDropoff(val);
+        if (val.length > 1) {
+            const filtered = POPULAR_LOCATIONS.filter(l => l.toLowerCase().includes(val.toLowerCase()));
+            setDropoffSuggestions(filtered);
+            setShowDropoffList(true);
+        } else {
+            setDropoffSuggestions([]);
+            setShowDropoffList(false);
+        }
+    };
+
     // Live Refresh Loop
     useEffect(() => {
         if (!result) return;
-
         const interval = setInterval(() => {
             handleFindRides(true);
-        }, 45000); // Refresh every 45 seconds
-
+        }, 45000); 
         return () => clearInterval(interval);
     }, [result, pickup, dropoff]);
 
@@ -101,8 +175,11 @@ export default function RideFinderPage() {
         return acc;
     }, {} as Record<string, RideOption[]>);
 
-    const mapUrl = GOOGLE_MAPS_API_KEY 
+    // Using Maps Embed API - Directions mode
+    const mapUrl = (pickup && dropoff) 
         ? `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(dropoff)}&mode=driving`
+        : pickup 
+        ? `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(pickup)}`
         : null;
 
     return (
@@ -118,7 +195,7 @@ export default function RideFinderPage() {
                             <Car className="h-8 w-8 text-primary" />
                             Ride Finder
                         </CardTitle>
-                        <CardDescription>Real-time traffic and tentative fare comparison.</CardDescription>
+                        <CardDescription>Real-time traffic and tentative fare comparison across major providers.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -129,86 +206,133 @@ export default function RideFinderPage() {
                         </Alert>
                     )}
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+                        {/* Pickup Input */}
+                        <div className="space-y-2 relative" ref={pickupRef}>
                             <Label htmlFor="pickup">Pickup Location</Label>
-                            <Input
-                                id="pickup"
-                                value={pickup}
-                                onChange={(e) => setPickup(e.target.value)}
-                                placeholder="e.g., 'Koramangala, Bangalore'"
-                                disabled={loading}
-                            />
+                            <div className='relative'>
+                                <Input
+                                    id="pickup"
+                                    value={pickup}
+                                    onChange={(e) => handlePickupChange(e.target.value)}
+                                    onFocus={() => pickup.length > 0 && setShowPickupList(true)}
+                                    placeholder="Start typing (e.g., Koramangala)"
+                                    className="pr-10"
+                                    disabled={loading}
+                                />
+                                {pickup && <X className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground' onClick={() => setPickup('')} />}
+                            </div>
+                            {showPickupList && pickupSuggestions.length > 0 && (
+                                <ul className="absolute z-[60] w-full bg-background border rounded-md shadow-lg mt-1 overflow-hidden">
+                                    {pickupSuggestions.map((loc) => (
+                                        <li 
+                                            key={loc} 
+                                            className="px-4 py-2 hover:bg-muted cursor-pointer text-sm flex items-center gap-2"
+                                            onClick={() => {
+                                                setPickup(loc);
+                                                setShowPickupList(false);
+                                            }}
+                                        >
+                                            <MapPin className='h-3 w-3 text-primary' /> {loc}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
-                        <div className="space-y-2">
+
+                        {/* Drop-off Input */}
+                        <div className="space-y-2 relative" ref={dropoffRef}>
                             <Label htmlFor="dropoff">Drop-off Location</Label>
-                            <Input
-                                id="dropoff"
-                                value={dropoff}
-                                onChange={(e) => setDropoff(e.target.value)}
-                                placeholder="e.g., 'Indiranagar, Bangalore'"
-                                disabled={loading}
-                            />
+                            <div className='relative'>
+                                <Input
+                                    id="dropoff"
+                                    value={dropoff}
+                                    onChange={(e) => handleDropoffChange(e.target.value)}
+                                    onFocus={() => dropoff.length > 0 && setShowDropoffList(true)}
+                                    placeholder="Destination (e.g., Indiranagar)"
+                                    className="pr-10"
+                                    disabled={loading}
+                                />
+                                {dropoff && <X className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground' onClick={() => setDropoff('')} />}
+                            </div>
+                            {showDropoffList && dropoffSuggestions.length > 0 && (
+                                <ul className="absolute z-[60] w-full bg-background border rounded-md shadow-lg mt-1 overflow-hidden">
+                                    {dropoffSuggestions.map((loc) => (
+                                        <li 
+                                            key={loc} 
+                                            className="px-4 py-2 hover:bg-muted cursor-pointer text-sm flex items-center gap-2"
+                                            onClick={() => {
+                                                setDropoff(loc);
+                                                setShowDropoffList(false);
+                                            }}
+                                        >
+                                            <MapPin className='h-3 w-3 text-primary' /> {loc}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Button onClick={() => handleFindRides()} disabled={loading} className="w-full text-lg h-12">
+                        <Button onClick={() => handleFindRides()} disabled={loading || !pickup || !dropoff} className="w-full text-lg h-12">
                             {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-                            {loading ? 'Analyzing Traffic...' : 'Find Best Live Rates'}
+                            {loading ? 'Analyzing Real-Time Traffic...' : 'Find Best Live Rates'}
                         </Button>
                         <p className="text-[10px] text-muted-foreground text-center italic">
-                            * Fares are tentative live estimates. Actual price may vary based on the provider app at the time of booking.
+                            * All fares are tentative live estimates. Actual price is shown in the provider app.
                         </p>
                     </div>
 
-                    {result && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
-                            {/* Left: Live Traffic Feed */}
-                            <Card className="lg:col-span-1 border-primary/20 bg-primary/5">
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                                        <Activity className="h-4 w-4 text-primary animate-pulse" />
-                                        LIVE TRAFFIC FEED
-                                    </CardTitle>
-                                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                                        <Clock className="h-3 w-3" />
-                                        Last Updated: {lastUpdated}
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <ScrollArea className="h-48 pr-4">
-                                        <div className="space-y-4">
-                                            {trafficAlerts.map((alert, i) => (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+                        {/* Left: Live Traffic Feed */}
+                        <Card className="lg:col-span-1 border-primary/20 bg-primary/5">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                                    <Activity className="h-4 w-4 text-primary animate-pulse" />
+                                    LIVE ROAD STATUS
+                                </CardTitle>
+                                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                                    <Clock className="h-3 w-3" />
+                                    Updated: {lastUpdated || 'Waiting for locations...'}
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <ScrollArea className="h-48 pr-4">
+                                    <div className="space-y-4">
+                                        {!pickup || !dropoff ? (
+                                            <p className="text-xs text-muted-foreground italic">Enter locations to see road status...</p>
+                                        ) : (
+                                            trafficAlerts.map((alert, i) => (
                                                 <div key={i} className="flex gap-2 text-xs border-l-2 border-primary/30 pl-3 py-1">
                                                     <Navigation className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
                                                     <p>{alert}</p>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </ScrollArea>
-                                </CardContent>
-                            </Card>
-
-                            {/* Right: Map */}
-                            <Card className="lg:col-span-2 overflow-hidden">
-                                {mapUrl ? (
-                                    <iframe
-                                        className="w-full h-full min-h-[250px] border-0"
-                                        loading="lazy"
-                                        allowFullScreen
-                                        src={mapUrl}>
-                                    </iframe>
-                                ) : (
-                                    <div className="w-full h-full min-h-[250px] bg-muted flex flex-col items-center justify-center text-center p-4">
-                                        <Map className="h-10 w-10 text-muted-foreground mb-2"/>
-                                        <p className="font-semibold text-sm">Live Road Map</p>
-                                        <p className="text-xs text-muted-foreground max-w-xs">Add a Google Maps API Key to enable real-time visual road status.</p>
+                                            ))
+                                        )}
                                     </div>
-                                )}
-                            </Card>
-                        </div>
-                    )}
+                                </ScrollArea>
+                            </CardContent>
+                        </Card>
+
+                        {/* Right: Map */}
+                        <Card className="lg:col-span-2 overflow-hidden relative">
+                            {mapUrl ? (
+                                <iframe
+                                    className="w-full h-full min-h-[300px] border-0"
+                                    loading="lazy"
+                                    allowFullScreen
+                                    src={mapUrl}>
+                                </iframe>
+                            ) : (
+                                <div className="w-full h-full min-h-[300px] bg-muted flex flex-col items-center justify-center text-center p-4">
+                                    <Map className="h-10 w-10 text-muted-foreground mb-2"/>
+                                    <p className="font-semibold text-sm">Interactive Live Map</p>
+                                    <p className="text-xs text-muted-foreground max-w-xs">Select a pickup and drop-off to view real-time road status and routes.</p>
+                                </div>
+                            )}
+                        </Card>
+                    </div>
 
                     {loading && (
                          <div className="space-y-4 pt-6 border-t">
@@ -221,14 +345,14 @@ export default function RideFinderPage() {
                 
                     {result && !loading && (
                         <div className="space-y-6 pt-6 border-t">
-                            <h2 className="text-2xl font-bold text-center">Available Rides</h2>
+                            <h2 className="text-2xl font-bold text-center">Tentative Live Rates</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
                                 {Object.entries(groupedResults || {}).map(([service, options]) => (
-                                    <Card key={service} className="flex flex-col h-full border-t-4 border-t-primary shadow-lg">
+                                    <Card key={service} className="flex flex-col h-full border-t-4 border-t-primary shadow-lg hover:shadow-xl transition-shadow">
                                         <CardHeader className="pb-2">
                                             <CardTitle className="flex items-center justify-between">
                                                 <span className='font-bold text-xl'>{service}</span>
-                                                <Badge variant="outline" className="text-[10px] font-normal uppercase tracking-wider">Tentative</Badge>
+                                                <Badge variant="outline" className="text-[10px] font-normal uppercase tracking-wider">Estimate</Badge>
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-3 flex-grow">
@@ -255,7 +379,7 @@ export default function RideFinderPage() {
                                         <div className='p-4 pt-0'>
                                             <Button asChild className="w-full mt-auto" variant="default">
                                                 <a href={serviceUrls[service as keyof typeof serviceUrls]} target="_blank" rel="noopener noreferrer">
-                                                    Open {service}
+                                                    Book on {service}
                                                     <ArrowUpRight className="ml-2 h-4 w-4" />
                                                 </a>
                                             </Button>
