@@ -11,7 +11,7 @@
 import { FAKE_FEEDBACK_DB } from '@/lib/feedback-db';
 import fs from 'fs/promises';
 import path from 'path';
-import { FeedbackSchema, type Feedback, FeedbackSubmissionInputSchema, type FeedbackSubmissionInput } from '../schemas';
+import { type Feedback, type FeedbackSubmissionInput } from '../schemas';
 
 // Helper function to stringify a feedback object for file writing
 function stringifyFeedback(feedback: Feedback): string {
@@ -71,7 +71,11 @@ export async function submitFeedback(input: FeedbackSubmissionInput): Promise<Fe
   FAKE_FEEDBACK_DB.unshift(newFeedback);
 
   // Persist the entire updated array to the file
-  await persistFeedback(FAKE_FEEDBACK_DB);
+  try {
+      await persistFeedback(FAKE_FEEDBACK_DB);
+  } catch (e) {
+      console.warn("Could not persist feedback to file (expected in production):", e);
+  }
 
   return newFeedback;
 }
@@ -87,19 +91,10 @@ export async function updateFeedback(updatedItem: Feedback): Promise<Feedback> {
     FAKE_FEEDBACK_DB[itemIndex] = updatedItem;
 
     try {
-        // This is the pattern to use for your Firestore calls.
-        // We await the database call inside a try block.
         await persistFeedback(FAKE_FEEDBACK_DB);
-        
-        // SUCCESS: If the write succeeds, we return the updated item.
         return updatedItem;
     } catch (error) {
-        // FAILURE: If the write fails (e.g., Firestore security rules deny it),
-        // we catch the error here instead of letting the app crash.
         console.error("!!! FAILED TO PERSIST FEEDBACK (Simulated Firestore Error) !!!", error);
-        
-        // We then throw a new, user-friendly error.
-        // The code that called this function can now handle this error in its own try/catch block.
         throw new Error("Database update failed. Check permissions or network connection.");
     }
 }

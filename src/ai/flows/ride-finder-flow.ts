@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow for finding ride-sharing options.
@@ -11,49 +12,63 @@ const services = [
   {
     service: 'Uber',
     vehicleTypes: [
-      { type: 'Uber Go', baseFare: 50, ratePerKm: 12, capacity: 4 },
-      { type: 'Premier', baseFare: 70, ratePerKm: 15, capacity: 4 },
-      { type: 'UberXL', baseFare: 90, ratePerKm: 18, capacity: 6 },
+      { type: 'Uber Go', baseFare: 55, ratePerKm: 14.5, capacity: 4 },
+      { type: 'Premier', baseFare: 75, ratePerKm: 18.2, capacity: 4 },
+      { type: 'UberXL', baseFare: 110, ratePerKm: 22.5, capacity: 6 },
     ],
   },
   {
     service: 'Ola',
     vehicleTypes: [
-      { type: 'Mini', baseFare: 45, ratePerKm: 11, capacity: 4 },
-      { type: 'Sedan', baseFare: 65, ratePerKm: 14, capacity: 4 },
-      { type: 'Prime SUV', baseFare: 85, ratePerKm: 17, capacity: 6 },
+      { type: 'Mini', baseFare: 50, ratePerKm: 13.8, capacity: 4 },
+      { type: 'Sedan', baseFare: 70, ratePerKm: 17.5, capacity: 4 },
+      { type: 'Prime SUV', baseFare: 100, ratePerKm: 21.0, capacity: 6 },
     ],
   },
   {
     service: 'inDrive',
     vehicleTypes: [
-      { type: 'Standard', baseFare: 40, ratePerKm: 10, capacity: 4 },
+      { type: 'Standard', baseFare: 45, ratePerKm: 12.5, capacity: 4 },
     ],
   },
   {
     service: 'Rapido',
     vehicleTypes: [
-      { type: 'Bike', baseFare: 25, ratePerKm: 8, capacity: 1 },
-      { type: 'Auto', baseFare: 40, ratePerKm: 10, capacity: 3 },
+      { type: 'Bike', baseFare: 25, ratePerKm: 9.5, capacity: 1 },
+      { type: 'Auto', baseFare: 45, ratePerKm: 12.0, capacity: 3 },
     ],
   },
 ] as const;
 
+/**
+ * Simulates a realistic distance (in km) based on the input strings.
+ * In a real app, this would call a Maps API (Directions Service).
+ */
 function simulateDistance(pickup: string, dropoff: string): number {
-  // Simple simulation: longer location names imply longer distance
   const combinedLength = pickup.length + dropoff.length;
-  // Map string length to a plausible km range, e.g., 20-100 chars -> 3-25 km
-  const distance = 3 + (combinedLength / 120) * 22;
-  return Math.max(3, Math.min(25, distance)); // Clamp between 3km and 25km
+  // Map string length to a plausible range: 20 chars -> ~5km, 100 chars -> ~25km
+  let distance = 2 + (combinedLength / 120) * 28;
+  
+  // Basic heuristic: if names are short, assume short intra-city trip
+  if (combinedLength < 25) distance = Math.min(distance, 8);
+  
+  return Math.max(2.5, Math.min(35, distance)); 
 }
 
 function isPeakTime(): boolean {
     const now = new Date();
-    // Use Indian Standard Time for simulation
+    // Indian Standard Time (IST)
     const istTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
     const hour = istTime.getHours();
-    // Peak hours: 8-11 AM and 5-9 PM
-    return (hour >= 8 && hour < 11) || (hour >= 17 && hour < 21);
+    const day = istTime.getDay(); // 0 is Sunday
+    
+    // Morning Rush: 8:30 AM - 11 AM
+    // Evening Rush: 5:30 PM - 9 PM
+    const isWeekday = day >= 1 && day <= 5;
+    const isMorningRush = hour >= 8 && hour < 11;
+    const isEveningRush = hour >= 17 && hour < 21;
+    
+    return isWeekday && (isMorningRush || isEveningRush);
 }
 
 export async function findRides(
@@ -69,30 +84,37 @@ export async function findRides(
       // 1. Base fare calculation
       let fare = vehicle.baseFare + (simulatedDistance * vehicle.ratePerKm);
       
-      // 2. Add peak time surcharge
+      // 2. Add peak time surcharge (simulating traffic/demand)
       if (peakTime) {
-          fare *= 1.25; // 25% peak time surcharge
+          fare *= 1.35; // 35% peak time surcharge
+      } else {
+          // Off-peak slight discount simulation
+          fare *= 0.95;
       }
 
-      // 3. Add small random variation
-      fare += Math.random() * 10 - 5; // +/- 5 rupees
+      // 3. Service specific variations (Uber is often slightly more expensive in peak)
+      if (service.service === 'Uber' && peakTime) fare *= 1.05;
+      if (service.service === 'inDrive') fare *= 0.9; // Often cheaper as its bid-based
 
-      // 4. Simulate surge pricing (20% chance)
-      const surge = Math.random() < 0.2;
+      // 4. Random fluctuation (+/- 3%)
+      fare += (Math.random() - 0.5) * (fare * 0.06);
+
+      // 5. Simulate surge pricing (15% chance)
+      const surge = Math.random() < 0.15;
       if (surge) {
-        fare *= 1.5; // 50% surge multiplier
+        fare *= 1.6; // 60% surge multiplier
       }
 
       const finalFare = Math.round(fare / 5) * 5; // Round to nearest 5 rupees
       
-      const etaMinutes = 5 + Math.floor(simulatedDistance / 2) + Math.floor(Math.random() * 5);
-
+      // ETA calculation: ~3-5 mins base + 1 min per 2km
+      const etaMinutes = 4 + Math.floor(simulatedDistance / 3) + Math.floor(Math.random() * 4);
 
       options.push({
         service: service.service,
         vehicleType: vehicle.type,
-        eta: `${etaMinutes - 2}-${etaMinutes + 3} min`,
-        fare: `₹${finalFare - 10}-₹${finalFare + 15}`,
+        eta: `${Math.max(3, etaMinutes - 2)}-${etaMinutes + 3} min`,
+        fare: `₹${finalFare - 10}-₹${finalFare + 20}`,
         surge: surge,
       });
     }
