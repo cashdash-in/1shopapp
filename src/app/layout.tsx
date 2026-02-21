@@ -1,3 +1,4 @@
+
 'use client';
 
 import "./globals.css";
@@ -5,7 +6,10 @@ import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { trackPWAInstall } from "@/lib/analytics";
-import { Camera, BarChart3, Presentation, LayoutGrid, AreaChart, FileSpreadsheet, FileText, Car } from "lucide-react";
+import { 
+  Camera, BarChart3, Presentation, LayoutGrid, 
+  AreaChart, FileSpreadsheet, FileText, Car, Briefcase 
+} from "lucide-react";
 
 export default function RootLayout({
   children,
@@ -42,6 +46,11 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <div className="fixed top-1/2 -translate-y-1/2 left-4 flex flex-col gap-2 z-50">
             
+            <Link href="/office-assistant" passHref>
+                <div className="h-12 w-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground cursor-pointer hover:scale-110 transition-transform shadow-lg border-2 border-primary" title="AI Office Assistant">
+                    <Briefcase className="h-6 w-6" />
+                </div>
+            </Link>
             <Link href="/photo-booth" passHref>
                 <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground cursor-pointer hover:bg-muted transition-colors" title="AI Photo Booth">
                     <Camera className="h-6 w-6" />

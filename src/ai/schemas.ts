@@ -173,3 +173,41 @@ export type RideFinderOutput = {
   options: RideOption[];
   trafficAlerts?: string[];
 };
+
+// --- NEW OFFICE ASSISTANT SCHEMAS ---
+
+export type MeetingInput = {
+  transcript: string;
+  context?: string;
+};
+
+export type MeetingOutput = {
+  summary: string;
+  mom: string; // Minutes of Meeting markdown
+  actionItems: string[];
+  keyDecisions: string[];
+};
+
+export type BudgetInput = {
+  expenseData: string; // CSV or raw text
+  provisionsSpent: number;
+  budgetGoal: string;
+};
+
+export type BudgetOutput = {
+  analysis: string;
+  spendingSummary: { category: string; amount: number }[];
+  forecast: string;
+  savingTips: string[];
+};
+
+export type CalendarInput = {
+  scheduleText: string;
+  date: string;
+};
+
+export type CalendarOutput = {
+  review: string;
+  priorities: string[];
+  prepNeeded: { meetingTitle: string; prepNotes: string }[];
+};
