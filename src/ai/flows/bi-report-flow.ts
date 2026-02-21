@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow for generating Business Intelligence reports.
@@ -22,14 +23,9 @@ const BiReportOutputSchema = z.object({
   })).describe('Structured data for rendering a bar chart.'),
 });
 
-export async function generateBiReport(
-  input: BiReportInput
-): Promise<BiReportOutput> {
-  return biReportFlow(input);
-}
-
 const prompt = ai.definePrompt({
   name: 'biReportPrompt',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: BiReportInputSchema },
   output: { schema: BiReportOutputSchema },
   prompt: `You are a professional Business Intelligence Analyst.
@@ -57,3 +53,9 @@ const biReportFlow = ai.defineFlow(
     return output;
   }
 );
+
+export async function generateBiReport(
+  input: BiReportInput
+): Promise<BiReportOutput> {
+  return biReportFlow(input);
+}

@@ -31,6 +31,7 @@ const RideFinderOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'rideFinderPrompt',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: RideFinderInputSchema },
   output: { schema: RideFinderOutputSchema },
   prompt: `You are a real-time ride-sharing fare and traffic estimator for Indian cities.
@@ -51,17 +52,6 @@ const prompt = ai.definePrompt({
   Return a structured list of options and traffic alerts.`,
 });
 
-/**
- * Main function to fetch ride estimates and traffic status.
- */
-export async function findRides(input: RideFinderInput): Promise<RideFinderOutput> {
-  const result = await rideFinderFlow({
-    ...input,
-    currentTime: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-  });
-  return result;
-}
-
 const rideFinderFlow = ai.defineFlow(
   {
     name: 'rideFinderFlow',
@@ -74,3 +64,14 @@ const rideFinderFlow = ai.defineFlow(
     return output;
   }
 );
+
+/**
+ * Main function to fetch ride estimates and traffic status.
+ */
+export async function findRides(input: RideFinderInput): Promise<RideFinderOutput> {
+  const result = await rideFinderFlow({
+    ...input,
+    currentTime: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+  });
+  return result;
+}

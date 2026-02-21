@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow for analyzing data with an AI.
@@ -18,14 +19,9 @@ const DataAnalysisOutputSchema = z.object({
   data: z.string().optional().describe('The result data formatted as a Markdown table if applicable.'),
 });
 
-export async function analyzeData(
-  input: DataAnalysisInput
-): Promise<DataAnalysisOutput> {
-  return dataAnalysisFlow(input);
-}
-
 const prompt = ai.definePrompt({
   name: 'dataAnalysisPrompt',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: DataAnalysisInputSchema },
   output: { schema: DataAnalysisOutputSchema },
   prompt: `You are an expert Data Scientist.
@@ -53,3 +49,9 @@ const dataAnalysisFlow = ai.defineFlow(
     return output;
   }
 );
+
+export async function analyzeData(
+  input: DataAnalysisInput
+): Promise<DataAnalysisOutput> {
+  return dataAnalysisFlow(input);
+}

@@ -23,6 +23,7 @@ export type TileCreationOutput = z.infer<typeof TileCreationOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'tileCreationPrompt',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: TileCreationInputSchema },
   output: { schema: TileCreationOutputSchema },
   prompt: `You are a design assistant for 1ShopApp. 
@@ -34,10 +35,6 @@ const prompt = ai.definePrompt({
   
   Lucide icons to pick from include: ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search, Building2, Ticket, Mail, Book, Briefcase, Film, Music, Globe, Home, Heart, Headphones, Camera, Cloud, Code, CreditCard, Database, DollarSign, Download, ExternalLink, File, Folder, Gift, Image, Instagram, Layout, Link, Lock, LogIn, LogOut, Map, MessageCircle, Monitor, Moon, MousePointer, Package, Palette, Phone, Play, Plus, Settings, Share2, Smile, Sun, Tag, Target, ThumbsUp, Trash2, TrendingUp, Twitter, Upload, Video, Wallet, Wifi, Youtube, Zap.`,
 });
-
-export async function generateTileMetadata(input: TileCreationInput): Promise<TileCreationOutput> {
-  return tileCreationFlow(input);
-}
 
 const tileCreationFlow = ai.defineFlow(
   {
@@ -51,3 +48,7 @@ const tileCreationFlow = ai.defineFlow(
     return output;
   }
 );
+
+export async function generateTileMetadata(input: TileCreationInput): Promise<TileCreationOutput> {
+  return tileCreationFlow(input);
+}

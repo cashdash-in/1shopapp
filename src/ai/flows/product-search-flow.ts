@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -18,18 +19,9 @@ const ProductSearchOutputSchema = z.object({
   results: z.array(z.string()).describe('A list of suggested products, brands, or categories.'),
 });
 
-/**
- * Performs an AI-powered search to suggest relevant products or categories.
- * This enhances the user experience when searching for specific items.
- */
-export async function searchProducts(
-  input: ProductSearchInput
-): Promise<ProductSearchOutput> {
-  return productSearchFlow(input);
-}
-
 const prompt = ai.definePrompt({
   name: 'productSearchPrompt',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: ProductSearchInputSchema },
   output: { schema: ProductSearchOutputSchema },
   prompt: `You are an AI e-commerce assistant for 1ShopApp, a one-stop app for Indian consumers.
@@ -55,3 +47,9 @@ const productSearchFlow = ai.defineFlow(
     return output;
   }
 );
+
+export async function searchProducts(
+  input: ProductSearchInput
+): Promise<ProductSearchOutput> {
+  return productSearchFlow(input);
+}

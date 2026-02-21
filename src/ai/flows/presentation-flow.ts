@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow for generating presentation outlines.
@@ -20,14 +21,9 @@ const PresentationOutputSchema = z.object({
   })).describe('A list of slides for the presentation.'),
 });
 
-export async function generatePresentation(
-  input: PresentationInput
-): Promise<PresentationOutput> {
-  return presentationFlow(input);
-}
-
 const prompt = ai.definePrompt({
   name: 'presentationPrompt',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: PresentationInputSchema },
   output: { schema: PresentationOutputSchema },
   prompt: `You are a professional presentation designer.
@@ -54,3 +50,9 @@ const presentationFlow = ai.defineFlow(
     return output;
   }
 );
+
+export async function generatePresentation(
+  input: PresentationInput
+): Promise<PresentationOutput> {
+  return presentationFlow(input);
+}

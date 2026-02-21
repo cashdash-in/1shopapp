@@ -24,6 +24,7 @@ export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'sentimentAnalysisPrompt',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: SentimentAnalysisInputSchema },
   output: { schema: SentimentOutputSchema },
   prompt: `Analyze the following user feedback for a mobile app aggregator named 1ShopApp.
@@ -33,10 +34,6 @@ const prompt = ai.definePrompt({
   
   Identify the overall sentiment, the relevant categories, and provide a concise summary.`,
 });
-
-export async function runSentimentAnalysis(input: SentimentAnalysisInput): Promise<SentimentOutput> {
-  return sentimentAnalysisFlow(input);
-}
 
 const sentimentAnalysisFlow = ai.defineFlow(
   {
@@ -50,3 +47,7 @@ const sentimentAnalysisFlow = ai.defineFlow(
     return output;
   }
 );
+
+export async function runSentimentAnalysis(input: SentimentAnalysisInput): Promise<SentimentOutput> {
+  return sentimentAnalysisFlow(input);
+}
