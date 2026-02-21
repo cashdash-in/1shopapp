@@ -1,13 +1,52 @@
+
 'use server';
 /**
- * @fileOverview A sentiment analysis flow that uses Genkit.
+ * @fileOverview A sentiment analysis flow using Genkit.
  *
- * - runSentimentAnalysis - A function that takes feedback text and returns a sentiment analysis.
+ * - runSentimentAnalysis - A function that analyzes user feedback.
  */
-import type { SentimentAnalysisInput, SentimentOutput } from '../schemas';
 
-export async function runSentimentAnalysis(
-  input: SentimentAnalysisInput
-): Promise<SentimentOutput> {
-  throw new Error('AI functionality is temporarily disabled due to a package installation issue. Please try again later.');
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+
+const SentimentAnalysisInputSchema = z.object({
+  text: z.string().describe('The feedback text to analyze.'),
+  rating: z.number().describe('The star rating provided by the user.'),
+});
+export type SentimentAnalysisInput = z.infer<typeof SentimentAnalysisInputSchema>;
+
+const SentimentOutputSchema = z.object({
+  sentiment: z.enum(['Positive', 'Negative', 'Neutral']),
+  categories: z.array(z.string()).describe('Categories like "UI/UX", "App Performance", "Feature Request", etc.'),
+  summary: z.string().describe('A one-sentence summary of the user feedback.'),
+});
+export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
+
+const prompt = ai.definePrompt({
+  name: 'sentimentAnalysisPrompt',
+  input: { schema: SentimentAnalysisInputSchema },
+  output: { schema: SentimentOutputSchema },
+  prompt: `Analyze the following user feedback for a mobile app aggregator named 1ShopApp.
+  
+  Feedback: "{{text}}"
+  Rating: {{rating}} stars
+  
+  Identify the overall sentiment, the relevant categories, and provide a concise summary.`,
+});
+
+export async function runSentimentAnalysis(input: SentimentAnalysisInput): Promise<SentimentOutput> {
+  return sentimentAnalysisFlow(input);
 }
+
+const sentimentAnalysisFlow = ai.defineFlow(
+  {
+    name: 'sentimentAnalysisFlow',
+    inputSchema: SentimentAnalysisInputSchema,
+    outputSchema: SentimentOutputSchema,
+  },
+  async (input) => {
+    const { output } = await prompt(input);
+    if (!output) throw new Error('AI failed to analyze feedback.');
+    return output;
+  }
+);

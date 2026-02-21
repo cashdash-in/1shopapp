@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -23,8 +24,7 @@ const serviceUrls = {
     Rapido: 'https://www.rapido.bike/',
 };
 
-// Replace with your actual key if the default one is restricted
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBtlfFMkRfdkVLvq2OXv6dolC0PlnzQsKY'; 
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''; 
 
 const POPULAR_LOCATIONS = [
     "Koramangala, Bangalore",
@@ -50,7 +50,36 @@ const POPULAR_LOCATIONS = [
     "Anna Nagar, Chennai",
     "Adyar, Chennai",
     "Salt Lake City, Kolkata",
-    "Park Street, Kolkata"
+    "Park Street, Kolkata",
+    "Borivali West, Mumbai",
+    "Dadar West, Mumbai",
+    "Lower Parel, Mumbai",
+    "Malad West, Mumbai",
+    "Worli, Mumbai",
+    "Chandni Chowk, New Delhi",
+    "Karol Bagh, New Delhi",
+    "Lajpat Nagar, New Delhi",
+    "Rohini, New Delhi",
+    "Vasant Kunj, New Delhi",
+    "Hebbal, Bangalore",
+    "Jayanagar, Bangalore",
+    "Malleshwaram, Bangalore",
+    "Marathahalli, Bangalore",
+    "Rajajinagar, Bangalore",
+    "Banjara Hills, Hyderabad",
+    "Jubilee Hills, Hyderabad",
+    "Kukatpally, Hyderabad",
+    "Madhapur, Hyderabad",
+    "Miyapur, Hyderabad",
+    "Alwarpet, Chennai",
+    "Besant Nagar, Chennai",
+    "Mylapore, Chennai",
+    "Nungambakkam, Chennai",
+    "T. Nagar, Chennai",
+    "Ballygunge, Kolkata",
+    "Behala, Kolkata",
+    "New Town, Kolkata",
+    "Tollygunge, Kolkata"
 ];
 
 export default function RideFinderPage() {
@@ -69,19 +98,6 @@ export default function RideFinderPage() {
 
     const pickupRef = useRef<HTMLDivElement>(null);
     const dropoffRef = useRef<HTMLDivElement>(null);
-
-    const generateTrafficAlerts = useCallback(() => {
-        const alerts = [
-            `Smooth flow detected on main arterial roads near ${pickup.split(',')[0] || 'your location'}.`,
-            `Minor slowdown reported due to construction near ${dropoff.split(',')[0] || 'destination'}.`,
-            `High demand in your area. Fares may fluctuate.`,
-            `Traffic moving at 25km/h on major junctions.`,
-            `Estimated travel time is stable for the next 15 minutes.`,
-            `Accident reported on flyover near ${pickup.split(',')[0] || 'route'}. Expect 10 min delay.`,
-            `Heavy rain causing waterlogging in low-lying areas. Check route.`
-        ];
-        return alerts.sort(() => 0.5 - Math.random()).slice(0, 3);
-    }, [pickup, dropoff]);
 
     const handleFindRides = async (isRefresh = false) => {
         if (!pickup.trim() || !dropoff.trim()) {
@@ -105,13 +121,13 @@ export default function RideFinderPage() {
                 });
             }
             setResult(response);
-            setTrafficAlerts(generateTrafficAlerts());
+            setTrafficAlerts(response.trafficAlerts || ["Traffic moving smoothly on main junctions.", "High demand detected in your area."]);
             setLastUpdated(new Date().toLocaleTimeString());
             
             if (isRefresh) {
                 toast({
-                    title: "Live Update",
-                    description: "Fares and traffic status updated.",
+                    title: "Live AI Update",
+                    description: "Fares and traffic status updated via AI.",
                 });
             }
         } catch (error: any) {
@@ -122,7 +138,6 @@ export default function RideFinderPage() {
         }
     };
 
-    // Close suggestions when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (pickupRef.current && !pickupRef.current.contains(event.target as Node)) {
@@ -136,7 +151,6 @@ export default function RideFinderPage() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Autocomplete Logic
     const handlePickupChange = (val: string) => {
         setPickup(val);
         if (val.length > 1) {
@@ -161,7 +175,6 @@ export default function RideFinderPage() {
         }
     };
 
-    // Live Refresh Loop
     useEffect(() => {
         if (!result) return;
         const interval = setInterval(() => {
@@ -175,10 +188,9 @@ export default function RideFinderPage() {
         return acc;
     }, {} as Record<string, RideOption[]>);
 
-    // Using Maps Embed API - Directions mode
-    const mapUrl = (pickup && dropoff) 
+    const mapUrl = (pickup && dropoff && GOOGLE_MAPS_API_KEY) 
         ? `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(dropoff)}&mode=driving`
-        : pickup 
+        : (pickup && GOOGLE_MAPS_API_KEY)
         ? `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(pickup)}`
         : null;
 
@@ -193,21 +205,20 @@ export default function RideFinderPage() {
                     <div className="text-center pt-8">
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Car className="h-8 w-8 text-primary" />
-                            Ride Finder
+                            AI Ride Finder
                         </CardTitle>
-                        <CardDescription>Real-time traffic and tentative fare comparison across major providers.</CardDescription>
+                        <CardDescription>Live AI-powered comparisons and real-time traffic updates from our digital assistant.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {aiError && (
                         <Alert variant="destructive">
-                            <AlertTitle>Feature Unavailable</AlertTitle>
+                            <AlertTitle>AI Feature Unavailable</AlertTitle>
                             <AlertDescription>{aiError}</AlertDescription>
                         </Alert>
                     )}
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
-                        {/* Pickup Input */}
                         <div className="space-y-2 relative" ref={pickupRef}>
                             <Label htmlFor="pickup">Pickup Location</Label>
                             <div className='relative'>
@@ -223,7 +234,7 @@ export default function RideFinderPage() {
                                 {pickup && <X className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground' onClick={() => setPickup('')} />}
                             </div>
                             {showPickupList && pickupSuggestions.length > 0 && (
-                                <ul className="absolute z-[60] w-full bg-background border rounded-md shadow-lg mt-1 overflow-hidden">
+                                <ul className="absolute z-[60] w-full bg-background border rounded-md shadow-lg mt-1 overflow-hidden max-h-60 overflow-y-auto">
                                     {pickupSuggestions.map((loc) => (
                                         <li 
                                             key={loc} 
@@ -240,7 +251,6 @@ export default function RideFinderPage() {
                             )}
                         </div>
 
-                        {/* Drop-off Input */}
                         <div className="space-y-2 relative" ref={dropoffRef}>
                             <Label htmlFor="dropoff">Drop-off Location</Label>
                             <div className='relative'>
@@ -256,7 +266,7 @@ export default function RideFinderPage() {
                                 {dropoff && <X className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground' onClick={() => setDropoff('')} />}
                             </div>
                             {showDropoffList && dropoffSuggestions.length > 0 && (
-                                <ul className="absolute z-[60] w-full bg-background border rounded-md shadow-lg mt-1 overflow-hidden">
+                                <ul className="absolute z-[60] w-full bg-background border rounded-md shadow-lg mt-1 overflow-hidden max-h-60 overflow-y-auto">
                                     {dropoffSuggestions.map((loc) => (
                                         <li 
                                             key={loc} 
@@ -277,31 +287,30 @@ export default function RideFinderPage() {
                     <div className="flex flex-col gap-2">
                         <Button onClick={() => handleFindRides()} disabled={loading || !pickup || !dropoff} className="w-full text-lg h-12">
                             {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-                            {loading ? 'Analyzing Real-Time Traffic...' : 'Find Best Live Rates'}
+                            {loading ? 'AI Analyzing Traffic & Fares...' : 'Get Live AI Rates'}
                         </Button>
                         <p className="text-[10px] text-muted-foreground text-center italic">
-                            * All fares are tentative live estimates. Actual price is shown in the provider app.
+                            * Fares are live tentative estimates generated by Gemini AI based on current traffic patterns.
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
-                        {/* Left: Live Traffic Feed */}
                         <Card className="lg:col-span-1 border-primary/20 bg-primary/5">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-bold flex items-center gap-2">
                                     <Activity className="h-4 w-4 text-primary animate-pulse" />
-                                    LIVE ROAD STATUS
+                                    AI LIVE ROAD STATUS
                                 </CardTitle>
                                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                     <Clock className="h-3 w-3" />
-                                    Updated: {lastUpdated || 'Waiting for locations...'}
+                                    Last AI Sync: {lastUpdated || 'Waiting for locations...'}
                                 </div>
                             </CardHeader>
                             <CardContent>
                                 <ScrollArea className="h-48 pr-4">
                                     <div className="space-y-4">
                                         {!pickup || !dropoff ? (
-                                            <p className="text-xs text-muted-foreground italic">Enter locations to see road status...</p>
+                                            <p className="text-xs text-muted-foreground italic">Enter locations to get AI traffic updates...</p>
                                         ) : (
                                             trafficAlerts.map((alert, i) => (
                                                 <div key={i} className="flex gap-2 text-xs border-l-2 border-primary/30 pl-3 py-1">
@@ -315,7 +324,6 @@ export default function RideFinderPage() {
                             </CardContent>
                         </Card>
 
-                        {/* Right: Map */}
                         <Card className="lg:col-span-2 overflow-hidden relative">
                             {mapUrl ? (
                                 <iframe
@@ -328,7 +336,11 @@ export default function RideFinderPage() {
                                 <div className="w-full h-full min-h-[300px] bg-muted flex flex-col items-center justify-center text-center p-4">
                                     <Map className="h-10 w-10 text-muted-foreground mb-2"/>
                                     <p className="font-semibold text-sm">Interactive Live Map</p>
-                                    <p className="text-xs text-muted-foreground max-w-xs">Select a pickup and drop-off to view real-time road status and routes.</p>
+                                    <p className="text-xs text-muted-foreground max-w-xs">
+                                        {!GOOGLE_MAPS_API_KEY 
+                                            ? "Add your Google Maps API Key to activate the live map view."
+                                            : "Select locations to see AI-generated routes and road status."}
+                                    </p>
                                 </div>
                             )}
                         </Card>
@@ -345,14 +357,14 @@ export default function RideFinderPage() {
                 
                     {result && !loading && (
                         <div className="space-y-6 pt-6 border-t">
-                            <h2 className="text-2xl font-bold text-center">Tentative Live Rates</h2>
+                            <h2 className="text-2xl font-bold text-center">Live AI Fare Estimates</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
                                 {Object.entries(groupedResults || {}).map(([service, options]) => (
                                     <Card key={service} className="flex flex-col h-full border-t-4 border-t-primary shadow-lg hover:shadow-xl transition-shadow">
                                         <CardHeader className="pb-2">
                                             <CardTitle className="flex items-center justify-between">
                                                 <span className='font-bold text-xl'>{service}</span>
-                                                <Badge variant="outline" className="text-[10px] font-normal uppercase tracking-wider">Estimate</Badge>
+                                                <Badge variant="outline" className="text-[10px] font-normal uppercase tracking-wider">AI Estimate</Badge>
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-3 flex-grow">

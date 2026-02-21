@@ -1,111 +1,76 @@
+
 'use server';
 /**
- * @fileOverview A flow for finding ride-sharing options with realistic simulation logic.
+ * @fileOverview A ride-sharing fare estimation and live traffic flow using Genkit.
  *
- * - findRides - A function that takes pickup/dropoff locations and returns simulated ride options.
+ * - findRides - A function that takes pickup/dropoff locations and returns AI-generated tentative fare estimates and traffic status.
  */
 
-import type { RideFinderInput, RideFinderOutput, RideOption } from '../schemas';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import type { RideFinderInput, RideFinderOutput } from '../schemas';
 
-const services = [
-  {
-    service: 'Uber',
-    vehicleTypes: [
-      { type: 'Uber Go', baseFare: 55, ratePerKm: 14.5, capacity: 4 },
-      { type: 'Premier', baseFare: 75, ratePerKm: 18.2, capacity: 4 },
-      { type: 'UberXL', baseFare: 110, ratePerKm: 22.5, capacity: 6 },
-    ],
-  },
-  {
-    service: 'Ola',
-    vehicleTypes: [
-      { type: 'Mini', baseFare: 50, ratePerKm: 13.8, capacity: 4 },
-      { type: 'Sedan', baseFare: 70, ratePerKm: 17.5, capacity: 4 },
-      { type: 'Prime SUV', baseFare: 100, ratePerKm: 21.0, capacity: 6 },
-    ],
-  },
-  {
-    service: 'inDrive',
-    vehicleTypes: [
-      { type: 'Standard', baseFare: 45, ratePerKm: 12.5, capacity: 4 },
-    ],
-  },
-  {
-    service: 'Rapido',
-    vehicleTypes: [
-      { type: 'Bike', baseFare: 25, ratePerKm: 9.5, capacity: 1 },
-      { type: 'Auto', baseFare: 45, ratePerKm: 12.0, capacity: 3 },
-    ],
-  },
-] as const;
+const RideFinderInputSchema = z.object({
+  pickup: z.string().describe('The pickup location address.'),
+  dropoff: z.string().describe('The drop-off location address.'),
+  currentTime: z.string().optional().describe('The current time and day for traffic context.'),
+});
+
+const RideOptionSchema = z.object({
+  service: z.enum(['Uber', 'Ola', 'inDrive', 'Rapido']),
+  vehicleType: z.string().describe('Type of vehicle (e.g., Auto, Bike, Premier, Mini, Prime Sedan).'),
+  eta: z.string().describe('Estimated time of arrival (e.g., "5-8 min").'),
+  fare: z.string().describe('The estimated fare in INR (e.g., "₹150").'),
+  surge: z.boolean().describe('Whether surge pricing is likely active.'),
+});
+
+const RideFinderOutputSchema = z.object({
+  options: z.array(RideOptionSchema),
+  trafficAlerts: z.array(z.string()).describe('A list of 3-4 short, realistic live traffic status updates for this specific route.'),
+});
+
+const prompt = ai.definePrompt({
+  name: 'rideFinderPrompt',
+  input: { schema: RideFinderInputSchema },
+  output: { schema: RideFinderOutputSchema },
+  prompt: `You are a real-time ride-sharing fare and traffic estimator for Indian cities.
+  
+  Based on the following locations and current time, provide tentative, realistic fare estimates for Uber, Ola, inDrive, and Rapido. 
+  Also, provide a set of "Live Traffic Alerts" that describe the road conditions between these two points right now.
+  
+  Pickup: {{pickup}}
+  Drop-off: {{dropoff}}
+  Current Time: {{currentTime}}
+  
+  Instructions:
+  1. Calculate realistic INR fares based on estimated distance in Indian metros (like Bangalore, Mumbai, Delhi).
+  2. Account for traffic patterns typical for this time of day.
+  3. Generate specific traffic alerts like "Congestion near [landmark]", "Smooth flow on [main road]", or "Minor delay due to peak hours".
+  4. Ensure multiple vehicle types (Auto, Bike, Cab) are provided for each service where realistic.
+  
+  Return a structured list of options and traffic alerts.`,
+});
 
 /**
- * Simulates a realistic distance (in km) based on the input strings.
+ * Main function to fetch ride estimates and traffic status.
  */
-function simulateDistance(pickup: string, dropoff: string): number {
-  const combinedLength = pickup.length + dropoff.length;
-  let distance = 2 + (combinedLength / 120) * 28;
-  if (combinedLength < 25) distance = Math.min(distance, 8);
-  return Math.max(2.5, Math.min(35, distance)); 
+export async function findRides(input: RideFinderInput): Promise<RideFinderOutput> {
+  const result = await rideFinderFlow({
+    ...input,
+    currentTime: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+  });
+  return result;
 }
 
-/**
- * Checks if current time falls within Indian peak hour windows.
- */
-function isPeakTime(): boolean {
-    const now = new Date();
-    const istTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-    const hour = istTime.getHours();
-    const day = istTime.getDay();
-    const isWeekday = day >= 1 && day <= 5;
-    const isMorningRush = hour >= 8 && hour < 11;
-    const isEveningRush = hour >= 17 && hour < 21;
-    return isWeekday && (isMorningRush || isEveningRush);
-}
-
-export async function findRides(
-  input: RideFinderInput
-): Promise<RideFinderOutput> {
-  const { pickup, dropoff } = input;
-  const options: RideOption[] = [];
-  const simulatedDistance = simulateDistance(pickup, dropoff);
-  const peakTime = isPeakTime();
-
-  // Traffic Factor: 1.0 (Normal) to 1.8 (Heavy)
-  const trafficFactor = peakTime ? 1.4 + Math.random() * 0.4 : 1.0 + Math.random() * 0.2;
-
-  for (const service of services) {
-    for (const vehicle of service.vehicleTypes) {
-      // Base fare calculation
-      let fare = (vehicle.baseFare + (simulatedDistance * vehicle.ratePerKm)) * trafficFactor;
-      
-      // Service specific variations
-      if (service.service === 'Uber' && peakTime) fare *= 1.05;
-      if (service.service === 'inDrive') fare *= 0.9;
-
-      // Random fluctuation (+/- 3%)
-      fare += (Math.random() - 0.5) * (fare * 0.06);
-
-      // Surge pricing simulation (15% chance)
-      const surge = Math.random() < 0.15;
-      if (surge) fare *= 1.6;
-
-      const finalFare = Math.round(fare / 5) * 5;
-      
-      // ETA calculation: ~4 mins base + traffic impact
-      const baseEta = 4 + Math.floor(simulatedDistance / 3);
-      const trafficDelay = Math.floor((trafficFactor - 1) * 10);
-      const etaMinutes = baseEta + trafficDelay + Math.floor(Math.random() * 3);
-
-      options.push({
-        service: service.service,
-        vehicleType: vehicle.type,
-        eta: `${Math.max(3, etaMinutes - 1)}-${etaMinutes + 2} min`,
-        fare: `₹${finalFare}`,
-        surge: surge,
-      });
-    }
+const rideFinderFlow = ai.defineFlow(
+  {
+    name: 'rideFinderFlow',
+    inputSchema: RideFinderInputSchema,
+    outputSchema: RideFinderOutputSchema,
+  },
+  async (input) => {
+    const { output } = await prompt(input);
+    if (!output) throw new Error('AI failed to generate ride estimates and traffic data.');
+    return output;
   }
-
-  return { options };
-}
+);

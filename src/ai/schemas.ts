@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview This file contains all the Zod schemas and TypeScript types 
  * for the AI flows. Separating these into their own file prevents "use server"
@@ -157,6 +158,7 @@ export type BiReportOutput = {
 export type RideFinderInput = {
   pickup: string;
   dropoff: string;
+  currentTime?: string;
 };
 
 export type RideOption = {
@@ -169,4 +171,5 @@ export type RideOption = {
 
 export type RideFinderOutput = {
   options: RideOption[];
+  trafficAlerts?: string[];
 };
