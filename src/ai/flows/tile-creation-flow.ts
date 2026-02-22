@@ -7,7 +7,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { gemini15Flash } from '@genkit-ai/google-genai';
 
 const TileCreationInputSchema = z.object({
   url: z.string().describe('The URL of the website to create a tile for.'),
@@ -23,7 +22,7 @@ export type TileCreationOutput = z.infer<typeof TileCreationOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'tileCreationPrompt',
-  model: gemini15Flash,
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: TileCreationInputSchema },
   output: { schema: TileCreationOutputSchema },
   prompt: `You are a design assistant for 1ShopApp. 

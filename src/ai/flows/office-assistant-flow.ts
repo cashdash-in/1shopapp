@@ -10,7 +10,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { gemini15Flash } from '@genkit-ai/google-genai';
 import type { 
   MeetingInput, MeetingOutput, 
   BudgetInput, BudgetOutput, 
@@ -18,7 +17,7 @@ import type {
   TaskPrepInput, TaskPrepOutput
 } from '../schemas';
 
-const MODEL = gemini15Flash;
+const MODEL = 'googleai/gemini-1.5-flash';
 
 // --- Meeting Flow ---
 

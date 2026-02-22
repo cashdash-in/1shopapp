@@ -7,7 +7,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { gemini15Flash } from '@genkit-ai/google-genai';
 import type { RideFinderInput, RideFinderOutput } from '../schemas';
 
 const RideFinderInputSchema = z.object({
@@ -31,7 +30,7 @@ const RideFinderOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'rideFinderPrompt',
-  model: gemini15Flash,
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: RideFinderInputSchema },
   output: { schema: RideFinderOutputSchema },
   prompt: `You are a real-time ride-sharing fare and traffic estimator for Indian cities.

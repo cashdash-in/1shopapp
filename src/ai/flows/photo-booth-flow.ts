@@ -5,7 +5,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { gemini20Flash } from '@genkit-ai/google-genai';
 import type { PhotoBoothInput, PhotoBoothOutput } from '../schemas';
 
 const PhotoBoothInputSchema = z.object({
@@ -31,7 +30,7 @@ const photoBoothFlow = ai.defineFlow(
   },
   async (input) => {
     const { media } = await ai.generate({
-      model: gemini20Flash,
+      model: 'googleai/gemini-2.0-flash',
       prompt: [
         { media: { url: input.photoDataUri } },
         { text: `Re-imagine this image in a ${input.style} artistic style. Maintain the main subjects and composition but transform the aesthetic completely. Output the result as an image.` },
