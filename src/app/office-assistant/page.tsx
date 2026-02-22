@@ -59,7 +59,6 @@ export default function OfficeAssistantPage() {
             recognitionRef.current.interimResults = true;
 
             recognitionRef.current.onresult = (event: any) => {
-                let interimTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         setTranscript(prev => prev + ' ' + event.results[i][0].transcript);
@@ -70,13 +69,30 @@ export default function OfficeAssistantPage() {
             recognitionRef.current.onerror = (event: any) => {
                 console.error("Speech Recognition Error:", event.error);
                 setIsListening(false);
+                
+                let errorTitle = "Speech Recognition Failed";
+                let errorMessage = "An unexpected error occurred with voice transcription.";
+                
+                if (event.error === 'network') {
+                    errorMessage = "A network error occurred. Please ensure you have a stable internet connection, as voice processing often requires cloud connectivity.";
+                } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    errorMessage = "Microphone access was denied or is not supported. Please check your browser permissions.";
+                } else if (event.error === 'no-speech') {
+                    errorMessage = "No speech was detected. Please try again.";
+                }
+
+                toast({
+                    variant: 'destructive',
+                    title: errorTitle,
+                    description: errorMessage,
+                });
             };
         }
-    }, []);
+    }, [toast]);
 
     const toggleListening = () => {
         if (!recognitionRef.current) {
-            toast({ variant: 'destructive', title: "Not Supported", description: "Voice-to-text is not supported in this browser." });
+            toast({ variant: 'destructive', title: "Not Supported", description: "Voice-to-text is not supported in this browser. Please try Chrome or Edge." });
             return;
         }
 
@@ -85,9 +101,14 @@ export default function OfficeAssistantPage() {
             setIsListening(false);
             toast({ title: "Microphone Off", description: "Transcription paused." });
         } else {
-            recognitionRef.current.start();
-            setIsListening(true);
-            toast({ title: "Listening...", description: "Discuss your meeting points now." });
+            try {
+                recognitionRef.current.start();
+                setIsListening(true);
+                toast({ title: "Listening...", description: "Discuss your meeting points now." });
+            } catch (e) {
+                console.error("Failed to start recognition:", e);
+                setIsListening(false);
+            }
         }
     };
 
@@ -221,7 +242,7 @@ export default function OfficeAssistantPage() {
                                             variant={isListening ? "destructive" : "secondary"} 
                                             size="sm" 
                                             onClick={toggleListening}
-                                            className="animate-pulse"
+                                            className={isListening ? "animate-pulse" : ""}
                                         >
                                             {isListening ? <MicOff className="mr-2 h-4 w-4"/> : <Mic className="mr-2 h-4 w-4"/>}
                                             {isListening ? 'Stop Listening' : 'Listen to Meeting'}
