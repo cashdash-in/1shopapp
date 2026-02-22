@@ -14,12 +14,12 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 const styles = [
-    { id: 'Cartoon', label: 'Cartoon', filter: 'saturate(2) contrast(1.5)' },
-    { id: 'Anime', label: 'Anime', filter: 'brightness(1.2) contrast(1.2)' },
-    { id: 'Oil Painting', label: 'Oil Painting', filter: 'sepia(0.5) contrast(1.4)' },
-    { id: 'Cyberpunk', label: 'Cyberpunk', filter: 'hue-rotate(-45deg) saturate(1.5) contrast(1.2)' },
-    { id: 'Pixel Art', label: 'Pixel Art', filter: 'grayscale(1) brightness(0.9) contrast(2)' },
-    { id: 'Wallpaper', label: 'Wallpaper', filter: 'brightness(1.1) contrast(1.1) saturate(1.2)' },
+    { id: 'Cartoon', label: 'Cartoon', filter: 'saturate(1.8) contrast(1.3) brightness(1.1)' },
+    { id: 'Anime', label: 'Anime', filter: 'brightness(1.2) contrast(1.1) saturate(1.4)' },
+    { id: 'Oil Painting', label: 'Oil Painting', filter: 'sepia(0.4) contrast(1.2) saturate(0.8) blur(0.5px)' },
+    { id: 'Cyberpunk', label: 'Cyberpunk', filter: 'hue-rotate(-45deg) saturate(2) contrast(1.3) brightness(0.9)' },
+    { id: 'Pixel Art', label: 'Pixel Art', filter: 'contrast(2) saturate(1.5) brightness(1.1)' },
+    { id: 'Wallpaper', label: 'Wallpaper', filter: 'brightness(1.05) contrast(1.05) saturate(1.1)' },
 ];
 
 export default function PhotoBoothPage() {
@@ -36,7 +36,6 @@ export default function PhotoBoothPage() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Request camera permission on mount
     useEffect(() => {
         const getCameraPermission = async () => {
           try {
@@ -48,7 +47,6 @@ export default function PhotoBoothPage() {
     
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
-              // Add an event listener to know when the video is ready to be played.
               videoRef.current.onloadedmetadata = () => {
                 setIsCameraReady(true);
               };
@@ -67,7 +65,6 @@ export default function PhotoBoothPage() {
         getCameraPermission();
 
         return () => {
-            // Cleanup: stop camera stream when component unmounts
             if (videoRef.current && videoRef.current.srcObject) {
                 (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
             }
@@ -80,7 +77,7 @@ export default function PhotoBoothPage() {
             const reader = new FileReader();
             reader.onload = (e) => {
                 setOriginalImage(e.target?.result as string);
-                setGeneratedImage(null); // Clear previous result
+                setGeneratedImage(null);
             };
             reader.readAsDataURL(file);
         }
@@ -97,7 +94,7 @@ export default function PhotoBoothPage() {
                 context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
                 const dataUri = canvas.toDataURL('image/png');
                 setOriginalImage(dataUri);
-                setGeneratedImage(null); // Clear previous result
+                setGeneratedImage(null);
             }
         }
     };
@@ -122,26 +119,37 @@ export default function PhotoBoothPage() {
                 style: selectedStyle,
             });
             setGeneratedImage(result.imageDataUri);
+            toast({ title: "Transformation Complete", description: `Applied ${selectedStyle} stylization.` });
         } catch (error: any) {
             console.error('AI generation failed:', error);
-            setAiError(error.message || 'The AI could not process the image. Please try again or use a different image.');
+            setAiError(error.message || 'The AI could not process the image.');
         } finally {
             setLoading(false);
         }
     };
 
+    const activeStyleFilter = styles.find(s => s.id === selectedStyle)?.filter || 'none';
+
     const downloadImage = () => {
         if (generatedImage) {
-            const a = document.createElement('a');
-            a.href = generatedImage;
-            a.download = `1shopapp-ai-photobooth-${selectedStyle.toLowerCase()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new window.Image();
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                if (ctx) {
+                    ctx.filter = activeStyleFilter;
+                    ctx.drawImage(img, 0, 0);
+                    const a = document.createElement('a');
+                    a.href = canvas.toDataURL('image/png');
+                    a.download = `1shopapp-${selectedStyle.toLowerCase()}-${Date.now()}.png`;
+                    a.click();
+                }
+            };
+            img.src = generatedImage;
         }
     };
-
-    const activeStyleFilter = styles.find(s => s.id === selectedStyle)?.filter || 'none';
 
     return (
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
@@ -153,11 +161,10 @@ export default function PhotoBoothPage() {
                     </Link>
                     <div className="text-center pt-8">
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3"><Wand2 className="h-8 w-8 text-primary"/>AI Photo Booth</CardTitle>
-                        <CardDescription>Transform your photos into stunning works of art with AI.</CardDescription>
+                        <CardDescription>Transform your photos into stunning works of art with exact AI styles.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Left Column: Input */}
                     <div className="space-y-6">
                         {aiError && (
                             <Alert variant="destructive">
@@ -167,10 +174,10 @@ export default function PhotoBoothPage() {
                         )}
                         <Card>
                             <CardHeader>
-                                <CardTitle>1. Provide an Image</CardTitle>
+                                <CardTitle className="text-sm">1. Provide an Image</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className='relative w-full aspect-video bg-muted rounded-md overflow-hidden flex items-center justify-center'>
+                                <div className='relative w-full aspect-video bg-muted rounded-md overflow-hidden flex items-center justify-center border shadow-inner'>
                                      <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
                                      <canvas ref={canvasRef} className="hidden" />
                                      {hasCameraPermission === false && (
@@ -179,7 +186,7 @@ export default function PhotoBoothPage() {
                                                 <Camera className='h-4 w-4'/>
                                                 <AlertTitle>Camera Access Required</AlertTitle>
                                                 <AlertDescription>
-                                                    Please allow camera access to use this feature. You may need to reload the page after granting permission.
+                                                    Please allow camera access to use this feature.
                                                 </AlertDescription>
                                             </Alert>
                                         </div>
@@ -187,13 +194,13 @@ export default function PhotoBoothPage() {
                                      {hasCameraPermission === null && <Loader2 className="h-8 w-8 animate-spin text-primary"/>}
                                 </div>
                                 <div className="flex gap-2">
-                                     <Button onClick={handleCapture} disabled={!hasCameraPermission || !isCameraReady} className="w-full">
+                                     <Button onClick={handleCapture} disabled={!hasCameraPermission || !isCameraReady} className="w-full" variant="secondary">
                                         <Camera className="mr-2 h-4 w-4" />
-                                        Capture Photo
+                                        Capture
                                     </Button>
                                     <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full">
                                         <Upload className="mr-2 h-4 w-4" />
-                                        Upload Image
+                                        Upload
                                     </Button>
                                     <input
                                         type="file"
@@ -207,16 +214,16 @@ export default function PhotoBoothPage() {
                         </Card>
                          <Card>
                             <CardHeader>
-                                <CardTitle>2. Choose a Style</CardTitle>
+                                <CardTitle className="text-sm">2. Select Artistic Style</CardTitle>
                             </CardHeader>
                             <CardContent>
-                               <RadioGroup value={selectedStyle} onValueChange={setSelectedStyle} className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                               <RadioGroup value={selectedStyle} onValueChange={setSelectedStyle} className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                     {styles.map((style) => (
                                         <div key={style.id}>
                                             <RadioGroupItem value={style.id} id={style.id} className="peer sr-only" />
                                             <Label
                                                 htmlFor={style.id}
-                                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                                                className="flex flex-col items-center justify-center text-center h-12 rounded-md border-2 border-muted bg-popover hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer text-xs font-bold transition-all"
                                             >
                                                 {style.label}
                                             </Label>
@@ -225,47 +232,58 @@ export default function PhotoBoothPage() {
                                 </RadioGroup>
                             </CardContent>
                         </Card>
-                        <Button onClick={handleGenerate} disabled={loading || !originalImage} className="w-full text-lg h-12">
-                            {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-                            {loading ? 'Generating...' : 'Generate Image'}
+                        <Button onClick={handleGenerate} disabled={loading || !originalImage} className="w-full text-lg h-12 shadow-lg group">
+                            {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5 group-hover:animate-pulse" />}
+                            {loading ? 'AI Processing...' : 'Apply Exact AI Style'}
                         </Button>
                     </div>
 
-                    {/* Right Column: Output */}
                     <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <h3 className='font-semibold text-center mb-2'>Original</h3>
-                                <div className="aspect-square w-full rounded-md bg-muted flex items-center justify-center overflow-hidden">
+                                <h3 className='text-xs font-bold text-muted-foreground uppercase mb-2 ml-1'>Input Image</h3>
+                                <div className="aspect-square w-full rounded-md bg-muted border shadow-sm flex items-center justify-center overflow-hidden">
                                     {originalImage ? (
                                         <Image src={originalImage} alt="Original" width={512} height={512} className="object-contain w-full h-full" />
                                     ) : (
-                                        <p className="text-muted-foreground text-sm">Your image</p>
+                                        <div className="flex flex-col items-center text-muted-foreground/40 italic">
+                                            <Camera className="h-10 w-10 mb-2" />
+                                            <p className="text-[10px]">Awaiting source</p>
+                                        </div>
                                     )}
                                 </div>
                             </div>
                              <div>
-                                <h3 className='font-semibold text-center mb-2'>Stylized</h3>
-                                <div className="aspect-square w-full rounded-md bg-muted flex items-center justify-center overflow-hidden">
-                                     {loading && <Loader2 className="h-10 w-10 animate-spin text-primary" />}
+                                <h3 className='text-xs font-bold text-primary uppercase mb-2 ml-1'>Stylized Result</h3>
+                                <div className="aspect-square w-full rounded-md bg-muted border shadow-sm flex items-center justify-center overflow-hidden relative">
+                                     {loading && (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                                            <p className="text-[10px] text-primary font-bold animate-pulse">Rendering...</p>
+                                        </div>
+                                     )}
                                      {!loading && generatedImage && (
-                                        <Image 
-                                            src={generatedImage} 
-                                            alt="Generated" 
-                                            width={512} 
-                                            height={512} 
-                                            className="object-contain w-full h-full" 
-                                        />
+                                        <div className="relative w-full h-full" style={{ filter: activeStyleFilter }}>
+                                            <Image 
+                                                src={generatedImage} 
+                                                alt="Generated" 
+                                                fill
+                                                className="object-contain w-full h-full" 
+                                            />
+                                        </div>
                                      )}
                                      {!loading && !generatedImage && (
-                                        <p className="text-muted-foreground text-sm">Your result</p>
+                                        <div className="flex flex-col items-center text-muted-foreground/40 italic">
+                                            <Wand2 className="h-10 w-10 mb-2" />
+                                            <p className="text-[10px]">Processed output</p>
+                                        </div>
                                      )}
                                 </div>
                             </div>
                         </div>
-                        <Button onClick={downloadImage} disabled={!generatedImage} variant="secondary" className="w-full">
+                        <Button onClick={downloadImage} disabled={!generatedImage} variant="secondary" className="w-full h-12 border-2 border-primary/10">
                             <Download className="mr-2 h-4 w-4" />
-                            Download Generated Image
+                            Download Professional Grade File
                         </Button>
                     </div>
                 </CardContent>
