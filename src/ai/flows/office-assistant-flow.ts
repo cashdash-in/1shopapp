@@ -17,7 +17,7 @@ import type {
   TaskPrepInput, TaskPrepOutput
 } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 // --- Meeting Flow ---
 

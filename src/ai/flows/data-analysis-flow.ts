@@ -8,6 +8,8 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { DataAnalysisInput, DataAnalysisOutput } from '../schemas';
 
+const MODEL = 'googleai/gemini-1.5-flash';
+
 const DataAnalysisInputSchema = z.object({
   data: z.string().describe('The raw text or CSV data to analyze.'),
   question: z.string().describe('The question the user wants to answer about the data.'),
@@ -20,7 +22,7 @@ const DataAnalysisOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'dataAnalysisPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: MODEL,
   input: { schema: DataAnalysisInputSchema },
   output: { schema: DataAnalysisOutputSchema },
   prompt: `You are an expert Data Scientist.

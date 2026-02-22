@@ -8,6 +8,8 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
+const MODEL = 'googleai/gemini-1.5-flash';
+
 const SentimentAnalysisInputSchema = z.object({
   text: z.string().describe('The feedback text to analyze.'),
   rating: z.number().describe('The star rating provided by the user.'),
@@ -23,7 +25,7 @@ export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'sentimentAnalysisPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: MODEL,
   input: { schema: SentimentAnalysisInputSchema },
   output: { schema: SentimentOutputSchema },
   prompt: `Analyze the following user feedback for a mobile app aggregator named 1ShopApp.

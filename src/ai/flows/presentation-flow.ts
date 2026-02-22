@@ -8,6 +8,8 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { PresentationInput, PresentationOutput } from '../schemas';
 
+const MODEL = 'googleai/gemini-1.5-flash';
+
 const PresentationInputSchema = z.object({
   topic: z.string().describe('The main topic of the presentation.'),
   instructions: z.string().optional().describe('Specific instructions for the outline.'),
@@ -22,7 +24,7 @@ const PresentationOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'presentationPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: MODEL,
   input: { schema: PresentationInputSchema },
   output: { schema: PresentationOutputSchema },
   prompt: `You are a professional presentation designer.

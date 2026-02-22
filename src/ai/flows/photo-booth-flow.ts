@@ -7,6 +7,8 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { PhotoBoothInput, PhotoBoothOutput } from '../schemas';
 
+const MODEL = 'googleai/gemini-1.5-flash';
+
 const PhotoBoothInputSchema = z.object({
   photoDataUri: z.string().describe("A photo as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
   style: z.string().describe('The artistic style to apply (e.g., Cartoon, Anime, Cyberpunk).'),
@@ -29,10 +31,9 @@ const photoBoothFlow = ai.defineFlow(
     outputSchema: PhotoBoothOutputSchema,
   },
   async (input) => {
-    // Note: Gemini 1.5 Flash supports Vision input but focused on text generation.
-    // Standardizing on the latest stable alias to resolve 404 errors.
+    // Gemini 1.5 Flash supports Vision input and is stable on the v1 API endpoint.
     const { text } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash-latest',
+      model: MODEL,
       prompt: [
         { media: { url: input.photoDataUri } },
         { text: `Describe this image in detail and then suggest how it would look in a ${input.style} artistic style.` },

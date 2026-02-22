@@ -10,6 +10,8 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { ProductSearchInput, ProductSearchOutput } from '../schemas';
 
+const MODEL = 'googleai/gemini-1.5-flash';
+
 const ProductSearchInputSchema = z.object({
   query: z.string().describe('The user search query or brand name.'),
 });
@@ -20,7 +22,7 @@ const ProductSearchOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'productSearchPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: MODEL,
   input: { schema: ProductSearchInputSchema },
   output: { schema: ProductSearchOutputSchema },
   prompt: `You are an AI e-commerce assistant for 1ShopApp, a one-stop app for Indian consumers.
