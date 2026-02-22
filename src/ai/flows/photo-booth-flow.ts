@@ -31,7 +31,7 @@ const photoBoothFlow = ai.defineFlow(
     outputSchema: PhotoBoothOutputSchema,
   },
   async (input) => {
-    // Gemini 1.5 Flash supports Vision input and is stable on the v1 API endpoint.
+    // Standardizing on gemini-1.5-flash via v1beta for stability.
     const { text } = await ai.generate({
       model: MODEL,
       prompt: [
