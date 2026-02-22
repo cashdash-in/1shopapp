@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Loader2, Sparkles, BarChart3, Bot } from 'lucide-react';
+import { ArrowLeft, Loader2, Sparkles, BarChart3, Bot, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeData } from '@/ai/flows/data-analysis-flow';
 import type { DataAnalysisOutput } from '@/ai/schemas';
@@ -44,18 +44,46 @@ export default function DataAnalystPage() {
             setLoading(false);
         }
     };
+
+    const downloadTxt = () => {
+        if (!result) return;
+        const blob = new Blob([result.summary, '\n\n', result.data || ''], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ai-analysis-report.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const downloadCsv = () => {
+        if (!result?.data) return;
+        // Simple conversion from MD table to CSV
+        const rows = result.data.trim().split('\n').filter(r => r.includes('|') && !r.includes('---'));
+        const csvContent = rows.map(row => {
+            return row.split('|')
+                .map(cell => cell.trim())
+                .filter((_, i, arr) => i > 0 && i < arr.length - 1)
+                .join(',');
+        }).join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ai-analysis-data.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
     
-    // A more robust function to render markdown tables
     const renderMarkdownTable = (markdown: string) => {
         try {
             const rows = markdown.trim().split('\n').filter(row => row.includes('|'));
             if (rows.length < 2) return <p>Could not render table from AI output.</p>;
 
             const headerCells = rows[0].split('|').map(h => h.trim()).filter(h => h);
-            // The separator line is not needed for rendering, so we skip it (rows[1]).
             const bodyRows = rows.slice(2).map(row => {
                 const cells = row.split('|').map(c => c.trim());
-                // Remove the first and last empty cells caused by leading/trailing pipes
                 return cells.slice(1, -1);
             });
 
@@ -80,8 +108,6 @@ export default function DataAnalystPage() {
                 </div>
             );
         } catch (error) {
-            console.error("Failed to render markdown table:", error);
-            // If rendering fails, just show the raw markdown data.
             return (
                 <pre className="text-xs bg-muted p-4 rounded-md whitespace-pre-wrap font-mono">
                     <code>{markdown}</code>
@@ -100,9 +126,9 @@ export default function DataAnalystPage() {
                     </Link>
                     <div className="text-center pt-8">
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
-                            <BarChart3 className="h-8 w-8 text-primary" />AI Data Analyst
+                            <BarChart3 className="h-8 w-8 text-primary" />AI High-Precision Data Analyst
                         </CardTitle>
-                        <CardDescription>Paste your data, ask a question, and get instant insights from AI.</CardDescription>
+                        <CardDescription>Paste your data, ask a question, and get professional-grade insights and documents.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -130,7 +156,7 @@ export default function DataAnalystPage() {
                                 id="question"
                                 value={question}
                                 onChange={(e) => setQuestion(e.target.value)}
-                                placeholder="Example: 'What are the total sales per region?'"
+                                placeholder="Example: 'Analyze the growth trend and output a precision summary.'"
                                 disabled={loading}
                                 rows={8}
                             />
@@ -139,15 +165,27 @@ export default function DataAnalystPage() {
 
                     <Button onClick={handleAnalyze} disabled={loading} className="w-full text-lg h-12">
                         {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-                        {loading ? 'Analyzing...' : 'Analyze Data'}
+                        {loading ? 'Analyzing with Precision...' : 'Analyze & Generate Documents'}
                     </Button>
                 
                     {result && (
                          <div className="space-y-4 pt-6 border-t">
-                            <h2 className="text-2xl font-bold text-center">Analysis Result</h2>
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold">Analysis Result</h2>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" size="sm" onClick={downloadTxt}>
+                                        <FileText className="mr-2 h-4 w-4" /> Download Report
+                                    </Button>
+                                    {result.data && (
+                                        <Button variant="outline" size="sm" onClick={downloadCsv}>
+                                            <FileSpreadsheet className="mr-2 h-4 w-4" /> Download CSV
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
                              <Card className="bg-secondary/50">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5"/> AI Summary</CardTitle>
+                                    <CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5"/> AI Precision Summary</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-muted-foreground whitespace-pre-wrap">{result.summary}</p>
@@ -156,7 +194,7 @@ export default function DataAnalystPage() {
                             {result.data && (
                                  <Card>
                                     <CardHeader>
-                                        <CardTitle>Resulting Data</CardTitle>
+                                        <CardTitle>Calculated Data</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         {renderMarkdownTable(result.data)}
@@ -165,7 +203,6 @@ export default function DataAnalystPage() {
                             )}
                         </div>
                     )}
-                
                 </CardContent>
             </Card>
         </div>

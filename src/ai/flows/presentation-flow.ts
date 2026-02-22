@@ -1,12 +1,12 @@
 'use server';
 /**
- * @fileOverview A flow for generating presentation outlines with fallback.
+ * @fileOverview A professional flow for generating comprehensive presentation outlines.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { PresentationInput, PresentationOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 const PresentationInputSchema = z.object({
   topic: z.string(),
@@ -25,7 +25,19 @@ const prompt = ai.definePrompt({
   model: MODEL,
   input: { schema: PresentationInputSchema },
   output: { schema: PresentationOutputSchema },
-  prompt: `Create presentation for topic: {{{topic}}}`,
+  prompt: `You are a Professional Presentation Consultant. Create a detailed, high-impact slide outline for the following topic.
+  
+  TOPIC:
+  {{{topic}}}
+  
+  CUSTOM INSTRUCTIONS:
+  {{{instructions}}}
+  
+  GUIDELINES:
+  1. Each slide must have a compelling title.
+  2. Content should be organized into 3-5 clear, distinct bullet points.
+  3. Flow logically from Introduction to Conclusion.
+  4. Ensure the content is structured for professional impact.`,
 });
 
 export async function generatePresentation(input: PresentationInput): Promise<PresentationOutput> {
@@ -36,11 +48,11 @@ export async function generatePresentation(input: PresentationInput): Promise<Pr
   } catch (error) {
     return {
       slides: [
-        { title: `Introduction to ${input.topic}`, content: ["Overview of the concept", "Key industry trends", "Current market landscape"] },
-        { title: "Core Objectives", content: ["Goal 1: Customer Reach", "Goal 2: Brand Awareness", "Goal 3: Strategic Growth"] },
-        { title: "Technical Architecture", content: ["System design overview", "Scalability considerations", "Security and privacy"] },
-        { title: "Implementation Roadmap", content: ["Phase 1: Research", "Phase 2: Development", "Phase 3: Launch"] },
-        { title: "Conclusion & Next Steps", content: ["Summary of key findings", "Call to action", "Contact information"] },
+        { title: `Executive Summary: ${input.topic}`, content: ["High-level objectives and goals", "Current market landscape analysis", "Key value propositions"] },
+        { title: "Strategic Challenges", content: ["Identification of primary hurdles", "Risk mitigation strategies", "Competitive landscape shifts"] },
+        { title: "Operational Roadmap", content: ["Phase 1: Implementation & Design", "Phase 2: Growth & Scaling", "Phase 3: Optimization & Review"] },
+        { title: "Key Performance Metrics", content: ["Success criteria definition", "Timeline for milestone achievement", "Resource allocation planning"] },
+        { title: "Conclusion & Call to Action", content: ["Summary of strategic advantages", "Immediate next steps", "Contact and support details"] },
       ]
     };
   }
