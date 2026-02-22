@@ -6,6 +6,7 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { gemini15Flash } from '@genkit-ai/google-genai';
 import type { BiReportInput, BiReportOutput } from '../schemas';
 
 const BiReportInputSchema = z.object({
@@ -24,7 +25,7 @@ const BiReportOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'biReportPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: gemini15Flash,
   input: { schema: BiReportInputSchema },
   output: { schema: BiReportOutputSchema },
   prompt: `You are a professional Business Intelligence Analyst.

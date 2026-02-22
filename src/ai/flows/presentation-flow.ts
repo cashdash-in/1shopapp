@@ -6,6 +6,7 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { gemini15Flash } from '@genkit-ai/google-genai';
 import type { PresentationInput, PresentationOutput } from '../schemas';
 
 const PresentationInputSchema = z.object({
@@ -22,7 +23,7 @@ const PresentationOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'presentationPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: gemini15Flash,
   input: { schema: PresentationInputSchema },
   output: { schema: PresentationOutputSchema },
   prompt: `You are a professional presentation designer.

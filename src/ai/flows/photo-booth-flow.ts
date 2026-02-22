@@ -1,10 +1,11 @@
 'use server';
 /**
- * @fileOverview A flow for applying styles to photos using Gemini 1.5 Flash.
+ * @fileOverview A flow for applying styles to photos using Gemini 2.0 Flash.
  * - runPhotoBooth - A function that takes an image and a style and returns a new image.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { gemini20Flash } from '@genkit-ai/google-genai';
 import type { PhotoBoothInput, PhotoBoothOutput } from '../schemas';
 
 const PhotoBoothInputSchema = z.object({
@@ -30,7 +31,7 @@ const photoBoothFlow = ai.defineFlow(
   },
   async (input) => {
     const { media } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
+      model: gemini20Flash,
       prompt: [
         { media: { url: input.photoDataUri } },
         { text: `Re-imagine this image in a ${input.style} artistic style. Maintain the main subjects and composition but transform the aesthetic completely. Output the result as an image.` },

@@ -6,6 +6,7 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { gemini15Flash } from '@genkit-ai/google-genai';
 import type { DataAnalysisInput, DataAnalysisOutput } from '../schemas';
 
 const DataAnalysisInputSchema = z.object({
@@ -20,7 +21,7 @@ const DataAnalysisOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'dataAnalysisPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: gemini15Flash,
   input: { schema: DataAnalysisInputSchema },
   output: { schema: DataAnalysisOutputSchema },
   prompt: `You are an expert Data Scientist.
