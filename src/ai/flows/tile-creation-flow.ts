@@ -22,7 +22,7 @@ export type TileCreationOutput = z.infer<typeof TileCreationOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'tileCreationPrompt',
-  model: 'gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: TileCreationInputSchema },
   output: { schema: TileCreationOutputSchema },
   prompt: `You are a design assistant for 1ShopApp. 

@@ -20,7 +20,7 @@ const ProductSearchOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'productSearchPrompt',
-  model: 'gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: ProductSearchInputSchema },
   output: { schema: ProductSearchOutputSchema },
   prompt: `You are an AI e-commerce assistant for 1ShopApp, a one-stop app for Indian consumers.
