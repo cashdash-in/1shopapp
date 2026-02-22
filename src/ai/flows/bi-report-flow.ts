@@ -8,7 +8,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { BiReportInput, BiReportOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash';
+const MODEL = 'googleai/gemini-1.5-flash-latest';
 
 const BiReportInputSchema = z.object({
   data: z.string().describe('The raw data (CSV or text) to analyze.'),

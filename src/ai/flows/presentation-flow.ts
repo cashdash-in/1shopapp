@@ -8,7 +8,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { PresentationInput, PresentationOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash';
+const MODEL = 'googleai/gemini-1.5-flash-latest';
 
 const PresentationInputSchema = z.object({
   topic: z.string().describe('The main topic of the presentation.'),

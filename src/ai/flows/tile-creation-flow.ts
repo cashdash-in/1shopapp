@@ -8,7 +8,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const MODEL = 'googleai/gemini-1.5-flash';
+const MODEL = 'googleai/gemini-1.5-flash-latest';
 
 const TileCreationInputSchema = z.object({
   url: z.string().describe('The URL of the website to create a tile for.'),

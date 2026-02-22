@@ -10,7 +10,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { ProductSearchInput, ProductSearchOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash';
+const MODEL = 'googleai/gemini-1.5-flash-latest';
 
 const ProductSearchInputSchema = z.object({
   query: z.string().describe('The user search query or brand name.'),

@@ -7,7 +7,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { PhotoBoothInput, PhotoBoothOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash';
+const MODEL = 'googleai/gemini-1.5-flash-latest';
 
 const PhotoBoothInputSchema = z.object({
   photoDataUri: z.string().describe("A photo as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
@@ -31,7 +31,7 @@ const photoBoothFlow = ai.defineFlow(
     outputSchema: PhotoBoothOutputSchema,
   },
   async (input) => {
-    // We use gemini-1.5-flash to process the image and provide a description.
+    // We use gemini-1.5-flash-latest to process the image and provide a description.
     // In a prototype environment, we return the original image as a placeholder 
     // to avoid modality errors while ensuring the API call itself is successful.
     await ai.generate({

@@ -8,7 +8,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { DataAnalysisInput, DataAnalysisOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash';
+const MODEL = 'googleai/gemini-1.5-flash-latest';
 
 const DataAnalysisInputSchema = z.object({
   data: z.string().describe('The raw text or CSV data to analyze.'),

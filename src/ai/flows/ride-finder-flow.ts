@@ -9,7 +9,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { RideFinderInput, RideFinderOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash';
+const MODEL = 'googleai/gemini-1.5-flash-latest';
 
 const RideFinderInputSchema = z.object({
   pickup: z.string().describe('The pickup location address.'),

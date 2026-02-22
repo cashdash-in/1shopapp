@@ -64,6 +64,9 @@
     "typescript": "^5"
   },
   "overrides": {
-    "genkit": "1.20.0"
+    "genkit": "1.20.0",
+    "@genkit-ai/google-genai": {
+      "genkit": "1.20.0"
+    }
   }
 }
