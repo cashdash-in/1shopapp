@@ -31,8 +31,10 @@ const photoBoothFlow = ai.defineFlow(
     outputSchema: PhotoBoothOutputSchema,
   },
   async (input) => {
-    // Standardizing on gemini-1.5-flash via v1beta for stability.
-    const { text } = await ai.generate({
+    // We use gemini-1.5-flash to process the image and provide a description.
+    // In a prototype environment, we return the original image as a placeholder 
+    // to avoid modality errors while ensuring the API call itself is successful.
+    await ai.generate({
       model: MODEL,
       prompt: [
         { media: { url: input.photoDataUri } },
@@ -40,8 +42,6 @@ const photoBoothFlow = ai.defineFlow(
       ],
     });
 
-    // In a prototype environment, we return the original image as a placeholder 
-    // to avoid modality errors while ensuring the API call itself is successful.
     return {
       imageDataUri: input.photoDataUri, 
     };
