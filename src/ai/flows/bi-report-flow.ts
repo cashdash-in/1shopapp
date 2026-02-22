@@ -1,12 +1,12 @@
 'use server';
 /**
- * @fileOverview A flow for generating Business Intelligence reports with fallback.
+ * @fileOverview A flow for generating Business Intelligence reports with robust fallback.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { BiReportInput, BiReportOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 const BiReportInputSchema = z.object({
   data: z.string(),
@@ -36,9 +36,10 @@ export async function generateBiReport(input: BiReportInput): Promise<BiReportOu
     if (!output) throw new Error('AI Error');
     return output;
   } catch (error) {
+    console.warn("BI Report AI failed, using simulation:", error);
     return {
-      title: "Simulated Performance Report",
-      summary: "Based on the provided data, there is a clear upward trend in regional engagement.",
+      title: "Simulated Performance Insights",
+      summary: "Based on the provided data context, there is a clear upward trend in regional engagement and category performance.",
       chartData: [
         { name: 'North', value: 450 },
         { name: 'South', value: 320 },

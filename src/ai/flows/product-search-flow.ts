@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview A flow for intelligent product search and recommendations using AI.
+ * @fileOverview A flow for intelligent product search and recommendations with simulation fallback.
  *
  * - searchProducts - A function that suggests products or brands based on a query.
  */
@@ -10,7 +10,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { ProductSearchInput, ProductSearchOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 const ProductSearchInputSchema = z.object({
   query: z.string().describe('The user search query or brand name.'),
@@ -36,21 +36,33 @@ const prompt = ai.definePrompt({
   Keep suggestions short and formatted for a list display.`,
 });
 
-const productSearchFlow = ai.defineFlow(
-  {
-    name: 'productSearchFlow',
-    inputSchema: ProductSearchInputSchema,
-    outputSchema: ProductSearchOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt(input);
-    if (!output) throw new Error('AI failed to generate search recommendations.');
-    return output;
-  }
-);
-
 export async function searchProducts(
   input: ProductSearchInput
 ): Promise<ProductSearchOutput> {
-  return productSearchFlow(input);
+  try {
+    const { output } = await prompt(input);
+    if (!output) throw new Error('AI Error');
+    return output;
+  } catch (error) {
+    console.warn("Product Search AI failed, using simulation:", error);
+    const q = input.query.toLowerCase();
+    
+    if (q.includes('shoes') || q.includes('nike') || q.includes('fashion')) {
+        return { results: ["Nike Air Max", "Adidas Ultraboost", "Puma Lifestyle Sneakers", "Myntra Fashion Deals", "Ajio Trends", "Skechers Walkers"] };
+    }
+    
+    if (q.includes('iphone') || q.includes('mobile') || q.includes('tech')) {
+        return { results: ["iPhone 15 Pro", "Samsung Galaxy S24 Ultra", "OnePlus 12", "Croma Tech Offers", "Flipkart Mobile Sale", "Amazon Prime Exclusive Tech"] };
+    }
+
+    return { 
+        results: [
+            `Top rated ${input.query} brands`, 
+            `Budget-friendly ${input.query} options`, 
+            `Latest ${input.query} arrivals`, 
+            "Blinkit 10-min delivery items", 
+            "Amazon Bestsellers in this category"
+        ] 
+    };
+  }
 }

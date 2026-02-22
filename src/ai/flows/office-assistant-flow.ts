@@ -12,7 +12,7 @@ import type {
   TaskPrepInput, TaskPrepOutput
 } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 // --- Meeting Flow ---
 
@@ -42,11 +42,12 @@ export async function processMeeting(input: MeetingInput): Promise<MeetingOutput
     if (!output) throw new Error('AI Error');
     return output;
   } catch (error) {
+    console.warn("Meeting AI failed, using simulation:", error);
     return {
-      summary: "Simulation: Strategic planning sync regarding upcoming product release.",
-      mom: "# Minutes of Meeting\n\n**Participants:** Team A\n**Topic:** Product Launch\n\n1. Reviewed current progress.\n2. Identified blockers in design.\n3. Confirmed timeline for Q4.",
-      actionItems: ["Finalize UI assets by Friday", "Sync with marketing on budget", "Update internal wiki"],
-      keyDecisions: ["Proceed with October launch", "Approve increase in social media spend"]
+      summary: "Simulation: Strategic planning sync regarding upcoming product release and operational alignment.",
+      mom: "# Minutes of Meeting\n\n**Participants:** Strategic Planning Team\n**Topic:** Product Launch & Roadmapping\n\n1. Reviewed current sprint progress.\n2. Identified primary design bottlenecks.\n3. Confirmed go-to-market timeline for next quarter.",
+      actionItems: ["Finalize UI assets by end of week", "Sync with marketing on H2 budget", "Update internal stakeholder wiki"],
+      keyDecisions: ["Proceed with October launch phase", "Approve increase in regional social media spend"]
     };
   }
 }
@@ -83,11 +84,12 @@ export async function analyzeBudget(input: BudgetInput): Promise<BudgetOutput> {
     if (!output) throw new Error('AI Error');
     return output;
   } catch (error) {
+    console.warn("Budget AI failed, using simulation:", error);
     return {
-      analysis: "Simulation: Spending is concentrated in Operations and Marketing.",
-      spendingSummary: [{ category: 'Ops', amount: 5000 }, { category: 'Marketing', amount: 3000 }],
-      forecast: "Spend is projected to stay within 10% of total provisions.",
-      savingTips: ["Audit recurring subscriptions", "Negotiate vendor rates"]
+      analysis: "Simulation: Spending is currently optimized across Operations and Marketing channels.",
+      spendingSummary: [{ category: 'Ops', amount: 5000 }, { category: 'Marketing', amount: 3000 }, { category: 'Tech', amount: 1500 }],
+      forecast: "Spend is projected to stay within 10% of total allocated provisions based on current velocity.",
+      savingTips: ["Audit monthly recurring software subscriptions", "Negotiate bulk vendor rates for Q4"]
     };
   }
 }
@@ -122,10 +124,11 @@ export async function reviewCalendar(input: CalendarInput): Promise<CalendarOutp
     if (!output) throw new Error('AI Error');
     return output;
   } catch (error) {
+    console.warn("Calendar AI failed, using simulation:", error);
     return {
-      review: "Simulation: Your morning is packed, but afternoon has space for focused work.",
-      priorities: ["Client presentation prep", "Budget review", "Inbox zero"],
-      prepNeeded: [{ meetingTitle: "Weekly Sync", prepNotes: "Review last week's KPI report." }]
+      review: "Simulation: Your morning is densely packed with high-value meetings, but the afternoon has significant space for deep work.",
+      priorities: ["Major client presentation prep", "Q3 Budget review", "Inbox zero management"],
+      prepNeeded: [{ meetingTitle: "Weekly Strategic Sync", prepNotes: "Briefly review last week's KPI performance report to share updates." }]
     };
   }
 }
@@ -156,9 +159,10 @@ export async function prepareTask(input: TaskPrepInput): Promise<TaskPrepOutput>
     if (!output) throw new Error('AI Error');
     return output;
   } catch (error) {
+    console.warn("Task Prep AI failed, using simulation:", error);
     return {
-      draft: `Simulation: Dear Team,\n\nI am writing to initiate the ${input.taskDescription} phase. Let's align on next steps.\n\nBest,\nOffice Assistant`,
-      checklist: ["Outline key objectives", "Identify stakeholders", "Set deadline"]
+      draft: `Simulation: Dear Team,\n\nI am writing to initiate the ${input.taskDescription} phase. Let's align on next steps to ensure we hit our milestones.\n\nBest regards,\nOffice Assistant`,
+      checklist: ["Outline primary objectives", "Identify key internal stakeholders", "Set firm internal deadline"]
     };
   }
 }

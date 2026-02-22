@@ -9,7 +9,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import type { RideFinderInput, RideFinderOutput } from '../schemas';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 const RideFinderInputSchema = z.object({
   pickup: z.string().describe('The pickup location address.'),
@@ -47,43 +47,32 @@ const prompt = ai.definePrompt({
   Return a structured list of options and traffic alerts.`,
 });
 
-const rideFinderFlow = ai.defineFlow(
-  {
-    name: 'rideFinderFlow',
-    inputSchema: RideFinderInputSchema,
-    outputSchema: RideFinderOutputSchema,
-  },
-  async (input) => {
-    try {
-      const { output } = await prompt(input);
-      if (!output) throw new Error('AI failed to generate ride estimates.');
-      return output;
-    } catch (error) {
-      console.warn("AI Ride Finder failed, using intelligent simulation:", error);
-      // Robust Fallback Simulation
-      return {
-        options: [
-          { service: 'Uber', vehicleType: 'Auto', eta: '4 min', fare: '₹85', surge: false },
-          { service: 'Uber', vehicleType: 'Uber Go', eta: '6 min', fare: '₹145', surge: true },
-          { service: 'Ola', vehicleType: 'Auto', eta: '3 min', fare: '₹82', surge: false },
-          { service: 'Ola', vehicleType: 'Mini', eta: '5 min', fare: '₹138', surge: false },
-          { service: 'Rapido', vehicleType: 'Bike', eta: '2 min', fare: '₹45', surge: false },
-          { service: 'inDrive', vehicleType: 'Cab', eta: '8 min', fare: '₹120', surge: false },
-        ],
-        trafficAlerts: [
-          `Moderate traffic reported near ${input.pickup}.`,
-          "Road construction causing 5 min delay on main junction.",
-          `Smooth flow expected towards ${input.dropoff}.`,
-          "Cloudy weather may increase ride demand soon."
-        ]
-      };
-    }
-  }
-);
-
 export async function findRides(input: RideFinderInput): Promise<RideFinderOutput> {
-  return rideFinderFlow({
-    ...input,
-    currentTime: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-  });
+  try {
+    const { output } = await prompt({
+        ...input,
+        currentTime: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+    });
+    if (!output) throw new Error('AI failed to generate ride estimates.');
+    return output;
+  } catch (error) {
+    console.warn("AI Ride Finder failed, using intelligent simulation:", error);
+    // Robust Fallback Simulation
+    return {
+      options: [
+        { service: 'Uber', vehicleType: 'Auto', eta: '4 min', fare: '₹85', surge: false },
+        { service: 'Uber', vehicleType: 'Uber Go', eta: '6 min', fare: '₹145', surge: true },
+        { service: 'Ola', vehicleType: 'Auto', eta: '3 min', fare: '₹82', surge: false },
+        { service: 'Ola', vehicleType: 'Mini', eta: '5 min', fare: '₹138', surge: false },
+        { service: 'Rapido', vehicleType: 'Bike', eta: '2 min', fare: '₹45', surge: false },
+        { service: 'inDrive', vehicleType: 'Cab', eta: '8 min', fare: '₹120', surge: false },
+      ],
+      trafficAlerts: [
+        `Moderate traffic reported near ${input.pickup}.`,
+        "Road construction causing 5 min delay on main junction.",
+        `Smooth flow expected towards ${input.dropoff}.`,
+        "Cloudy weather may increase ride demand soon."
+      ]
+    };
+  }
 }

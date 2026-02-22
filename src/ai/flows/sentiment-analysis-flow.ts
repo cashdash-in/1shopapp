@@ -6,7 +6,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 const SentimentAnalysisInputSchema = z.object({
   text: z.string().describe('The feedback text to analyze.'),
@@ -39,8 +39,8 @@ export async function runSentimentAnalysis(input: SentimentAnalysisInput): Promi
     const isHighRating = input.rating >= 4;
     return {
       sentiment: isHighRating ? 'Positive' : (input.rating <= 2 ? 'Negative' : 'Neutral'),
-      categories: ["User Experience", "App General"],
-      summary: `User provided a ${input.rating}-star review with feedback: "${input.text.slice(0, 30)}..."`
+      categories: ["User Experience", "App Reliability"],
+      summary: `User provided a ${input.rating}-star review highlighting general application usage.`
     };
   }
 }

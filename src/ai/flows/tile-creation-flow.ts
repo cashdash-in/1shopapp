@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview A flow for generating tile metadata from a URL using Genkit.
+ * @fileOverview A flow for generating tile metadata from a URL using Genkit with simulation fallback.
  *
  * - generateTileMetadata - A function that takes a URL and returns a name, icon, and color.
  */
@@ -8,7 +8,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const MODEL = 'googleai/gemini-1.5-flash-latest';
+const MODEL = 'googleai/gemini-1.5-flash';
 
 const TileCreationInputSchema = z.object({
   url: z.string().describe('The URL of the website to create a tile for.'),
@@ -37,19 +37,23 @@ const prompt = ai.definePrompt({
   Lucide icons to pick from include: ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search, Building2, Ticket, Mail, Book, Briefcase, Film, Music, Globe, Home, Heart, Headphones, Camera, Cloud, Code, CreditCard, Database, DollarSign, Download, ExternalLink, File, Folder, Gift, Image, Instagram, Layout, Link, Lock, LogIn, LogOut, Map, MessageCircle, Monitor, Moon, MousePointer, Package, Palette, Phone, Play, Plus, Settings, Share2, Smile, Sun, Tag, Target, ThumbsUp, Trash2, TrendingUp, Twitter, Upload, Video, Wallet, Wifi, Youtube, Zap.`,
 });
 
-const tileCreationFlow = ai.defineFlow(
-  {
-    name: 'tileCreationFlow',
-    inputSchema: TileCreationInputSchema,
-    outputSchema: TileCreationOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt(input);
-    if (!output) throw new Error('AI failed to generate tile metadata.');
-    return output;
-  }
-);
-
 export async function generateTileMetadata(input: TileCreationInput): Promise<TileCreationOutput> {
-  return tileCreationFlow(input);
+  try {
+    const { output } = await prompt(input);
+    if (!output) throw new Error('AI Error');
+    return output;
+  } catch (error) {
+    console.warn("Tile Creation AI failed, using heuristics:", error);
+    let domain = "New App";
+    try {
+        domain = new URL(input.url).hostname.replace('www.', '').split('.')[0];
+        domain = domain.charAt(0).toUpperCase() + domain.slice(1);
+    } catch(e) {}
+    
+    return {
+      name: domain,
+      icon: 'Globe',
+      color: '#4285F4' // Standard blue
+    };
+  }
 }
