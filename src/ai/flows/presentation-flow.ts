@@ -22,7 +22,7 @@ const PresentationOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'presentationPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'gemini-1.5-flash',
   input: { schema: PresentationInputSchema },
   output: { schema: PresentationOutputSchema },
   prompt: `You are a professional presentation designer.
