@@ -181,7 +181,7 @@ const taskPrepPrompt = ai.definePrompt({
   model: MODEL,
   input: { schema: TaskPrepInputSchema },
   output: { schema: TaskPrepOutputSchema },
-  prompt: `You are a Management Consultant. Prepare a professional ${taskType} based on the following objective.
+  prompt: `You are a Management Consultant. Prepare a professional {{{type}}} based on the following objective.
   
   OBJECTIVE:
   {{{taskDescription}}}
