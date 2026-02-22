@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Loader2, Sparkles, Presentation, Copy, Download, FileType } from 'lucide-react';
+import { ArrowLeft, Loader2, Sparkles, Presentation, Copy, Download, FileType, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { generatePresentation } from '@/ai/flows/presentation-flow';
 import type { PresentationOutput } from '@/ai/schemas';
@@ -94,6 +94,35 @@ export default function PresentationGeneratorPage() {
         });
     }
 
+    const downloadWordOutline = () => {
+        if (!result) return;
+        const content = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <body style="font-family: Calibri, sans-serif; padding: 40px;">
+                <h1 style="color: #c43e1c; border-bottom: 2px solid #c43e1c;">Presentation Outline: ${topic.toUpperCase()}</h1>
+                <p><strong>Strategist:</strong> AI Presentation Assistant</p>
+                <p><strong>Status:</strong> High-Precision Draft</p>
+                <hr/>
+                ${result.slides.map((slide, i) => `
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="color: #2e74b5; margin-bottom: 5px;">Slide ${i + 1}: ${slide.title}</h2>
+                        <ul style="margin-top: 0;">
+                            ${slide.content.map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                `).join('')}
+            </body>
+            </html>
+        `;
+        const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${topic.toLowerCase().replace(/\s+/g, '-')}-outline.doc`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     const downloadPptxOutline = () => {
         if (!result) return;
         let content = `PRESENTATION OUTLINE: ${topic.toUpperCase()}\n`;
@@ -119,7 +148,7 @@ export default function PresentationGeneratorPage() {
         
         toast({
             title: "Outline Exported",
-            description: "Your presentation outline is ready for import into PowerPoint.",
+            description: "PPT structure ready for import.",
         });
     };
 
@@ -135,7 +164,7 @@ export default function PresentationGeneratorPage() {
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Presentation className="h-8 w-8 text-primary" />AI Professional Presentation Designer
                         </CardTitle>
-                        <CardDescription>Generate comprehensive slide outlines and export them for your next big meeting.</CardDescription>
+                        <CardDescription>Generate comprehensive slide decks and export them as MS Word or PPT outlines.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -152,7 +181,7 @@ export default function PresentationGeneratorPage() {
                                 id="topic"
                                 value={topic}
                                 onChange={(e) => setTopic(e.target.value)}
-                                placeholder="e.g., 'Strategic Expansion Plan for Q4'"
+                                placeholder="e.g., 'Q4 Market Disruption & Scalability Strategy'"
                                 disabled={loading}
                             />
                         </div>
@@ -162,7 +191,7 @@ export default function PresentationGeneratorPage() {
                                 id="instructions"
                                 value={instructions}
                                 onChange={(e) => setInstructions(e.target.value)}
-                                placeholder="e.g., 'Include slides on market risks, budget allocation, and team milestones.'"
+                                placeholder="e.g., 'Strict focus on ROI metrics, vendor risk assessment, and technical implementation roadmap.'"
                                 disabled={loading}
                             />
                         </div>
@@ -170,16 +199,21 @@ export default function PresentationGeneratorPage() {
 
                     <Button onClick={handleGenerate} disabled={loading} className="w-full text-lg h-12">
                         {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-                        {loading ? 'Crafting Professional Slides...' : 'Generate Presentation Outline'}
+                        {loading ? 'Crafting Strategic Slides...' : 'Generate Slide Deck Outline'}
                     </Button>
                 
                     {result && (
                          <div className="space-y-6 pt-6 border-t">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between flex-wrap gap-2">
                                 <h2 className="text-2xl font-bold">Slide Deck Preview</h2>
-                                <Button variant="outline" size="sm" onClick={downloadPptxOutline}>
-                                    <Download className="mr-2 h-4 w-4" /> Export to PPT Outline
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" size="sm" onClick={downloadWordOutline}>
+                                        <FileText className="mr-2 h-4 w-4 text-blue-500" /> MS Word
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={downloadPptxOutline}>
+                                        <Download className="mr-2 h-4 w-4 text-orange-500" /> PPT Outline
+                                    </Button>
+                                </div>
                             </div>
                             {result.slides.map((slide, index) => (
                                 <Card key={index} className="bg-secondary/50 border-primary/5">

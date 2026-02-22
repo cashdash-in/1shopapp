@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import React, { useState, useRef } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Loader2, Sparkles, BarChart3, Bot, Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { ArrowLeft, Loader2, Sparkles, BarChart3, Bot, Download, FileText, FileSpreadsheet, Upload, FileJson } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeData } from '@/ai/flows/data-analysis-flow';
 import type { DataAnalysisOutput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import * as XLSX from 'xlsx';
 
 export default function DataAnalystPage() {
     const { toast } = useToast();
@@ -19,6 +20,29 @@ export default function DataAnalystPage() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<DataAnalysisOutput | null>(null);
     const [aiError, setAiError] = useState('');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            try {
+                const bstr = evt.target?.result;
+                const wb = XLSX.read(bstr, { type: 'binary' });
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const csv = XLSX.utils.sheet_to_csv(ws);
+                setData(csv);
+                toast({ title: "File Uploaded", description: `${file.name} has been processed.` });
+            } catch (err) {
+                console.error("File processing error:", err);
+                toast({ variant: 'destructive', title: "Upload Failed", description: "Could not read the file. Please ensure it's a valid Excel or CSV." });
+            }
+        };
+        reader.readAsBinaryString(file);
+    };
 
     const handleAnalyze = async () => {
         if (!data.trim() || !question.trim()) {
@@ -45,35 +69,46 @@ export default function DataAnalystPage() {
         }
     };
 
-    const downloadTxt = () => {
+    const downloadWord = () => {
         if (!result) return;
-        const blob = new Blob([result.summary, '\n\n', result.data || ''], { type: 'text/plain' });
+        const content = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>AI Analysis Report</title></head>
+            <body style="font-family: Arial, sans-serif;">
+                <h1>AI High-Precision Analysis Report</h1>
+                <p><strong>Generated on:</strong> ${new Date().toLocaleString()}</p>
+                <hr/>
+                <h2>Executive Summary</h2>
+                <p style="white-space: pre-wrap;">${result.summary}</p>
+                ${result.data ? `<h2>Calculated Data Table</h2><pre>${result.data}</pre>` : ''}
+            </body>
+            </html>
+        `;
+        const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'ai-analysis-report.txt';
+        a.download = 'ai-analysis-report.doc';
         a.click();
         URL.revokeObjectURL(url);
     };
 
-    const downloadCsv = () => {
+    const downloadExcel = () => {
         if (!result?.data) return;
-        // Simple conversion from MD table to CSV
-        const rows = result.data.trim().split('\n').filter(r => r.includes('|') && !r.includes('---'));
-        const csvContent = rows.map(row => {
-            return row.split('|')
-                .map(cell => cell.trim())
-                .filter((_, i, arr) => i > 0 && i < arr.length - 1)
-                .join(',');
-        }).join('\n');
-
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'ai-analysis-data.csv';
-        a.click();
-        URL.revokeObjectURL(url);
+        try {
+            const rows = result.data.trim().split('\n').filter(r => r.includes('|') && !r.includes('---'));
+            const wsData = rows.map(row => {
+                return row.split('|')
+                    .map(cell => cell.trim())
+                    .filter((_, i, arr) => i > 0 && i < arr.length - 1);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "AI Results");
+            XLSX.writeFile(wb, 'ai-analysis-data.xlsx');
+        } catch (e) {
+            toast({ variant: 'destructive', title: "Excel Export Failed" });
+        }
     };
     
     const renderMarkdownTable = (markdown: string) => {
@@ -128,7 +163,7 @@ export default function DataAnalystPage() {
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <BarChart3 className="h-8 w-8 text-primary" />AI High-Precision Data Analyst
                         </CardTitle>
-                        <CardDescription>Paste your data, ask a question, and get professional-grade insights and documents.</CardDescription>
+                        <CardDescription>Upload Excel files or paste data, ask a question, and get professional-grade MS documents.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -138,25 +173,33 @@ export default function DataAnalystPage() {
                             <AlertDescription>{aiError}</AlertDescription>
                         </Alert>
                     )}
+                    
+                    <div className="flex justify-end">
+                        <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".xlsx,.xls,.csv" />
+                        <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                            <Upload className="mr-2 h-4 w-4" /> Upload Excel / CSV
+                        </Button>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="data">1. Paste your data (CSV or text)</Label>
+                            <Label htmlFor="data">1. Data Context</Label>
                             <Textarea
                                 id="data"
                                 value={data}
                                 onChange={(e) => setData(e.target.value)}
-                                placeholder="Example:&#10;Product,Sales,Region&#10;Laptop,5000,North&#10;Mouse,1200,South"
+                                placeholder="Paste data or upload a file above..."
                                 disabled={loading}
                                 rows={8}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="question">2. Ask a question about your data</Label>
+                            <Label htmlFor="question">2. Analysis Requirement</Label>
                             <Textarea
                                 id="question"
                                 value={question}
                                 onChange={(e) => setQuestion(e.target.value)}
-                                placeholder="Example: 'Analyze the growth trend and output a precision summary.'"
+                                placeholder="Example: 'Analyze the growth trend and output a precision summary with exact metrics.'"
                                 disabled={loading}
                                 rows={8}
                             />
@@ -170,15 +213,15 @@ export default function DataAnalystPage() {
                 
                     {result && (
                          <div className="space-y-4 pt-6 border-t">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-2xl font-bold">Analysis Result</h2>
+                            <div className="flex items-center justify-between flex-wrap gap-2">
+                                <h2 className="text-2xl font-bold">Analysis Results</h2>
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" onClick={downloadTxt}>
-                                        <FileText className="mr-2 h-4 w-4" /> Download Report
+                                    <Button variant="outline" size="sm" onClick={downloadWord}>
+                                        <FileText className="mr-2 h-4 w-4 text-blue-500" /> MS Word
                                     </Button>
                                     {result.data && (
-                                        <Button variant="outline" size="sm" onClick={downloadCsv}>
-                                            <FileSpreadsheet className="mr-2 h-4 w-4" /> Download CSV
+                                        <Button variant="outline" size="sm" onClick={downloadExcel}>
+                                            <FileSpreadsheet className="mr-2 h-4 w-4 text-green-500" /> MS Excel
                                         </Button>
                                     )}
                                 </div>
@@ -194,7 +237,7 @@ export default function DataAnalystPage() {
                             {result.data && (
                                  <Card>
                                     <CardHeader>
-                                        <CardTitle>Calculated Data</CardTitle>
+                                        <CardTitle>Structured Findings</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         {renderMarkdownTable(result.data)}
