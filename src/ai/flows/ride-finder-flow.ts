@@ -30,7 +30,7 @@ const RideFinderOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'rideFinderPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: RideFinderInputSchema },
   output: { schema: RideFinderOutputSchema },
   prompt: `You are a real-time ride-sharing fare and traffic estimator for Indian cities.

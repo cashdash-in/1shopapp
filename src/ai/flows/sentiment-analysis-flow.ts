@@ -23,7 +23,7 @@ export type SentimentOutput = z.infer<typeof SentimentOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'sentimentAnalysisPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: SentimentAnalysisInputSchema },
   output: { schema: SentimentOutputSchema },
   prompt: `Analyze the following user feedback for a mobile app aggregator named 1ShopApp.

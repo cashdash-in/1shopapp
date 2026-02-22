@@ -20,7 +20,7 @@ const DataAnalysisOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'dataAnalysisPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: DataAnalysisInputSchema },
   output: { schema: DataAnalysisOutputSchema },
   prompt: `You are an expert Data Scientist.

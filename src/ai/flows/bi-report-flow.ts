@@ -24,7 +24,7 @@ const BiReportOutputSchema = z.object({
 
 const prompt = ai.definePrompt({
   name: 'biReportPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: BiReportInputSchema },
   output: { schema: BiReportOutputSchema },
   prompt: `You are a professional Business Intelligence Analyst.
