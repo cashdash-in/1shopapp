@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview AI flows for the Personal Office Assistant.
@@ -6,6 +5,7 @@
  * - processMeeting - Generates MOM and action items from a transcript.
  * - analyzeBudget - Tracks spending and provides forecasts.
  * - reviewCalendar - Analyzes schedules and identifies priorities.
+ * - prepareTask - Drafts emails, reports, or plans for upcoming office work.
  */
 
 import { ai } from '@/ai/genkit';
@@ -13,8 +13,11 @@ import { z } from 'genkit';
 import type { 
   MeetingInput, MeetingOutput, 
   BudgetInput, BudgetOutput, 
-  CalendarInput, CalendarOutput 
+  CalendarInput, CalendarOutput,
+  TaskPrepInput, TaskPrepOutput
 } from '../schemas';
+
+const MODEL = 'googleai/gemini-1.5-flash';
 
 // --- Meeting Flow ---
 
@@ -32,7 +35,7 @@ const MeetingOutputSchema = z.object({
 
 const meetingPrompt = ai.definePrompt({
   name: 'meetingPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: MODEL,
   input: { schema: MeetingInputSchema },
   output: { schema: MeetingOutputSchema },
   prompt: `You are a professional executive assistant.
@@ -43,21 +46,10 @@ const meetingPrompt = ai.definePrompt({
     Generate a concise summary, a formal Minutes of Meeting (MOM), and extract all actionable tasks and key decisions.`,
 });
 
-const processMeetingFlow = ai.defineFlow(
-  {
-    name: 'processMeetingFlow',
-    inputSchema: MeetingInputSchema,
-    outputSchema: MeetingOutputSchema,
-  },
-  async (input) => {
-    const { output } = await meetingPrompt(input);
-    if (!output) throw new Error('AI failed to process meeting notes.');
-    return output;
-  }
-);
-
 export async function processMeeting(input: MeetingInput): Promise<MeetingOutput> {
-  return processMeetingFlow(input);
+  const { output } = await meetingPrompt(input);
+  if (!output) throw new Error('AI failed to process meeting notes.');
+  return output;
 }
 
 // --- Budget Flow ---
@@ -80,7 +72,7 @@ const BudgetOutputSchema = z.object({
 
 const budgetPrompt = ai.definePrompt({
   name: 'budgetPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: MODEL,
   input: { schema: BudgetInputSchema },
   output: { schema: BudgetOutputSchema },
   prompt: `You are a financial analyst. 
@@ -91,21 +83,10 @@ const budgetPrompt = ai.definePrompt({
     Provide a detailed breakdown of spending by category, an analysis of current trends, a realistic forecast for the next period, and practical tips to save or optimize.`,
 });
 
-const analyzeBudgetFlow = ai.defineFlow(
-  {
-    name: 'analyzeBudgetFlow',
-    inputSchema: BudgetInputSchema,
-    outputSchema: BudgetOutputSchema,
-  },
-  async (input) => {
-    const { output } = await budgetPrompt(input);
-    if (!output) throw new Error('AI failed to analyze budget.');
-    return output;
-  }
-);
-
 export async function analyzeBudget(input: BudgetInput): Promise<BudgetOutput> {
-  return analyzeBudgetFlow(input);
+  const { output } = await budgetPrompt(input);
+  if (!output) throw new Error('AI failed to analyze budget.');
+  return output;
 }
 
 // --- Calendar Flow ---
@@ -126,7 +107,7 @@ const CalendarOutputSchema = z.object({
 
 const calendarPrompt = ai.definePrompt({
   name: 'calendarPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: MODEL,
   input: { schema: CalendarInputSchema },
   output: { schema: CalendarOutputSchema },
   prompt: `You are a productivity coach. 
@@ -136,19 +117,39 @@ const calendarPrompt = ai.definePrompt({
     Identify the most important priorities, provide an overall review of the schedule (look for conflicts or tight gaps), and list specific preparation notes for the important meetings.`,
 });
 
-const reviewCalendarFlow = ai.defineFlow(
-  {
-    name: 'reviewCalendarFlow',
-    inputSchema: CalendarInputSchema,
-    outputSchema: CalendarOutputSchema,
-  },
-  async (input) => {
-    const { output } = await calendarPrompt(input);
-    if (!output) throw new Error('AI failed to review calendar.');
-    return output;
-  }
-);
-
 export async function reviewCalendar(input: CalendarInput): Promise<CalendarOutput> {
-  return reviewCalendarFlow(input);
+  const { output } = await calendarPrompt(input);
+  if (!output) throw new Error('AI failed to review calendar.');
+  return output;
+}
+
+// --- Task Preparation Flow ---
+
+const TaskPrepInputSchema = z.object({
+  taskDescription: z.string().describe('The task or goal to prepare for.'),
+  type: z.enum(['email', 'report', 'plan', 'analysis']).describe('The format of the draft.'),
+});
+
+const TaskPrepOutputSchema = z.object({
+  draft: z.string().describe('A high-quality draft of the email, report, or plan.'),
+  checklist: z.array(z.string()).describe('A checklist of sub-tasks to complete.'),
+});
+
+const taskPrepPrompt = ai.definePrompt({
+  name: 'taskPrepPrompt',
+  model: MODEL,
+  input: { schema: TaskPrepInputSchema },
+  output: { schema: TaskPrepOutputSchema },
+  prompt: `You are a highly efficient office chief of staff. 
+    Prepare a draft for the following task:
+    Task Description: {{{taskDescription}}}
+    Type: {{{type}}}
+    
+    Create a professional draft and a detailed checklist of items to consider or complete to finish the task successfully.`,
+});
+
+export async function prepareTask(input: TaskPrepInput): Promise<TaskPrepOutput> {
+  const { output } = await taskPrepPrompt(input);
+  if (!output) throw new Error('AI failed to prepare task.');
+  return output;
 }

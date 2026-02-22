@@ -211,3 +211,13 @@ export type CalendarOutput = {
   priorities: string[];
   prepNeeded: { meetingTitle: string; prepNotes: string }[];
 };
+
+export type TaskPrepInput = {
+  taskDescription: string;
+  type: 'email' | 'report' | 'plan' | 'analysis';
+};
+
+export type TaskPrepOutput = {
+  draft: string;
+  checklist: string[];
+};

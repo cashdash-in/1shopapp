@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A sentiment analysis flow using Genkit.
@@ -29,7 +28,7 @@ const prompt = ai.definePrompt({
   output: { schema: SentimentOutputSchema },
   prompt: `Analyze the following user feedback for a mobile app aggregator named 1ShopApp.
   
-  Feedback: "{{text}}"
+  Feedback: "{{{text}}}"
   Rating: {{rating}} stars
   
   Identify the overall sentiment, the relevant categories, and provide a concise summary.`,

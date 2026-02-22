@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A flow for generating tile metadata from a URL using Genkit.
@@ -28,7 +27,7 @@ const prompt = ai.definePrompt({
   output: { schema: TileCreationOutputSchema },
   prompt: `You are a design assistant for 1ShopApp. 
   
-  Given the URL: {{url}}
+  Given the URL: {{{url}}}
   
   Suggest a Tile Name, a Lucide Icon name, and a Hex Color that represents this brand. 
   Try to find the actual brand name from the URL if possible.
