@@ -9,7 +9,6 @@ import {
   ArrowLeft, Loader2, Search, Landmark, Droplets,
   Wifi, LineChart, Globe, Sparkles, ArrowUpRight, Target, ShieldAlert
 } from 'lucide-react';
-import Link from 'next/navigation'; // Changed from 'next/link' to prevent full page reloads if needed
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
 import type { MarketIndicatorOutput } from '@/ai/schemas';
@@ -17,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import Link from 'next/link';
 
 // --- Symbol Mapper for Common Indian Stocks ---
 const mapSymbol = (input: string) => {
@@ -27,6 +27,7 @@ const mapSymbol = (input: string) => {
         'PARADEEP': 'NSE:PARADEEP',
         'PARADEEP PHOSPHATES': 'NSE:PARADEEP',
         'PARADEEP PHOSPHATE': 'NSE:PARADEEP',
+        'PPL': 'NSE:PARADEEP',
         'HDFC': 'NSE:HDFCBANK',
         'HDFC BANK': 'NSE:HDFCBANK',
         'TATA MOTORS': 'NSE:TATAMOTORS',
@@ -39,7 +40,6 @@ const mapSymbol = (input: string) => {
         'TCS': 'NSE:TCS',
         'ZOMATO': 'NSE:ZOMATO',
         'SWIGGY': 'NSE:SWIGGY',
-        'PPL': 'NSE:PARADEEP',
     };
 
     if (mapping[clean]) return mapping[clean];
@@ -126,10 +126,10 @@ export default function MarketIndicatorPage() {
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
             <Card className="w-full max-w-7xl border-primary/10 shadow-2xl">
                 <CardHeader className="relative">
-                    <a href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-muted">
+                    <Link href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-muted">
                         <ArrowLeft className="h-5 w-5 text-muted-foreground" />
                         <span className="sr-only">Back to Home</span>
-                    </a>
+                    </Link>
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
                             <Badge variant="outline" className="text-green-500 border-green-500/20 bg-green-500/5 animate-pulse">
@@ -174,7 +174,7 @@ export default function MarketIndicatorPage() {
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div className="xl:col-span-2 h-[500px]">
                             <Card className="h-full overflow-hidden border-primary/5">
-                                {/* Use key to force full component remount on symbol change */}
+                                {/* Using activeSymbol as key forces TradingView to remount and show the CORRECT stock */}
                                 <TradingViewWidget key={activeSymbol} symbol={activeSymbol} />
                             </Card>
                         </div>
@@ -201,7 +201,7 @@ export default function MarketIndicatorPage() {
                                                     "text-xl px-6 py-2 shadow-lg",
                                                     result.verdict === 'Buy' ? "bg-green-600 hover:bg-green-500" : result.verdict === 'Sell' ? "bg-red-600 hover:bg-red-500" : "bg-amber-600 hover:bg-amber-500"
                                                 )}>
-                                                    {result.verdict.toUpperCase()}
+                                                    {result.verdict === 'Buy' ? 'BUY (LONG)' : result.verdict === 'Sell' ? 'SELL (SHORT)' : 'HOLD'}
                                                 </Badge>
                                             </div>
                                             <div className="mt-4 pt-4 border-t border-primary/10 flex justify-between items-end">
@@ -219,13 +219,13 @@ export default function MarketIndicatorPage() {
                                     <div className="grid grid-cols-1 gap-3">
                                         <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/5 border border-green-500/20">
                                             <div className="flex items-center gap-2 text-xs font-bold text-green-600">
-                                                <ArrowUpRight className="h-3 w-3" /> ENTRY
+                                                <ArrowUpRight className="h-3 w-3" /> EXACT ENTRY
                                             </div>
                                             <span className="font-mono font-black text-lg">{result.entryPrice}</span>
                                         </div>
                                         <div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
                                             <div className="flex items-center gap-2 text-xs font-bold text-blue-600">
-                                                <Target className="h-3 w-3" /> TARGET
+                                                <Target className="h-3 w-3" /> PROFIT TARGET
                                             </div>
                                             <span className="font-mono font-black text-lg">{result.targetPrice}</span>
                                         </div>
