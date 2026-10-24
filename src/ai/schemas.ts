@@ -174,7 +174,7 @@ export type RideFinderOutput = {
   trafficAlerts?: string[];
 };
 
-// --- NEW OFFICE ASSISTANT SCHEMAS ---
+// --- OFFICE ASSISTANT SCHEMAS ---
 
 export type MeetingInput = {
   transcript: string;
@@ -220,4 +220,32 @@ export type TaskPrepInput = {
 export type TaskPrepOutput = {
   draft: string;
   checklist: string[];
+};
+
+// --- NEW MARKET INDICATOR SCHEMAS ---
+
+export type MarketIndicatorInput = {
+  symbol: string;
+};
+
+export type MarketIndicatorOutput = {
+  symbol: string;
+  verdict: 'Buy' | 'Sell' | 'Hold';
+  currentPrice: string;
+  entryPrice: string;
+  targetPrice: string;
+  stopLoss: string;
+  rsi: number;
+  macd: {
+    value: number;
+    signal: number;
+    histogram: number;
+  };
+  globalFactors: {
+    brentOil: string;
+    usMarketSentiment: string;
+    asianMarketStatus: string;
+  };
+  rationale: string;
+  analysisDate: string;
 };

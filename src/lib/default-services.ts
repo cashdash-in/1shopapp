@@ -1,8 +1,14 @@
 
 import type { Service } from '@/components/service-tile';
-import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search as SearchIcon, Building2, Ticket, Mail, Camera, Car } from 'lucide-react';
+import { ShoppingCart, UtensilsCrossed, Receipt, Plane, Shield, Landmark, Truck, Users, Newspaper, Search as SearchIcon, Building2, Ticket, Mail, Camera, Car, TrendingUp } from 'lucide-react';
 
 export const services: Service[] = [
+  {
+    name: 'Market Indicator',
+    icon: TrendingUp,
+    color: '#0D9488', // Teal
+    href: '/market-indicator',
+  },
   { 
     name: 'Shopping', 
     icon: ShoppingCart, 
