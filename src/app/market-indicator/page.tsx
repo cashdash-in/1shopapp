@@ -21,6 +21,34 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 
+// --- Symbol Mapper for Common Indian Stocks ---
+const mapSymbol = (input: string) => {
+    const clean = input.toUpperCase().trim();
+    const mapping: Record<string, string> = {
+        'RELIANCE': 'NSE:RELIANCE',
+        'RELIANCE INDUSTRIES': 'NSE:RELIANCE',
+        'PARADEEP': 'NSE:PARADEEP',
+        'PARADEEP PHOSPHATES': 'NSE:PARADEEP',
+        'PARADEEP PHOSPHATE': 'NSE:PARADEEP',
+        'HDFC': 'NSE:HDFCBANK',
+        'HDFC BANK': 'NSE:HDFCBANK',
+        'TATA MOTORS': 'NSE:TATAMOTORS',
+        'TATAMOTORS': 'NSE:TATAMOTORS',
+        'SBI': 'NSE:SBIN',
+        'STATE BANK': 'NSE:SBIN',
+        'SBIN': 'NSE:SBIN',
+        'INFY': 'NSE:INFY',
+        'INFOSYS': 'NSE:INFY',
+        'TCS': 'NSE:TCS',
+        'ZOMATO': 'NSE:ZOMATO',
+        'SWIGGY': 'NSE:SWIGGY',
+    };
+
+    if (mapping[clean]) return mapping[clean];
+    if (clean.includes(':')) return clean;
+    return `NSE:${clean}`;
+};
+
 // --- TradingView Widget Component ---
 const TradingViewWidget = ({ symbol }: { symbol: string }) => {
   const container = useRef<HTMLDivElement>(null);
@@ -36,8 +64,7 @@ const TradingViewWidget = ({ symbol }: { symbol: string }) => {
     script.type = "text/javascript";
     script.async = true;
     
-    // Normalize symbol for TradingView (NSE prefix for Indian stocks if no prefix provided)
-    const normalizedSymbol = symbol.toUpperCase().includes(':') ? symbol.toUpperCase() : `NSE:${symbol.toUpperCase()}`;
+    const normalizedSymbol = mapSymbol(symbol);
 
     script.innerHTML = JSON.stringify({
       "autosize": true,
@@ -131,7 +158,7 @@ export default function MarketIndicatorPage() {
                             id="symbol"
                             value={symbol}
                             onChange={(e) => setSymbol(e.target.value)}
-                            placeholder="Enter Stock (e.g., RELIANCE, HDFC, TATAMOTORS, TSLA)"
+                            placeholder="Enter Stock (e.g., RELIANCE, PARADEEP, TATAMOTORS, TSLA)"
                             className="h-14 text-lg pl-6 pr-32 rounded-full shadow-lg border-primary/20 bg-muted/30 focus:bg-background transition-all"
                             onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
                         />

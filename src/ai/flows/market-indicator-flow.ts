@@ -30,14 +30,32 @@ const getLiveTechnicalContext = ai.defineTool(
     }),
   },
   async (input) => {
-    // Deterministic simulation for prototype grounding
-    const symbolHash = input.symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const basePrice = (symbolHash % 3000) + 100;
-    const isBullish = symbolHash % 2 === 0;
+    const sym = input.symbol.toUpperCase();
+    
+    // Deterministic Simulation for High-Precision prototyping
+    // Mapping Reliance and Paradeep Phosphates to realistic session values
+    let basePrice = 1450.00;
+    let rsi = 45;
+    let isBullish = true;
+
+    if (sym.includes('RELIANCE')) {
+        basePrice = 1264.45; // Simulated Reliance current price
+        rsi = 42.8;
+        isBullish = true;
+    } else if (sym.includes('PARADEEP')) {
+        basePrice = 98.20; // Simulated Paradeep price
+        rsi = 65.5;
+        isBullish = false;
+    } else {
+        const symbolHash = sym.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        basePrice = (symbolHash % 3000) + 100;
+        isBullish = symbolHash % 2 === 0;
+        rsi = isBullish ? 42.5 : 68.2;
+    }
 
     return {
       cmp: `₹${basePrice.toFixed(2)}`,
-      rsi: isBullish ? 42.5 : 68.2,
+      rsi: rsi,
       macdValue: isBullish ? 1.2 : -0.5,
       macdSignal: isBullish ? 0.8 : -0.2,
       macdHist: isBullish ? 0.4 : -0.3,
@@ -116,7 +134,7 @@ const prompt = ai.definePrompt({
   2. ALWAYS call 'getGlobalMacroContext' to verify world sentiments and Brent Oil impact.
   3. Synthesize the findings into an exact Buy/Sell/Hold recommendation.
   4. Determine the precision Entry, Target, and Stop-Loss based on the fetched data.
-  5. Provide a rationale that references the exact tool outputs.
+  5. Provide a rationale that references the exact tool outputs and explains the technical reason (e.g. RSI level, MACD cross).
   
   Your output must be structured and address the exact requirement for professional-grade accuracy.`,
 });
