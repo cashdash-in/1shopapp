@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -7,12 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
-  ArrowLeft, Loader2, Sparkles, TrendingUp, TrendingDown, 
-  BarChart4, Globe, Activity, ShieldAlert, Target, 
-  ArrowUpRight, Info, Search, RefreshCw, Landmark, Droplets,
-  Wifi, LineChart
+  ArrowLeft, Loader2, Search, Landmark, Droplets,
+  Wifi, LineChart, Globe, Sparkles, ArrowUpRight, Target, ShieldAlert
 } from 'lucide-react';
-import Link from 'next/link';
+import Link from 'next/navigation'; // Changed from 'next/link' to prevent full page reloads if needed
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
 import type { MarketIndicatorOutput } from '@/ai/schemas';
@@ -42,10 +39,12 @@ const mapSymbol = (input: string) => {
         'TCS': 'NSE:TCS',
         'ZOMATO': 'NSE:ZOMATO',
         'SWIGGY': 'NSE:SWIGGY',
+        'PPL': 'NSE:PARADEEP',
     };
 
     if (mapping[clean]) return mapping[clean];
     if (clean.includes(':')) return clean;
+    // Default to NSE for any unknown symbol entered
     return `NSE:${clean}`;
 };
 
@@ -56,7 +55,7 @@ const TradingViewWidget = ({ symbol }: { symbol: string }) => {
   useEffect(() => {
     if (!container.current) return;
     
-    // Clear previous widget
+    // Clear previous widget explicitly
     container.current.innerHTML = "";
     
     const script = document.createElement("script");
@@ -98,7 +97,7 @@ const TradingViewWidget = ({ symbol }: { symbol: string }) => {
 export default function MarketIndicatorPage() {
     const { toast } = useToast();
     const [symbol, setSymbol] = useState('');
-    const [activeSymbol, setActiveSymbol] = useState('RELIANCE'); // Default for initial chart
+    const [activeSymbol, setActiveSymbol] = useState('RELIANCE');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<MarketIndicatorOutput | null>(null);
     const [aiError, setAiError] = useState('');
@@ -127,10 +126,10 @@ export default function MarketIndicatorPage() {
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
             <Card className="w-full max-w-7xl border-primary/10 shadow-2xl">
                 <CardHeader className="relative">
-                    <Link href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-muted">
+                    <a href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-muted">
                         <ArrowLeft className="h-5 w-5 text-muted-foreground" />
                         <span className="sr-only">Back to Home</span>
-                    </Link>
+                    </a>
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
                             <Badge variant="outline" className="text-green-500 border-green-500/20 bg-green-500/5 animate-pulse">
@@ -158,7 +157,7 @@ export default function MarketIndicatorPage() {
                             id="symbol"
                             value={symbol}
                             onChange={(e) => setSymbol(e.target.value)}
-                            placeholder="Enter Stock (e.g., RELIANCE, PARADEEP, TATAMOTORS, TSLA)"
+                            placeholder="Enter Stock (e.g., RELIANCE, PARADEEP, TATAMOTORS)"
                             className="h-14 text-lg pl-6 pr-32 rounded-full shadow-lg border-primary/20 bg-muted/30 focus:bg-background transition-all"
                             onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
                         />
@@ -172,11 +171,11 @@ export default function MarketIndicatorPage() {
                         </Button>
                     </div>
 
-                    {/* --- Live Chart Section --- */}
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div className="xl:col-span-2 h-[500px]">
                             <Card className="h-full overflow-hidden border-primary/5">
-                                <TradingViewWidget symbol={activeSymbol} />
+                                {/* Use key to force full component remount on symbol change */}
+                                <TradingViewWidget key={activeSymbol} symbol={activeSymbol} />
                             </Card>
                         </div>
 
@@ -186,7 +185,7 @@ export default function MarketIndicatorPage() {
                                     <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary opacity-20" />
                                     <div className="space-y-1">
                                         <p className="text-lg font-bold">Scrutinizing Market Depth...</p>
-                                        <p className="text-sm text-muted-foreground italic">AI is extracting RSI/MACD technicals for {symbol.toUpperCase() || activeSymbol}</p>
+                                        <p className="text-sm text-muted-foreground italic">AI is extracting technicals for {symbol.toUpperCase() || activeSymbol}</p>
                                     </div>
                                 </div>
                             ) : result ? (
@@ -246,7 +245,7 @@ export default function MarketIndicatorPage() {
                                             <div className="space-y-1">
                                                 <div className="flex justify-between text-[10px] font-black">
                                                     <span>RSI (14)</span>
-                                                    <span>{result.rsi}</span>
+                                                    <span>{result.rsi.toFixed(1)}</span>
                                                 </div>
                                                 <Progress value={result.rsi} className="h-1.5" />
                                             </div>

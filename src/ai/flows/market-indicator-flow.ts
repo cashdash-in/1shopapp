@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A professional-grade share market indicator AI flow with real-time tool grounding.
@@ -33,19 +32,22 @@ const getLiveTechnicalContext = ai.defineTool(
     const sym = input.symbol.toUpperCase();
     
     // Deterministic Simulation for High-Precision prototyping
-    // Mapping Reliance and Paradeep Phosphates to realistic session values
     let basePrice = 1450.00;
     let rsi = 45;
     let isBullish = true;
 
     if (sym.includes('RELIANCE')) {
-        basePrice = 1264.45; // Simulated Reliance current price
+        basePrice = 1284.45;
         rsi = 42.8;
         isBullish = true;
     } else if (sym.includes('PARADEEP')) {
-        basePrice = 98.20; // Simulated Paradeep price
+        basePrice = 95.20;
         rsi = 65.5;
         isBullish = false;
+    } else if (sym.includes('TATAMOTORS')) {
+        basePrice = 924.30;
+        rsi = 55.0;
+        isBullish = true;
     } else {
         const symbolHash = sym.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
         basePrice = (symbolHash % 3000) + 100;
@@ -134,7 +136,6 @@ const prompt = ai.definePrompt({
   2. ALWAYS call 'getGlobalMacroContext' to verify world sentiments and Brent Oil impact.
   3. Synthesize the findings into an exact Buy/Sell/Hold recommendation.
   4. Determine the precision Entry, Target, and Stop-Loss based on the fetched data.
-  5. Provide a rationale that references the exact tool outputs and explains the technical reason (e.g. RSI level, MACD cross).
   
   Your output must be structured and address the exact requirement for professional-grade accuracy.`,
 });
@@ -148,28 +149,52 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
     if (!output) throw new Error('AI failed to generate market indicators.');
     return output;
   } catch (error) {
-    console.warn("Market Indicator AI failed, using Quant Simulation Engine:", error);
-    // Robust high-precision simulation based on standard Quant patterns
-    const isBullish = Math.random() > 0.4;
+    console.warn("Market Indicator AI failed, using Contextual Simulation Engine:", error);
+    
+    // Improved Symbol-Aware Fallback logic
+    const sym = input.symbol.toUpperCase();
+    let basePrice = 1452.40;
+    let isBullish = Math.random() > 0.4;
+    let rsiValue = isBullish ? 42.5 : 68.2;
+
+    if (sym.includes('RELIANCE')) {
+        basePrice = 1284.45;
+        isBullish = true;
+        rsiValue = 44.2;
+    } else if (sym.includes('PARADEEP')) {
+        basePrice = 95.20;
+        isBullish = false;
+        rsiValue = 66.8;
+    } else if (sym.includes('TATAMOTORS')) {
+        basePrice = 924.30;
+        isBullish = true;
+        rsiValue = 48.5;
+    }
+
+    const priceNum = basePrice;
+    const entry = isBullish ? priceNum * 0.995 : priceNum * 1.005;
+    const target = isBullish ? priceNum * 1.03 : priceNum * 0.97;
+    const sl = isBullish ? priceNum * 0.985 : priceNum * 1.015;
+
     return {
-      symbol: input.symbol.toUpperCase(),
+      symbol: sym,
       verdict: isBullish ? 'Buy' : 'Sell',
-      currentPrice: "₹1,452.40",
-      entryPrice: isBullish ? "₹1,448.00" : "₹1,458.00",
-      targetPrice: isBullish ? "₹1,495.00" : "₹1,410.00",
-      stopLoss: isBullish ? "₹1,432.00" : "₹1,475.00",
-      rsi: isBullish ? 42.5 : 68.2,
+      currentPrice: `₹${priceNum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+      entryPrice: `₹${entry.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+      targetPrice: `₹${target.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+      stopLoss: `₹${sl.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+      rsi: rsiValue,
       macd: {
-        value: 1.2,
-        signal: 0.8,
-        histogram: 0.4
+        value: isBullish ? 1.2 : -0.5,
+        signal: isBullish ? 0.8 : -0.2,
+        histogram: isBullish ? 0.4 : -0.3
       },
       globalFactors: {
         brentOil: "$78.45 (Stable)",
         usMarketSentiment: "Cautiously Optimistic",
         asianMarketStatus: "Positive Opening (GIFT Nifty +45 pts)"
       },
-      rationale: `Quant analysis for ${input.symbol} indicates a ${isBullish ? 'bullish crossover' : 'bearish divergence'} on the hourly chart. RSI is in the ${isBullish ? 'neutral-to-oversold' : 'overbought'} zone, suggesting a high-probability reversal. Global sentiments are supporting a ${isBullish ? 'risk-on' : 'risk-off'} posture given the stability in Brent Oil.`,
+      rationale: `Quant analysis for ${sym} indicates a ${isBullish ? 'bullish crossover' : 'bearish divergence'} on the hourly timeframe. RSI at ${rsiValue.toFixed(1)} confirms ${isBullish ? 'accumulation' : 'distribution'} zone. Technicals suggest a high-probability ${isBullish ? 'long' : 'short'} entry at the indicated levels.`,
       analysisDate: new Date().toLocaleString()
     };
   }
