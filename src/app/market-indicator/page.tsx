@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
 import type { MarketIndicatorOutput } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/badge';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 
@@ -289,4 +289,3 @@ export default function MarketIndicatorPage() {
         </div>
     );
 }
-
