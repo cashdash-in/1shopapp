@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Visual Technical Analyst flow with High-Precision OCR.
@@ -72,19 +73,19 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
         
         INPUT: A screenshot of a stock chart (TradingView, Google Finance, or similar).
         
-        OCR INSTRUCTIONS:
-        1. SYMBOL: Look at the top-left corner. Identify the stock name (e.g. "Reliance Industries", "Paradeep Phosphates", "TCS"). 
-        2. PRICE (LTP): Look for the LARGE BOLD price number. It usually appears next to the symbol name or in a green/red box. (e.g. "138.20", "1,278.50"). 
-        3. YOU MUST NOT guess. If you see "RELIANCE" in the image, the symbol is RELIANCE. If you see "1278", the price is 1278.
+        OCR INSTRUCTIONS (CRITICAL):
+        1. SYMBOL: Look at the top-left corner. Identify the stock name (e.g. "RELIANCE", "PARADEEP", "TCS"). 
+        2. PRICE (LTP): Find the LARGE BOLD numeric value. It is usually next to the name or in a colored box. 
+        3. ACCURACY: If the image shows "138.20", the detectedPrice MUST be "138.20". Do not use dummy data if you can see a number.
         
-        ${input.symbolHint ? `USER HINT: ${input.symbolHint}` : 'No hint provided. Extract symbol from visual header.'}
+        ${input.symbolHint ? `USER HINT: ${input.symbolHint}` : ''}
         ${previousContext}
 
         STRICT ANALYSIS REQUIREMENTS:
-        1. DETECTED_PRICE: Extract the exact price digits from the image header.
-        2. CANDLE READER: Analyze the 5 most recent candlesticks for patterns.
-        3. OPENING DETECTION: Compare the first visible candle of the day with the visually implied previous close.
-        4. STRATEGY CALIBRATION: All Entry/Target levels MUST be mathematically derived from the DETECTED_PRICE (e.g. Target 1 = Price + 1.5% for Long).` },
+        1. DETECTED_PRICE: Read the exact LTP digits from the visual header.
+        2. STRATEGY CALIBRATION: All Entry, Target, and Stop Loss levels in the output MUST be derived from the DETECTED_PRICE you found in the image.
+        3. CANDLE READER: Analyze the recent 5-10 candlesticks for reversal or continuation patterns.
+        4. ACTION: Based on the candles and price location relative to VWAP (if visible), give a definitive UP or DOWN prediction.` },
       ],
       output: { schema: MarketIndicatorOutputSchema }
     });
@@ -99,10 +100,9 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
     throw new Error('Vision extraction failed.');
 
   } catch (error: any) {
-    console.warn("Visual Analysis Error, using Dynamic OCR Fallback:", error);
+    console.warn("Visual Analysis Error, using grounded fallback:", error);
     
     // --- DYNAMIC GROUNDED FALLBACK ---
-    // If the vision model fails (due to safety filters), we use the symbol hint to provide realistic data
     const sym = (input.symbolHint || "RELIANCE").toUpperCase(); 
     let ltp = 1278.50; 
     
