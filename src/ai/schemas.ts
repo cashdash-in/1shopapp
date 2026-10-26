@@ -1,4 +1,3 @@
-
 /**
  * @fileOverview This file contains all the Zod schemas and TypeScript types 
  * for the AI flows. Separating these into their own file prevents "use server"
@@ -233,6 +232,7 @@ export type ExecutionStep = {
 
 export type MarketIndicatorOutput = {
   symbol: string;
+  detectedPrice?: string;
   currentSentiment: 'Bullish' | 'Bearish' | 'Neutral';
   openingStatus: 'Up Opening' | 'Down Opening' | 'Flat';
   openingGapPercent?: string;

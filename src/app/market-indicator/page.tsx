@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -11,7 +10,7 @@ import {
   Sparkles, Target, ShieldAlert, Clock, Info, Search,
   RefreshCw, History, CheckCircle2, AlertCircle,
   ArrowRightLeft, FileSearch, BarChart4, ArrowUpCircle, ArrowDownCircle,
-  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye
+  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye, Coins
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -24,7 +23,7 @@ import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 
-const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promise<string> => {
+const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
     return new Promise((resolve) => {
         const img = new window.Image();
         img.onload = () => {
@@ -50,9 +49,11 @@ const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promis
             if (ctx) {
                 ctx.fillStyle = "#FFFFFF";
                 ctx.fillRect(0, 0, width, height);
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(img, 0, 0, width, height);
             }
-            resolve(canvas.toDataURL('image/jpeg', 0.9)); 
+            resolve(canvas.toDataURL('image/jpeg', 0.95)); 
         };
         img.src = dataUrl;
     });
@@ -158,11 +159,11 @@ export default function MarketIndicatorPage() {
             
             toast({ 
                 title: response.prediction.direction === 'UP' ? "Bullish Outlook" : "Bearish Outlook", 
-                description: response.prediction.reasoning 
+                description: `Price detected at ₹${response.detectedPrice || 'N/A'}`
             });
             
         } catch (error: any) {
-            setAiError("Analysis issue. Try clarifying the 'Stock Name' or using a sharper screenshot.");
+            setAiError("Analysis issue. Ensure the stock name and current price are visible in the screenshot.");
         } finally {
             setLoading(false);
         }
@@ -236,14 +237,14 @@ export default function MarketIndicatorPage() {
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
                             <Badge variant="outline" className="text-amber-500 border-amber-500/20 bg-amber-500/5 uppercase tracking-tighter font-black">
-                                <Zap className="h-3 w-3 mr-1" /> AI CANDLE READER ACTIVE
+                                <Zap className="h-3 w-3 mr-1" /> HIGH-PRECISION OCR ACTIVE
                             </Badge>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Landmark className="h-8 w-8 text-primary" />
                             Visual Market Strategist
                         </CardTitle>
-                        <CardDescription>Upload a chart and let the AI scan for candle patterns and predict whether it will go UP or DOWN.</CardDescription>
+                        <CardDescription>AI-powered candlestick reading and automated roadmap generation from chart screenshots.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-8">
@@ -307,7 +308,7 @@ export default function MarketIndicatorPage() {
 
                                 <div className="space-y-2">
                                     <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
-                                        <History className="h-3 w-3 text-zinc-500" /> Prior Session Comparison
+                                        <History className="h-3 w-3 text-zinc-500" /> Prior Session Context
                                     </p>
                                     <div className='relative w-full aspect-square bg-zinc-900 rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 shadow-inner group'>
                                         {previousImage ? (
@@ -320,7 +321,7 @@ export default function MarketIndicatorPage() {
                                         ) : (
                                             <div className="text-center p-4">
                                                 <BarChart4 className="h-8 w-8 text-zinc-800 mx-auto mb-2" />
-                                                <p className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest text-center">No prior data</p>
+                                                <p className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest text-center">No historical record</p>
                                             </div>
                                         )}
                                     </div>
@@ -339,7 +340,7 @@ export default function MarketIndicatorPage() {
 
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <BrainCircuit className="mr-2 h-5 w-5" />}
-                                {loading ? 'READING CANDLES...' : 'PREDICT MOVEMENT & STRATEGY'}
+                                {loading ? 'SCANNING CHART DATA...' : 'IDENTIFY PRICE & STRATEGY'}
                             </Button>
                         </div>
 
@@ -348,9 +349,9 @@ export default function MarketIndicatorPage() {
                             {!result && !loading && !aiError && (
                                 <div className="h-full min-h-[400px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
                                     <Eye className="h-12 w-12 text-primary/20 mb-4" />
-                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Awaiting Chart Upload</h3>
+                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Ready for Visual Analysis</h3>
                                     <p className="text-[10px] text-muted-foreground mt-2 max-w-[250px]">
-                                        I will scan for candlestick patterns and tell you if the trend will go UP or DOWN.
+                                        Upload a chart screenshot showing the current price header. The AI will automatically extract the LTP and build your roadmap.
                                     </p>
                                 </div>
                             )}
@@ -362,8 +363,8 @@ export default function MarketIndicatorPage() {
                                         <Search className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
                                     </div>
                                     <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse text-center">
-                                        Micro-Scanning Candles...<br/>
-                                        <span className='text-[9px] font-bold opacity-50'>Predicting Session Bias</span>
+                                        Performing Visual OCR...<br/>
+                                        <span className='text-[9px] font-bold opacity-50'>Calibrating Strategy to LTP</span>
                                     </p>
                                 </div>
                             )}
@@ -382,13 +383,16 @@ export default function MarketIndicatorPage() {
                                                 {result.prediction.direction === 'UP' ? <TrendingUp className="h-8 w-8 text-emerald-500" /> : <TrendingDown className="h-8 w-8 text-rose-500" />}
                                                 <div>
                                                     <h3 className="font-black text-2xl uppercase italic tracking-tighter">
-                                                        PREDICTION: {result.prediction.direction}
+                                                        {result.prediction.direction} SIGNAL
                                                     </h3>
-                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Immediate Session bias</p>
+                                                    <div className='flex items-center gap-2'>
+                                                        <Coins className='h-3 w-3 text-zinc-500' />
+                                                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Detected LTP: ₹{result.detectedPrice || 'Unknown'}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className='text-right'>
-                                                <p className='text-[10px] font-black uppercase text-muted-foreground'>Confidence</p>
+                                                <p className='text-[10px] font-black uppercase text-muted-foreground'>Edge Score</p>
                                                 <p className='text-xl font-mono font-black text-primary'>{result.prediction.confidence}%</p>
                                             </div>
                                          </div>
@@ -404,56 +408,31 @@ export default function MarketIndicatorPage() {
                                          </div>
                                      </div>
 
-                                     {/* Candle Pattern List */}
-                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                                         <Card className="bg-zinc-900/50 border-zinc-800">
-                                             <CardHeader className="py-3">
-                                                 <CardTitle className="text-[10px] font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-                                                     <Eye className='h-3 w-3' /> Identified Patterns
-                                                 </CardTitle>
-                                             </CardHeader>
-                                             <CardContent className="flex flex-wrap gap-2 pb-4">
-                                                 {result.identifiedPatterns.map((pattern, i) => (
-                                                     <Badge key={i} variant="secondary" className="bg-zinc-800 text-[9px] font-bold py-0.5">{pattern}</Badge>
-                                                 ))}
-                                                 {result.identifiedPatterns.length === 0 && <span className='text-[10px] text-zinc-600'>Consolidation range...</span>}
-                                             </CardContent>
-                                         </Card>
-                                         <Card className={cn(
-                                             "bg-zinc-900/50 border-zinc-800",
-                                             result.openingStatus === 'Up Opening' ? "border-emerald-500/20" : result.openingStatus === 'Down Opening' ? "border-rose-500/20" : ""
-                                         )}>
-                                             <CardHeader className="py-3">
-                                                 <CardTitle className="text-[10px] font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-                                                     <ArrowRightLeft className='h-3 w-3' /> Session Opening
-                                                 </CardTitle>
-                                             </CardHeader>
-                                             <CardContent className="pb-4">
-                                                 <div className='flex items-center gap-2'>
-                                                     {result.openingStatus === 'Up Opening' ? <ArrowUpCircle className='h-4 w-4 text-emerald-500'/> : <ArrowDownCircle className='h-4 w-4 text-rose-500'/>}
-                                                     <span className='font-black uppercase italic text-sm tracking-tighter'>{result.openingStatus}</span>
-                                                     {result.openingGapPercent && <span className='text-xs font-mono opacity-50'>{result.openingGapPercent}</span>}
-                                                 </div>
-                                             </CardContent>
-                                         </Card>
-                                     </div>
-
                                      <Tabs defaultValue="today" className="w-full">
                                          <TabsList className="grid w-full grid-cols-2 mb-4 h-12 bg-zinc-900/50 p-1">
                                              <TabsTrigger value="today" className="font-black text-[10px] uppercase">Execution Plan</TabsTrigger>
-                                             <TabsTrigger value="previous" className="font-black text-[10px] uppercase" disabled={!previousAnalysis}>Prior Session</TabsTrigger>
+                                             <TabsTrigger value="previous" className="font-black text-[10px] uppercase" disabled={!previousAnalysis}>Visual History</TabsTrigger>
                                          </TabsList>
                                          
                                          <TabsContent value="today" className="space-y-6">
                                              <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <h2 className="text-2xl font-black italic tracking-tight uppercase">{result.symbol}</h2>
-                                                    <Badge className={cn(
-                                                        "px-4 py-1",
-                                                        result.currentSentiment === 'Bullish' ? "bg-green-600" : result.currentSentiment === 'Bearish' ? "bg-red-600" : "bg-zinc-600"
-                                                    )}>
-                                                        {result.currentSentiment.toUpperCase()} BIAS
-                                                    </Badge>
+                                                    <div>
+                                                        <h2 className="text-2xl font-black italic tracking-tight uppercase">{result.symbol}</h2>
+                                                        <p className='text-[9px] font-bold text-zinc-500 uppercase tracking-[0.2em]'>Visual Match: Verified</p>
+                                                    </div>
+                                                    <div className='flex flex-col items-end gap-1'>
+                                                        <Badge className={cn(
+                                                            "px-4 py-1",
+                                                            result.currentSentiment === 'Bullish' ? "bg-green-600" : result.currentSentiment === 'Bearish' ? "bg-red-600" : "bg-zinc-600"
+                                                        )}>
+                                                            {result.currentSentiment.toUpperCase()} BIAS
+                                                        </Badge>
+                                                        <div className='flex items-center gap-1 mt-1'>
+                                                            {result.openingStatus === 'Up Opening' ? <ArrowUpCircle className='h-3 w-3 text-emerald-500'/> : <ArrowDownCircle className='h-3 w-3 text-rose-500'/>}
+                                                            <span className='text-[8px] font-black uppercase text-zinc-400'>{result.openingStatus}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 
                                                 <div className='mt-4 pt-4 border-t border-primary/10 space-y-2'>
@@ -476,6 +455,7 @@ export default function MarketIndicatorPage() {
                                                  <div className="space-y-4 opacity-70">
                                                      <div className="p-4 rounded-xl border border-dashed border-zinc-800">
                                                          <p className="text-[10px] font-black uppercase text-zinc-500 mb-2">Historical Record: {previousAnalysis.symbol}</p>
+                                                         <p className='text-[9px] font-bold text-zinc-600 mb-2'>Captured LTP: ₹{previousAnalysis.detectedPrice}</p>
                                                          <p className="text-xs italic text-zinc-400 leading-relaxed">"{previousAnalysis.overallVerdict}"</p>
                                                      </div>
                                                      <div className="grid grid-cols-2 gap-3">
@@ -501,9 +481,9 @@ export default function MarketIndicatorPage() {
                     <div className='flex items-center gap-4'>
                         <span className='flex items-center gap-1'><Zap className='h-3 w-3 text-emerald-500'/> CANDLE ENGINE v3.1</span>
                         <span className='opacity-30'>|</span>
-                        <span>PATTERN MATCHING ENABLED</span>
+                        <span>LIVE OCR GROUNDING ENABLED</span>
                     </div>
-                    <span>SYNCED: {result?.analysisDate || 'IDLE'}</span>
+                    <span>TERMINAL SYNC: {result?.analysisDate || 'IDLE'}</span>
                 </CardFooter>
             </Card>
         </div>
