@@ -8,13 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, Loader2, Landmark, Camera, Upload, 
-  Sparkles, ArrowUpRight, ArrowDownRight, Target, 
-  ShieldAlert, Clock, Info, CheckCircle2, Wand2, Search,
-  RefreshCw
+  Sparkles, Target, ShieldAlert, Clock, Info, Wand2, Search,
+  RefreshCw, History, CheckCircle2, TrendingUp, AlertCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
-import type { MarketIndicatorOutput, ExecutionStep } from '@/ai/schemas';
+import type { MarketIndicatorOutput } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -49,7 +48,6 @@ const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promis
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
             }
-            // Higher quality (0.9) to ensure prices are readable
             resolve(canvas.toDataURL('image/jpeg', 0.9)); 
         };
         img.src = dataUrl;
@@ -61,30 +59,33 @@ export default function MarketIndicatorPage() {
     const [originalImage, setOriginalImage] = useState<string | null>(null);
     const [symbolHint, setSymbolHint] = useState('');
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<MarketIndicatorOutput | null>(null);
+    const [previousAnalysis, setPreviousAnalysis] = useState<MarketIndicatorOutput | null>(null);
     const [aiError, setAiError] = useState('');
     
-    const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
+        // Load previous analysis from local storage if available
+        const saved = localStorage.getItem('last_market_analysis');
+        if (saved) {
+            try {
+                setPreviousAnalysis(JSON.parse(saved));
+            } catch (e) {}
+        }
+
         const getCameraPermission = async () => {
           try {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error('Camera API not available.');
-            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            setHasCameraPermission(true);
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
               videoRef.current.onloadedmetadata = () => setIsCameraReady(true);
             }
-          } catch (error) {
-            setHasCameraPermission(false);
-          }
+          } catch (error) {}
         };
         getCameraPermission();
         return () => {
@@ -137,14 +138,21 @@ export default function MarketIndicatorPage() {
         try {
             const response = await getMarketIndicator({ 
               photoDataUri: originalImage,
-              symbolHint: symbolHint.trim() || undefined
+              symbolHint: symbolHint.trim() || undefined,
+              previousAnalysis: previousAnalysis || undefined
             });
             
             setResult(response);
-            toast({ title: "Analysis Complete", description: "Trading setup identified from visual context." });
+            // Save to local storage for future comparison
+            localStorage.setItem('last_market_analysis', JSON.stringify(response));
+            
+            toast({ 
+                title: response.isPatternRepeating ? "Pattern Replay Detected!" : "Analysis Complete", 
+                description: response.isPatternRepeating ? "High similarity to previous session. Follow strategy." : "Intraday roadmap generated." 
+            });
             
         } catch (error: any) {
-            setAiError("Connection error. The image might be too large or the AI service is busy. Try adding a 'Stock Name' hint.");
+            setAiError("Analysis issue. Try clarifying the 'Stock Name' or using a sharper screenshot.");
         } finally {
             setLoading(false);
         }
@@ -218,14 +226,14 @@ export default function MarketIndicatorPage() {
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
                             <Badge variant="outline" className="text-amber-500 border-amber-500/20 bg-amber-500/5">
-                                <Sparkles className="h-3 w-3 mr-1" /> VISUAL QUANT SYNCHRONIZATION
+                                <Sparkles className="h-3 w-3 mr-1" /> VISUAL PATTERN COMPARISON
                             </Badge>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Landmark className="h-8 w-8 text-primary" />
                             AI Visual Market Strategist
                         </CardTitle>
-                        <CardDescription>Upload chart screenshot for time-wise Entry, Exit & Profit analysis.</CardDescription>
+                        <CardDescription>Analyze today's chart and compare it with previous patterns to verify profit strategies.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-8">
@@ -236,7 +244,7 @@ export default function MarketIndicatorPage() {
                                 <AlertTitle>Analysis Issue</AlertTitle>
                                 <AlertDescription className='flex flex-col gap-3'>
                                     <span>{aiError}</span>
-                                    <Button variant="outline" size="sm" className='w-fit h-7 text-[10px] border-destructive/20 text-destructive hover:bg-destructive/10' onClick={handleAnalyze}>
+                                    <Button variant="outline" size="sm" className='w-fit h-7 text-[10px]' onClick={handleAnalyze}>
                                         <RefreshCw className='mr-2 h-3 w-3' /> Retry Analysis
                                     </Button>
                                 </AlertDescription>
@@ -247,18 +255,17 @@ export default function MarketIndicatorPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="symbolHint" className="text-xs font-black text-zinc-500 uppercase">Stock Name (Optional Hint)</Label>
+                                <Label htmlFor="symbolHint" className="text-xs font-black text-zinc-500 uppercase">Stock Name (Optional)</Label>
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-600" />
                                     <Input 
                                         id="symbolHint" 
-                                        placeholder="e.g. Reliance, TCS, Paradeep" 
+                                        placeholder="e.g. Reliance, Paradeep" 
                                         className="pl-8 bg-muted/50 text-xs h-10 border-primary/10"
                                         value={symbolHint}
                                         onChange={(e) => setSymbolHint(e.target.value)}
                                     />
                                 </div>
-                                <p className="text-[10px] text-muted-foreground">Providing a hint helps the AI identify prices correctly if the header is cropped or blocked.</p>
                             </div>
 
                             <div className='relative w-full aspect-video bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner group'>
@@ -289,33 +296,55 @@ export default function MarketIndicatorPage() {
                                 </Button>
                                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
                             </div>
+
+                            {previousAnalysis && (
+                                <div className='p-3 bg-primary/5 border border-primary/10 rounded-xl flex items-center justify-between'>
+                                    <div className='flex items-center gap-2'>
+                                        <History className='h-4 w-4 text-primary' />
+                                        <span className='text-[10px] font-black uppercase text-zinc-500'>Previous Session Sync Active</span>
+                                    </div>
+                                    <Badge variant="secondary" className='text-[9px]'>{previousAnalysis.symbol}</Badge>
+                                </div>
+                            )}
+
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Wand2 className="mr-2 h-5 w-5" />}
-                                {loading ? 'Synthesizing Roadmap...' : 'Generate Step-by-Step Strategy'}
+                                {loading ? 'Scanning Patterns...' : 'Analyze & Compare Trends'}
                             </Button>
                         </div>
 
                         <div className="space-y-4">
                             {!result && !loading && !aiError && (
-                                <div className="h-full min-h-[300px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
+                                <div className="h-full min-h-[400px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
                                     <Sparkles className="h-12 w-12 text-primary/20 mb-4" />
-                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Awaiting Visual Data</h3>
-                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Take a photo of any market chart or search result page to unlock high-precision intraday signals.</p>
+                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Awaiting Analysis</h3>
+                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Take a photo of any market chart to identify setups and compare them with historical pattern repetition.</p>
                                 </div>
                             )}
 
                             {loading && (
-                                <div className="h-full min-h-[300px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
+                                <div className="h-full min-h-[400px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
                                     <div className='relative'>
                                         <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
-                                        <Wand2 className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
+                                        <History className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
                                     </div>
-                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Scanning Visual Levels...</p>
+                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Running Comparative Sync...</p>
                                 </div>
                             )}
 
                             {result && (
                                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+                                     {/* Similarity Alert */}
+                                     {result.isPatternRepeating && (
+                                         <Alert className='border-emerald-500/20 bg-emerald-500/10'>
+                                             <CheckCircle2 className='h-4 w-4 text-emerald-500' />
+                                             <AlertTitle className='text-emerald-500 font-black'>PATTERN REPLAY DETECTED</AlertTitle>
+                                             <AlertDescription className='text-xs'>
+                                                 The current chart movement is {result.similarityScore}% similar to your previous analysis. **Strategy consistency is high.**
+                                             </AlertDescription>
+                                         </Alert>
+                                     )}
+
                                      <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
                                         <div className="flex items-center justify-between mb-2">
                                             <h2 className="text-2xl font-black italic tracking-tight">{result.symbol}</h2>
@@ -326,9 +355,15 @@ export default function MarketIndicatorPage() {
                                                 {result.currentSentiment.toUpperCase()} BIAS
                                             </Badge>
                                         </div>
-                                        <p className="text-xs text-muted-foreground leading-relaxed italic border-l-2 border-primary/20 pl-3">
-                                            "{result.overallVerdict}"
-                                        </p>
+                                        
+                                        <div className='mt-4 pt-4 border-t border-primary/10 space-y-2'>
+                                            <p className='text-[10px] font-black text-zinc-500 uppercase flex items-center gap-2'>
+                                                <AlertCircle className='h-3 w-3' /> Trend Similarity Analysis
+                                            </p>
+                                            <p className='text-xs text-muted-foreground italic leading-relaxed'>
+                                                "{result.comparisonVerdict || result.overallVerdict}"
+                                            </p>
+                                        </div>
                                      </div>
                                      <div className="grid grid-cols-1 gap-4">
                                         <StrategyCard type="BUY" data={result.buyStrategy} />
@@ -340,7 +375,7 @@ export default function MarketIndicatorPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="justify-between border-t py-4 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                    <span>Grounded Visual Context Engine</span>
+                    <span>Grounded Pattern Engine v2.0</span>
                     <span>Sync: {result?.analysisDate || 'IDLE'}</span>
                 </CardFooter>
             </Card>

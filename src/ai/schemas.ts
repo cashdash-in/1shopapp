@@ -231,11 +231,6 @@ export type ExecutionStep = {
   logic: string;
 };
 
-export type MarketIndicatorInput = {
-  photoDataUri: string;
-  symbolHint?: string;
-};
-
 export type MarketIndicatorOutput = {
   symbol: string;
   currentSentiment: 'Bullish' | 'Bearish' | 'Neutral';
@@ -255,4 +250,14 @@ export type MarketIndicatorOutput = {
   };
   overallVerdict: string;
   analysisDate: string;
+  // Comparison fields
+  similarityScore?: number;
+  comparisonVerdict?: string;
+  isPatternRepeating?: boolean;
+};
+
+export type MarketIndicatorInput = {
+  photoDataUri: string;
+  symbolHint?: string;
+  previousAnalysis?: MarketIndicatorOutput;
 };
