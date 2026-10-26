@@ -1,0 +1,66 @@
+
+{
+  "entities": {
+    "Stock": {
+      "title": "Stock Opportunity",
+      "description": "A high-probability trading opportunity identified by the scanner.",
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string" },
+        "score": { "type": "number" },
+        "signal": { "type": "string", "enum": ["STRONG BUY", "BUY", "WATCH", "AVOID", "STRONG SHORT", "SHORT"] },
+        "entry": { "type": "number" },
+        "stoploss": { "type": "number" },
+        "target1": { "type": "number" },
+        "target2": { "type": "number" },
+        "tradeType": { "type": "string", "enum": ["LONG", "SHORT"] },
+        "ltp": { "type": "number" },
+        "rsi": { "type": "number" },
+        "confidence": { "type": "number" }
+      },
+      "required": ["symbol", "score", "signal", "tradeType"]
+    },
+    "Trade": {
+      "title": "Journal Entry",
+      "description": "A record of a completed or active trade.",
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string" },
+        "entry": { "type": "number" },
+        "exit": { "type": "number" },
+        "pnl": { "type": "number" },
+        "result": { "type": "string", "enum": ["WIN", "LOSS", "PENDING"] },
+        "rr": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["symbol", "entry", "date"]
+    },
+    "UserConfig": {
+      "title": "User Settings",
+      "description": "Risk and capital settings for the trader.",
+      "type": "object",
+      "properties": {
+        "capital": { "type": "number" },
+        "riskPerTrade": { "type": "number" },
+        "maxTradesPerDay": { "type": "number" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["google.com", "password"]
+  },
+  "firestore": {
+    "/stocks/{symbol}": {
+      "schema": "Stock",
+      "description": "Global collection of identified stock opportunities."
+    },
+    "/users/{userId}/trades/{tradeId}": {
+      "schema": "Trade",
+      "description": "User-specific trade journal entries."
+    },
+    "/users/{userId}/config": {
+      "schema": "UserConfig",
+      "description": "User-specific configuration and risk settings."
+    }
+  }
+}
