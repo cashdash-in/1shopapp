@@ -10,7 +10,7 @@ import {
   Sparkles, Target, ShieldAlert, Clock, Info, Search,
   RefreshCw, History, CheckCircle2, AlertCircle,
   ArrowRightLeft, FileSearch, BarChart4, ArrowUpCircle, ArrowDownCircle,
-  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye, Coins, MousePointer2
+  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye, Coins, MousePointer2, Trash2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -171,6 +171,17 @@ export default function MarketIndicatorPage() {
         }
     };
 
+    const handleClearHistory = () => {
+        localStorage.removeItem('last_market_analysis');
+        localStorage.removeItem('last_market_image');
+        setPreviousAnalysis(null);
+        setPreviousImage(null);
+        toast({ 
+            title: "History Cleared", 
+            description: "Previous session context has been reset for new stock analysis." 
+        });
+    };
+
     const StrategyCard = ({ type, data }: { type: 'BUY' | 'SHORT', data: any }) => {
         const isBuy = type === 'BUY';
         return (
@@ -323,14 +334,27 @@ export default function MarketIndicatorPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
-                                        <History className="h-3 w-3 text-zinc-500" /> Prior Session Context
-                                    </p>
+                                    <div className='flex items-center justify-between px-1 mb-1'>
+                                        <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2">
+                                            <History className="h-3 w-3 text-zinc-500" /> Prior Session Context
+                                        </p>
+                                        {previousImage && (
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-5 w-5 text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800 rounded-full transition-colors"
+                                                onClick={handleClearHistory}
+                                                title="Clear Prior Context"
+                                            >
+                                                <RefreshCw className="h-3.5 w-3.5" />
+                                            </Button>
+                                        )}
+                                    </div>
                                     <div className='relative w-full aspect-square bg-zinc-900 rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 shadow-inner group'>
                                         {previousImage ? (
                                             <div className="relative w-full h-full opacity-60 grayscale hover:grayscale-0 transition-all">
                                                 <Image src={previousImage} alt="Previous Chart" fill className="object-contain" />
-                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
                                                     <Badge variant="outline" className="bg-black/80 border-white/20 text-[8px] font-black tracking-widest uppercase">HISTORY</Badge>
                                                 </div>
                                             </div>
