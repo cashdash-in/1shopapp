@@ -2,7 +2,7 @@
 'use server';
 /**
  * @fileOverview Visual Quant Analyst flow. Analyzes stock chart screenshots 
- * to provide exact time-wise Entry/Exit instructions.
+ * to provide exact time-wise Entry/Exit instructions based on VISUAL evidence.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -11,22 +11,22 @@ import type { MarketIndicatorInput, MarketIndicatorOutput } from '../schemas';
 const MODEL = 'googleai/gemini-1.5-flash';
 
 const ExecutionStepSchema = z.object({
-  time: z.string().describe('The specific time or session trigger (e.g., "10:15 AM", "Break of PDH").'),
+  time: z.string().describe('The specific time or session trigger (e.g., "10:15 AM", "Break of Day High").'),
   action: z.string().describe('The action to take (e.g., "Buy at Market", "Trailing SL").'),
-  priceLevel: z.string().describe('The exact price or level to watch.'),
-  logic: z.string().describe('The technical reason for this step.'),
+  priceLevel: z.string().describe('The exact price level observed in the image for this action.'),
+  logic: z.string().describe('The technical reason for this step based on the chart pattern.'),
 });
 
 const StrategySchema = z.object({
-  entry: z.string(),
-  stopLoss: z.string(),
-  target1: z.string(),
-  target2: z.string(),
+  entry: z.string().describe('The precise entry price level based on the chart Y-axis.'),
+  stopLoss: z.string().describe('The precise stop loss price level.'),
+  target1: z.string().describe('The first profit target.'),
+  target2: z.string().describe('The second profit target.'),
   executionPlan: z.array(ExecutionStepSchema),
 });
 
 const MarketIndicatorOutputSchema = z.object({
-  symbol: z.string().describe('The identified stock symbol from the chart.'),
+  symbol: z.string().describe('The identified stock symbol from the chart image.'),
   currentSentiment: z.enum(['Bullish', 'Bearish', 'Neutral']),
   buyStrategy: StrategySchema,
   shortStrategy: StrategySchema,
@@ -40,14 +40,16 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
       model: MODEL,
       prompt: [
         { media: { url: input.photoDataUri } },
-        { text: `You are a Senior Intraday Quant Analyst. Analyze this stock chart screenshot.
+        { text: `You are a Senior Intraday Quant Analyst. Analyze this stock chart screenshot with 100% precision.
         
-        INSTRUCTIONS:
-        1. Identify the symbol and timeframe.
-        2. Provide exact time-wise actions for both a BUY (Long) setup and a SHORT SELL setup.
-        3. For each strategy, give precise Entry, Stop-Loss, and two Profit Targets based on the visual support/resistance levels.
-        4. Detail the "Time-wise execution plan" - when specifically (time or event) to enter and exit for maximum profit.
-        5. Keep the tone professional and clinical.` },
+        CRITICAL INSTRUCTIONS:
+        1. Read the Y-AXIS and latest PRICE TOOLTIP carefully. Use the EXACT numbers visible in the image.
+        2. If the price is around 130-140, do NOT suggest entry at 1200. Every number MUST be derived from the visual scale of this specific image.
+        3. Identify the symbol and session timeframe (look for market open/close times on the X-axis).
+        4. Provide exact time-wise actions for both a BUY (Long) setup and a SHORT SELL setup.
+        5. For each strategy, give precise Entry, Stop-Loss, and two Profit Targets based on the visual support/resistance levels seen in the candlesticks.
+        6. Detail the "Time-wise execution plan" - specify exactly when (time or event) to enter and exit.
+        7. Maintain a professional, clinical quant tone.` },
       ],
       output: { schema: MarketIndicatorOutputSchema }
     });
@@ -60,32 +62,29 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
 
   } catch (error) {
     console.warn("Visual Chart Analysis Error:", error);
-    // Robust simulation for prototype if vision fails
+    // Generic fallback that uses the user's symbol hint if available, but avoids hardcoded "Reliance" levels
     return {
-      symbol: input.symbolHint || "IDENTIFIED STOCK",
-      currentSentiment: 'Bullish',
+      symbol: input.symbolHint || "CHART ANALYSIS",
+      currentSentiment: 'Neutral',
       buyStrategy: {
-        entry: "₹1,202.40",
-        stopLoss: "₹1,195.00",
-        target1: "₹1,215.00",
-        target2: "₹1,230.00",
+        entry: "Determining...",
+        stopLoss: "Determining...",
+        target1: "Determining...",
+        target2: "Determining...",
         executionPlan: [
-          { time: "09:30 AM", action: "Monitor Open", priceLevel: "₹1,200", logic: "Morning volatility clearing." },
-          { time: "10:15 AM", action: "Confirm Entry", priceLevel: "₹1,202.40", logic: "Bullish crossover on 15min chart." },
-          { time: "02:30 PM", action: "Profit Booking", priceLevel: "₹1,225", logic: "Approaching session resistance." }
+          { time: "Market Open", action: "Identify Support", priceLevel: "See Chart", logic: "Waiting for visual confirmation." }
         ]
       },
       shortStrategy: {
-        entry: "₹1,185.50",
-        stopLoss: "₹1,194.00",
-        target1: "₹1,170.00",
-        target2: "₹1,155.00",
+        entry: "Determining...",
+        stopLoss: "Determining...",
+        target1: "Determining...",
+        target2: "Determining...",
         executionPlan: [
-          { time: "11:00 AM", action: "Short Sell", priceLevel: "₹1,185", logic: "Break of morning low." },
-          { time: "03:10 PM", action: "Exit All", priceLevel: "₹1,160", logic: "Session closing square-off." }
+          { time: "Market Open", action: "Identify Resistance", priceLevel: "See Chart", logic: "Waiting for visual confirmation." }
         ]
       },
-      overallVerdict: "Chart shows a strong accumulation phase near session base. Bullish bias preferred for intraday breakout.",
+      overallVerdict: "AI Vision analysis encountered an error. Please ensure the screenshot is clear and shows price levels on the Y-axis.",
       analysisDate: new Date().toLocaleString()
     };
   }
