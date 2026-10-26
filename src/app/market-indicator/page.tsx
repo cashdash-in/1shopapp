@@ -9,16 +9,18 @@ import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, Loader2, Landmark, Camera, Upload, 
   Sparkles, Target, ShieldAlert, Clock, Info, Wand2, Search,
-  RefreshCw, History, CheckCircle2, TrendingUp, AlertCircle
+  RefreshCw, History, CheckCircle2, TrendingUp, AlertCircle,
+  ArrowRightLeft, FileSearch, BarChart4
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
-import type { MarketIndicatorOutput } from '@/ai/schemas';
+import type { MarketIndicatorOutput, ExecutionStep } from '@/ai/schemas';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
     return new Promise((resolve) => {
@@ -61,6 +63,7 @@ export default function MarketIndicatorPage() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<MarketIndicatorOutput | null>(null);
     const [previousAnalysis, setPreviousAnalysis] = useState<MarketIndicatorOutput | null>(null);
+    const [previousImage, setPreviousImage] = useState<string | null>(null);
     const [aiError, setAiError] = useState('');
     
     const [isCameraReady, setIsCameraReady] = useState(false);
@@ -69,12 +72,17 @@ export default function MarketIndicatorPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Load previous analysis from local storage if available
-        const saved = localStorage.getItem('last_market_analysis');
-        if (saved) {
+        // Load previous analysis and image from local storage
+        const savedAnalysis = localStorage.getItem('last_market_analysis');
+        const savedImage = localStorage.getItem('last_market_image');
+        
+        if (savedAnalysis) {
             try {
-                setPreviousAnalysis(JSON.parse(saved));
+                setPreviousAnalysis(JSON.parse(savedAnalysis));
             } catch (e) {}
+        }
+        if (savedImage) {
+            setPreviousImage(savedImage);
         }
 
         const getCameraPermission = async () => {
@@ -143,8 +151,10 @@ export default function MarketIndicatorPage() {
             });
             
             setResult(response);
-            // Save to local storage for future comparison
+            
+            // Save current to previous storage for NEXT time
             localStorage.setItem('last_market_analysis', JSON.stringify(response));
+            localStorage.setItem('last_market_image', originalImage);
             
             toast({ 
                 title: response.isPatternRepeating ? "Pattern Replay Detected!" : "Analysis Complete", 
@@ -199,7 +209,7 @@ export default function MarketIndicatorPage() {
                             <Clock className="h-3 w-3" /> Execution Roadmap
                         </p>
                         <div className="space-y-2">
-                            {data.executionPlan.map((step: any, i: number) => (
+                            {data.executionPlan.map((step: ExecutionStep, i: number) => (
                                 <div key={i} className="flex gap-3 text-xs bg-background/50 p-2 rounded border border-primary/5">
                                     <span className="font-black text-primary shrink-0 w-16">{step.time}</span>
                                     <div className="flex flex-col">
@@ -217,7 +227,7 @@ export default function MarketIndicatorPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
-            <Card className="w-full max-w-5xl border-primary/10 shadow-2xl">
+            <Card className="w-full max-w-7xl border-primary/10 shadow-2xl">
                 <CardHeader className="relative">
                     <Link href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-muted">
                         <ArrowLeft className="h-5 w-5 text-muted-foreground" />
@@ -233,7 +243,7 @@ export default function MarketIndicatorPage() {
                             <Landmark className="h-8 w-8 text-primary" />
                             AI Visual Market Strategist
                         </CardTitle>
-                        <CardDescription>Analyze today's chart and compare it with previous patterns to verify profit strategies.</CardDescription>
+                        <CardDescription>Upload today's chart and compare it with the previous session for pattern validation.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-8">
@@ -252,8 +262,9 @@ export default function MarketIndicatorPage() {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-4">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        {/* INPUT SECTION */}
+                        <div className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="symbolHint" className="text-xs font-black text-zinc-500 uppercase">Stock Name (Optional)</Label>
                                 <div className="relative">
@@ -268,25 +279,56 @@ export default function MarketIndicatorPage() {
                                 </div>
                             </div>
 
-                            <div className='relative w-full aspect-video bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner group'>
-                                 {!originalImage && (
-                                     <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-                                 )}
-                                 {originalImage && (
-                                     <div className="relative w-full h-full">
-                                         <Image src={originalImage} alt="Uploaded Chart" fill className="object-contain" />
-                                         <Button 
-                                            variant="secondary" 
-                                            size="icon" 
-                                            className="absolute top-2 right-2 rounded-full h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => {setOriginalImage(null); setResult(null); setAiError('');}}
-                                         >
-                                             <Info className="h-4 w-4" />
-                                         </Button>
-                                     </div>
-                                 )}
-                                 <canvas ref={canvasRef} className="hidden" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* NEW CHART AREA */}
+                                <div className="space-y-2">
+                                    <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
+                                        <Target className="h-3 w-3 text-primary" /> Today's Chart Movement
+                                    </p>
+                                    <div className='relative w-full aspect-square bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner group'>
+                                         {!originalImage && (
+                                             <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                                         )}
+                                         {originalImage && (
+                                             <div className="relative w-full h-full">
+                                                 <Image src={originalImage} alt="Uploaded Chart" fill className="object-contain" />
+                                                 <Button 
+                                                    variant="secondary" 
+                                                    size="icon" 
+                                                    className="absolute top-2 right-2 rounded-full h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() => {setOriginalImage(null); setResult(null); setAiError('');}}
+                                                 >
+                                                     <Info className="h-4 w-4" />
+                                                 </Button>
+                                             </div>
+                                         )}
+                                         <canvas ref={canvasRef} className="hidden" />
+                                    </div>
+                                </div>
+
+                                {/* PREVIOUS CHART AREA */}
+                                <div className="space-y-2">
+                                    <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
+                                        <History className="h-3 w-3 text-zinc-500" /> Previous Session Movement
+                                    </p>
+                                    <div className='relative w-full aspect-square bg-zinc-900 rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 shadow-inner group'>
+                                        {previousImage ? (
+                                            <div className="relative w-full h-full opacity-60 grayscale hover:grayscale-0 transition-all cursor-pointer">
+                                                <Image src={previousImage} alt="Previous Chart" fill className="object-contain" />
+                                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-none">
+                                                    <History className="h-8 w-8 text-white/40" />
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center p-4">
+                                                <BarChart4 className="h-8 w-8 text-zinc-800 mx-auto mb-2" />
+                                                <p className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest">No previous session data</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
+
                             <div className="flex gap-2">
                                  <Button onClick={handleCapture} disabled={originalImage !== null || !isCameraReady} className="w-full h-12 rounded-xl" variant="secondary">
                                     <Camera className="mr-2 h-4 w-4" /> Capture
@@ -297,28 +339,21 @@ export default function MarketIndicatorPage() {
                                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
                             </div>
 
-                            {previousAnalysis && (
-                                <div className='p-3 bg-primary/5 border border-primary/10 rounded-xl flex items-center justify-between'>
-                                    <div className='flex items-center gap-2'>
-                                        <History className='h-4 w-4 text-primary' />
-                                        <span className='text-[10px] font-black uppercase text-zinc-500'>Previous Session Sync Active</span>
-                                    </div>
-                                    <Badge variant="secondary" className='text-[9px]'>{previousAnalysis.symbol}</Badge>
-                                </div>
-                            )}
-
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
-                                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Wand2 className="mr-2 h-5 w-5" />}
-                                {loading ? 'Scanning Patterns...' : 'Analyze & Compare Trends'}
+                                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <RefreshCw className="mr-2 h-5 w-5" />}
+                                {loading ? 'Running Comparative Analysis...' : 'Sync Today with Tomorrow'}
                             </Button>
                         </div>
 
+                        {/* RESULTS SECTION */}
                         <div className="space-y-4">
                             {!result && !loading && !aiError && (
                                 <div className="h-full min-h-[400px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
-                                    <Sparkles className="h-12 w-12 text-primary/20 mb-4" />
-                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Awaiting Analysis</h3>
-                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Take a photo of any market chart to identify setups and compare them with historical pattern repetition.</p>
+                                    <ArrowRightLeft className="h-12 w-12 text-primary/20 mb-4" />
+                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Comparative Interface Active</h3>
+                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[250px]">
+                                        Take a screenshot of tomorrow's chart. The AI will cross-reference it with today's visual data to identify repeating high-probability setups.
+                                    </p>
                                 </div>
                             )}
 
@@ -326,9 +361,12 @@ export default function MarketIndicatorPage() {
                                 <div className="h-full min-h-[400px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
                                     <div className='relative'>
                                         <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
-                                        <History className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
+                                        <FileSearch className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
                                     </div>
-                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Running Comparative Sync...</p>
+                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse text-center">
+                                        Detecting Pattern Similarity...<br/>
+                                        <span className='text-[9px] font-bold opacity-50'>Comparing Session Deltas</span>
+                                    </p>
                                 </div>
                             )}
 
@@ -336,49 +374,85 @@ export default function MarketIndicatorPage() {
                                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
                                      {/* Similarity Alert */}
                                      {result.isPatternRepeating && (
-                                         <Alert className='border-emerald-500/20 bg-emerald-500/10'>
+                                         <Alert className='border-emerald-500/20 bg-emerald-500/10 shadow-lg'>
                                              <CheckCircle2 className='h-4 w-4 text-emerald-500' />
-                                             <AlertTitle className='text-emerald-500 font-black'>PATTERN REPLAY DETECTED</AlertTitle>
+                                             <AlertTitle className='text-emerald-500 font-black'>HIGH PROBABILITY PATTERN REPLAY</AlertTitle>
                                              <AlertDescription className='text-xs'>
-                                                 The current chart movement is {result.similarityScore}% similar to your previous analysis. **Strategy consistency is high.**
+                                                 Current chart movement is <strong>{result.similarityScore}% identical</strong> to your previous session. 
+                                                 The technical setup is repeating perfectly. **Execute previously verified strategy.**
                                              </AlertDescription>
                                          </Alert>
                                      )}
 
-                                     <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h2 className="text-2xl font-black italic tracking-tight">{result.symbol}</h2>
-                                            <Badge className={cn(
-                                                "px-4 py-1",
-                                                result.currentSentiment === 'Bullish' ? "bg-green-600" : result.currentSentiment === 'Bearish' ? "bg-red-600" : "bg-zinc-600"
-                                            )}>
-                                                {result.currentSentiment.toUpperCase()} BIAS
-                                            </Badge>
-                                        </div>
-                                        
-                                        <div className='mt-4 pt-4 border-t border-primary/10 space-y-2'>
-                                            <p className='text-[10px] font-black text-zinc-500 uppercase flex items-center gap-2'>
-                                                <AlertCircle className='h-3 w-3' /> Trend Similarity Analysis
-                                            </p>
-                                            <p className='text-xs text-muted-foreground italic leading-relaxed'>
-                                                "{result.comparisonVerdict || result.overallVerdict}"
-                                            </p>
-                                        </div>
-                                     </div>
-                                     <div className="grid grid-cols-1 gap-4">
-                                        <StrategyCard type="BUY" data={result.buyStrategy} />
-                                        <StrategyCard type="SHORT" data={result.shortStrategy} />
-                                     </div>
+                                     <Tabs defaultValue="today" className="w-full">
+                                         <TabsList className="grid w-full grid-cols-2 mb-4 h-12 bg-zinc-900/50 p-1">
+                                             <TabsTrigger value="today" className="font-black text-[10px] uppercase">Today's Roadmap</TabsTrigger>
+                                             <TabsTrigger value="previous" className="font-black text-[10px] uppercase" disabled={!previousAnalysis}>Previous Context</TabsTrigger>
+                                         </TabsList>
+                                         
+                                         <TabsContent value="today" className="space-y-6">
+                                             <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h2 className="text-2xl font-black italic tracking-tight uppercase">{result.symbol}</h2>
+                                                    <Badge className={cn(
+                                                        "px-4 py-1",
+                                                        result.currentSentiment === 'Bullish' ? "bg-green-600" : result.currentSentiment === 'Bearish' ? "bg-red-600" : "bg-zinc-600"
+                                                    )}>
+                                                        {result.currentSentiment.toUpperCase()} BIAS
+                                                    </Badge>
+                                                </div>
+                                                
+                                                <div className='mt-4 pt-4 border-t border-primary/10 space-y-2'>
+                                                    <p className='text-[10px] font-black text-zinc-500 uppercase flex items-center gap-2'>
+                                                        <AlertCircle className='h-3 w-3' /> Trend Similarity Analysis
+                                                    </p>
+                                                    <p className='text-xs text-muted-foreground italic leading-relaxed'>
+                                                        "{result.comparisonVerdict || result.overallVerdict}"
+                                                    </p>
+                                                </div>
+                                             </div>
+                                             <div className="grid grid-cols-1 gap-4">
+                                                <StrategyCard type="BUY" data={result.buyStrategy} />
+                                                <StrategyCard type="SHORT" data={result.shortStrategy} />
+                                             </div>
+                                         </TabsContent>
+
+                                         <TabsContent value="previous">
+                                             {previousAnalysis && (
+                                                 <div className="space-y-4 opacity-70">
+                                                     <div className="p-4 rounded-xl border border-dashed border-zinc-800">
+                                                         <p className="text-[10px] font-black uppercase text-zinc-500 mb-2">Historical Record: {previousAnalysis.symbol}</p>
+                                                         <p className="text-xs italic text-zinc-400 leading-relaxed">"{previousAnalysis.overallVerdict}"</p>
+                                                     </div>
+                                                     <div className="grid grid-cols-2 gap-3">
+                                                         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                                                             <p className="text-[9px] font-bold text-zinc-600 uppercase">Buy Entry</p>
+                                                             <p className="text-sm font-mono font-bold">{previousAnalysis.buyStrategy.entry}</p>
+                                                         </div>
+                                                         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                                                             <p className="text-[9px] font-bold text-zinc-600 uppercase">Short Entry</p>
+                                                             <p className="text-sm font-mono font-bold">{previousAnalysis.shortStrategy.entry}</p>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             )}
+                                         </TabsContent>
+                                     </Tabs>
                                 </div>
                             )}
                         </div>
                     </div>
                 </CardContent>
                 <CardFooter className="justify-between border-t py-4 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                    <span>Grounded Pattern Engine v2.0</span>
-                    <span>Sync: {result?.analysisDate || 'IDLE'}</span>
+                    <div className='flex items-center gap-4'>
+                        <span className='flex items-center gap-1'><RefreshCw className='h-3 w-3'/> Grounded Sync v2.5</span>
+                        <span className='opacity-30'>|</span>
+                        <span>SESSION COMPARATOR ACTIVE</span>
+                    </div>
+                    <span>CALIBRATED: {result?.analysisDate || 'IDLE'}</span>
                 </CardFooter>
             </Card>
         </div>
     );
 }
+
