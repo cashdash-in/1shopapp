@@ -236,6 +236,12 @@ export type MarketIndicatorOutput = {
   currentSentiment: 'Bullish' | 'Bearish' | 'Neutral';
   openingStatus: 'Up Opening' | 'Down Opening' | 'Flat';
   openingGapPercent?: string;
+  prediction: {
+    direction: 'UP' | 'DOWN' | 'SIDEWAYS';
+    confidence: number;
+    reasoning: string;
+  };
+  identifiedPatterns: string[];
   buyStrategy: {
     entry: string;
     stopLoss: string;

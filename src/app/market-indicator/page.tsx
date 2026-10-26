@@ -10,7 +10,8 @@ import {
   ArrowLeft, Loader2, Landmark, Camera, Upload, 
   Sparkles, Target, ShieldAlert, Clock, Info, Search,
   RefreshCw, History, CheckCircle2, AlertCircle,
-  ArrowRightLeft, FileSearch, BarChart4, ArrowUpCircle, ArrowDownCircle
+  ArrowRightLeft, FileSearch, BarChart4, ArrowUpCircle, ArrowDownCircle,
+  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -21,6 +22,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 
 const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promise<string> => {
     return new Promise((resolve) => {
@@ -155,8 +157,8 @@ export default function MarketIndicatorPage() {
             localStorage.setItem('last_market_image', originalImage);
             
             toast({ 
-                title: response.openingStatus, 
-                description: response.isPatternRepeating ? "Pattern Replay Detected!" : "Intraday roadmap generated." 
+                title: response.prediction.direction === 'UP' ? "Bullish Outlook" : "Bearish Outlook", 
+                description: response.prediction.reasoning 
             });
             
         } catch (error: any) {
@@ -234,14 +236,14 @@ export default function MarketIndicatorPage() {
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
                             <Badge variant="outline" className="text-amber-500 border-amber-500/20 bg-amber-500/5 uppercase tracking-tighter font-black">
-                                <Sparkles className="h-3 w-3 mr-1" /> OPENING GAP DETECTOR ACTIVE
+                                <Zap className="h-3 w-3 mr-1" /> AI CANDLE READER ACTIVE
                             </Badge>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Landmark className="h-8 w-8 text-primary" />
-                            AI Visual Market Strategist
+                            Visual Market Strategist
                         </CardTitle>
-                        <CardDescription>Upload today's chart and compare it with previous sessions to detect Gaps and Pattern Repeats.</CardDescription>
+                        <CardDescription>Upload a chart and let the AI scan for candle patterns and predict whether it will go UP or DOWN.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-8">
@@ -280,7 +282,7 @@ export default function MarketIndicatorPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
-                                        <Target className="h-3 w-3 text-primary" /> Today's Chart Movement
+                                        <Target className="h-3 w-3 text-primary" /> Current Session Chart
                                     </p>
                                     <div className='relative w-full aspect-square bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner group'>
                                          {!originalImage && (
@@ -295,7 +297,7 @@ export default function MarketIndicatorPage() {
                                                     className="absolute top-2 right-2 rounded-full h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     onClick={() => {setOriginalImage(null); setResult(null); setAiError('');}}
                                                  >
-                                                     <Info className="h-4 w-4" />
+                                                     <RefreshCw className="h-4 w-4" />
                                                  </Button>
                                              </div>
                                          )}
@@ -305,20 +307,20 @@ export default function MarketIndicatorPage() {
 
                                 <div className="space-y-2">
                                     <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
-                                        <History className="h-3 w-3 text-zinc-500" /> Previous Session Context
+                                        <History className="h-3 w-3 text-zinc-500" /> Prior Session Comparison
                                     </p>
                                     <div className='relative w-full aspect-square bg-zinc-900 rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 shadow-inner group'>
                                         {previousImage ? (
-                                            <div className="relative w-full h-full opacity-60 grayscale hover:grayscale-0 transition-all cursor-pointer">
+                                            <div className="relative w-full h-full opacity-60 grayscale hover:grayscale-0 transition-all">
                                                 <Image src={previousImage} alt="Previous Chart" fill className="object-contain" />
-                                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-none">
-                                                    <History className="h-8 w-8 text-white/40" />
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                    <Badge variant="outline" className="bg-black/80 border-white/20 text-[8px] font-black tracking-widest uppercase">HISTORY</Badge>
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="text-center p-4">
                                                 <BarChart4 className="h-8 w-8 text-zinc-800 mx-auto mb-2" />
-                                                <p className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest text-center">No previous session<br/>data recorded</p>
+                                                <p className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest text-center">No prior data</p>
                                             </div>
                                         )}
                                     </div>
@@ -336,8 +338,8 @@ export default function MarketIndicatorPage() {
                             </div>
 
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
-                                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <RefreshCw className="mr-2 h-5 w-5" />}
-                                {loading ? 'Detecting Opening Movement...' : 'Check Opening & Strategy'}
+                                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <BrainCircuit className="mr-2 h-5 w-5" />}
+                                {loading ? 'READING CANDLES...' : 'PREDICT MOVEMENT & STRATEGY'}
                             </Button>
                         </div>
 
@@ -345,10 +347,10 @@ export default function MarketIndicatorPage() {
                         <div className="space-y-4">
                             {!result && !loading && !aiError && (
                                 <div className="h-full min-h-[400px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
-                                    <ArrowRightLeft className="h-12 w-12 text-primary/20 mb-4" />
-                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Opening Detector Active</h3>
+                                    <Eye className="h-12 w-12 text-primary/20 mb-4" />
+                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Awaiting Chart Upload</h3>
                                     <p className="text-[10px] text-muted-foreground mt-2 max-w-[250px]">
-                                        Upload tomorrow's morning chart. I will cross-reference it with your history to detect Gap Ups/Downs and pattern repeats.
+                                        I will scan for candlestick patterns and tell you if the trend will go UP or DOWN.
                                     </p>
                                 </div>
                             )}
@@ -357,36 +359,83 @@ export default function MarketIndicatorPage() {
                                 <div className="h-full min-h-[400px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
                                     <div className='relative'>
                                         <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
-                                        <FileSearch className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
+                                        <Search className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
                                     </div>
                                     <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse text-center">
-                                        Analyzing Opening Candles...<br/>
-                                        <span className='text-[9px] font-bold opacity-50'>Calculating Gap Variance</span>
+                                        Micro-Scanning Candles...<br/>
+                                        <span className='text-[9px] font-bold opacity-50'>Predicting Session Bias</span>
                                     </p>
                                 </div>
                             )}
 
                             {result && (
                                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                                     {/* Opening Status Badge */}
+                                     {/* Prediction Banner */}
                                      <div className={cn(
-                                         "p-6 rounded-2xl border-2 flex items-center justify-between",
-                                         result.openingStatus === 'Up Opening' ? "bg-emerald-500/10 border-emerald-500/20" : 
-                                         result.openingStatus === 'Down Opening' ? "bg-rose-500/10 border-rose-500/20" : 
-                                         "bg-zinc-500/10 border-zinc-500/20"
+                                         "p-6 rounded-2xl border-2 shadow-xl",
+                                         result.prediction.direction === 'UP' ? "bg-emerald-500/10 border-emerald-500/30" : 
+                                         result.prediction.direction === 'DOWN' ? "bg-rose-500/10 border-rose-500/30" : 
+                                         "bg-zinc-500/10 border-zinc-500/30"
                                      )}>
-                                         <div className="flex items-center gap-4">
-                                             {result.openingStatus === 'Up Opening' ? <ArrowUpCircle className="h-8 w-8 text-emerald-500" /> : <ArrowDownCircle className="h-8 w-8 text-rose-500" />}
-                                             <div>
-                                                 <h3 className="font-black text-xl uppercase italic tracking-tighter">
-                                                     {result.openingStatus} {result.openingGapPercent && `(${result.openingGapPercent})`}
-                                                 </h3>
-                                                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Visual Session Delta Detected</p>
-                                             </div>
+                                         <div className="flex items-center justify-between mb-4">
+                                            <div className='flex items-center gap-3'>
+                                                {result.prediction.direction === 'UP' ? <TrendingUp className="h-8 w-8 text-emerald-500" /> : <TrendingDown className="h-8 w-8 text-rose-500" />}
+                                                <div>
+                                                    <h3 className="font-black text-2xl uppercase italic tracking-tighter">
+                                                        PREDICTION: {result.prediction.direction}
+                                                    </h3>
+                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Immediate Session bias</p>
+                                                </div>
+                                            </div>
+                                            <div className='text-right'>
+                                                <p className='text-[10px] font-black uppercase text-muted-foreground'>Confidence</p>
+                                                <p className='text-xl font-mono font-black text-primary'>{result.prediction.confidence}%</p>
+                                            </div>
                                          </div>
-                                         {result.isPatternRepeating && (
-                                              <Badge className="bg-primary text-[10px] font-black py-1 px-3">REPLAY DETECTED</Badge>
-                                         )}
+                                         <div className='space-y-2'>
+                                            <div className='flex justify-between items-center text-[9px] font-black uppercase mb-1'>
+                                                <span className='text-zinc-500'>Sentiment Strength</span>
+                                                <span className={result.prediction.direction === 'UP' ? 'text-emerald-500' : 'text-rose-500'}>{result.prediction.confidence}%</span>
+                                            </div>
+                                            <Progress value={result.prediction.confidence} className="h-1 bg-zinc-800" />
+                                            <p className='text-xs italic text-muted-foreground mt-3 leading-relaxed'>
+                                                " {result.prediction.reasoning} "
+                                            </p>
+                                         </div>
+                                     </div>
+
+                                     {/* Candle Pattern List */}
+                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                         <Card className="bg-zinc-900/50 border-zinc-800">
+                                             <CardHeader className="py-3">
+                                                 <CardTitle className="text-[10px] font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+                                                     <Eye className='h-3 w-3' /> Identified Patterns
+                                                 </CardTitle>
+                                             </CardHeader>
+                                             <CardContent className="flex flex-wrap gap-2 pb-4">
+                                                 {result.identifiedPatterns.map((pattern, i) => (
+                                                     <Badge key={i} variant="secondary" className="bg-zinc-800 text-[9px] font-bold py-0.5">{pattern}</Badge>
+                                                 ))}
+                                                 {result.identifiedPatterns.length === 0 && <span className='text-[10px] text-zinc-600'>Consolidation range...</span>}
+                                             </CardContent>
+                                         </Card>
+                                         <Card className={cn(
+                                             "bg-zinc-900/50 border-zinc-800",
+                                             result.openingStatus === 'Up Opening' ? "border-emerald-500/20" : result.openingStatus === 'Down Opening' ? "border-rose-500/20" : ""
+                                         )}>
+                                             <CardHeader className="py-3">
+                                                 <CardTitle className="text-[10px] font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+                                                     <ArrowRightLeft className='h-3 w-3' /> Session Opening
+                                                 </CardTitle>
+                                             </CardHeader>
+                                             <CardContent className="pb-4">
+                                                 <div className='flex items-center gap-2'>
+                                                     {result.openingStatus === 'Up Opening' ? <ArrowUpCircle className='h-4 w-4 text-emerald-500'/> : <ArrowDownCircle className='h-4 w-4 text-rose-500'/>}
+                                                     <span className='font-black uppercase italic text-sm tracking-tighter'>{result.openingStatus}</span>
+                                                     {result.openingGapPercent && <span className='text-xs font-mono opacity-50'>{result.openingGapPercent}</span>}
+                                                 </div>
+                                             </CardContent>
+                                         </Card>
                                      </div>
 
                                      <Tabs defaultValue="today" className="w-full">
@@ -448,11 +497,11 @@ export default function MarketIndicatorPage() {
                         </div>
                     </div>
                 </CardContent>
-                <CardFooter className="justify-between border-t py-4 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                <CardFooter className="justify-between border-t py-4 text-[10px] text-zinc-500 font-black uppercase tracking-widest">
                     <div className='flex items-center gap-4'>
-                        <span className='flex items-center gap-1'><RefreshCw className='h-3 w-3'/> Grounded Sync v2.6</span>
+                        <span className='flex items-center gap-1'><Zap className='h-3 w-3 text-emerald-500'/> CANDLE ENGINE v3.1</span>
                         <span className='opacity-30'>|</span>
-                        <span>GAP DETECTOR ENABLED</span>
+                        <span>PATTERN MATCHING ENABLED</span>
                     </div>
                     <span>SYNCED: {result?.analysisDate || 'IDLE'}</span>
                 </CardFooter>
