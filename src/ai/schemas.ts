@@ -222,30 +222,37 @@ export type TaskPrepOutput = {
   checklist: string[];
 };
 
-// --- NEW MARKET INDICATOR SCHEMAS ---
+// --- NEW MARKET INDICATOR (CHART ANALYST) SCHEMAS ---
+
+export type ExecutionStep = {
+  time: string;
+  action: string;
+  priceLevel: string;
+  logic: string;
+};
 
 export type MarketIndicatorInput = {
-  symbol: string;
+  photoDataUri: string;
+  symbolHint?: string;
 };
 
 export type MarketIndicatorOutput = {
   symbol: string;
-  verdict: 'Buy' | 'Sell' | 'Hold';
-  currentPrice: string;
-  entryPrice: string;
-  targetPrice: string;
-  stopLoss: string;
-  rsi: number;
-  macd: {
-    value: number;
-    signal: number;
-    histogram: number;
+  currentSentiment: 'Bullish' | 'Bearish' | 'Neutral';
+  buyStrategy: {
+    entry: string;
+    stopLoss: string;
+    target1: string;
+    target2: string;
+    executionPlan: ExecutionStep[];
   };
-  globalFactors: {
-    brentOil: string;
-    usMarketSentiment: string;
-    asianMarketStatus: string;
+  shortStrategy: {
+    entry: string;
+    stopLoss: string;
+    target1: string;
+    target2: string;
+    executionPlan: ExecutionStep[];
   };
-  rationale: string;
+  overallVerdict: string;
   analysisDate: string;
 };
