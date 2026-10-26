@@ -1,7 +1,7 @@
 'use server';
 /**
- * @fileOverview Visual Quant Analyst flow. Analyzes stock chart screenshots 
- * to provide exact time-wise Entry/Exit instructions based on VISUAL evidence.
+ * @fileOverview Visual Quant Analyst flow. Optimized to handle generic stock page 
+ * screenshots (Google Finance, Yahoo, etc.) and extract exact session levels.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -25,7 +25,7 @@ const StrategySchema = z.object({
 });
 
 const MarketIndicatorOutputSchema = z.object({
-  symbol: z.string().describe('The identified stock symbol from the chart image.'),
+  symbol: z.string().describe('The identified stock symbol from the chart image or page header.'),
   currentSentiment: z.enum(['Bullish', 'Bearish', 'Neutral']),
   buyStrategy: StrategySchema,
   shortStrategy: StrategySchema,
@@ -39,21 +39,22 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
       model: MODEL,
       prompt: [
         { media: { url: input.photoDataUri } },
-        { text: `You are a Senior Intraday Quant Analyst. Analyze this stock chart screenshot with 100% precision.
+        { text: `You are a Senior Intraday Quant Analyst. Analyze this stock chart/page screenshot with 100% precision.
         
         CRITICAL INSTRUCTIONS:
-        1. Read the Y-AXIS and latest PRICE TOOLTIP carefully. Use the EXACT numbers visible in the image.
-        2. Identify the current candlestick pattern (e.g., Bullish Engulfing, Pin Bar, Breakout).
-        3. If the price is around 130-140, do NOT suggest entry at 1200. Every number MUST be derived from the visual scale of this specific image.
-        4. Provide exact time-wise actions for both a BUY (Long) setup and a SHORT SELL setup based on the current session timeframe.
-        5. For each strategy, give precise Entry, Stop-Loss, and two Profit Targets based on the visual support/resistance levels seen in the candlesticks.
-        6. Detail the "Time-wise execution plan" - specify exactly when (time or event) to enter and exit.
-        7. Maintain a professional, clinical quant tone.` },
+        1. IDENTIFY THE SYMBOL: Look at the top header. It might be "Reliance Industries", "TCS", etc.
+        2. EXTRACT EXACT PRICE: Read the latest price tooltip or large bold number (e.g., 1,201.80).
+        3. READ THE Y-AXIS: Use the visible price scale on the right/left to ground all your suggestions. 
+        4. NO HALLUCINATIONS: If the current price is ~1200, all your targets must be near 1200. Do NOT use random 1400/1500 levels.
+        5. PROVIDE INTRADAY ACTIONS: Give a Buy Setup (Long) and a Short Setup (Bearish). 
+        6. TIME-WISE PLAN: Specify exactly WHEN to take action based on the time scale shown on the X-axis (e.g., "at 11:00 AM", "on session break").
+        7. If the image is unclear or doesn't show price levels, return reasonable estimates based on the identified symbol's recent context, but prioritize visual evidence.` },
       ],
       output: { schema: MarketIndicatorOutputSchema }
     });
 
-    if (!output) throw new Error('AI failed to analyze chart');
+    if (!output) throw new Error('AI failed to provide a structured analysis.');
+    
     return {
       ...output,
       analysisDate: new Date().toLocaleString()
@@ -61,9 +62,9 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
 
   } catch (error) {
     console.warn("Visual Chart Analysis Error:", error);
-    // Robust fallback that uses the user's symbol hint if available
+    // Return a specific "Error State" object that the frontend can identify
     return {
-      symbol: input.symbolHint || "CHART ANALYSIS",
+      symbol: input.symbolHint || "ANALYSIS FAILED",
       currentSentiment: 'Neutral',
       buyStrategy: {
         entry: "Analysis Error",
@@ -71,7 +72,7 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
         target1: "N/A",
         target2: "N/A",
         executionPlan: [
-          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "Visual analysis request failed. Please check your network and ensure the image is clear." }
+          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "The AI encountered an error. Please try with a clearer screenshot focused on the chart." }
         ]
       },
       shortStrategy: {
@@ -80,10 +81,10 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
         target1: "N/A",
         target2: "N/A",
         executionPlan: [
-          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "Visual analysis request failed. Please check your network and ensure the image is clear." }
+          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "The AI encountered an error. Please try with a clearer screenshot focused on the chart." }
         ]
       },
-      overallVerdict: "Visual analysis encountered a network or payload error. Please ensure your image is smaller and clearly shows price levels on the Y-axis.",
+      overallVerdict: "The visual analysis failed because the image was too large or the AI service timed out. Please try uploading a smaller, cropped screenshot showing the price levels.",
       analysisDate: new Date().toLocaleString()
     };
   }

@@ -20,9 +20,9 @@ import Image from 'next/image';
 
 /**
  * Utility to resize and compress images before sending to server actions.
- * Prevents 'Request Entity Too Large' or 'Failed to fetch' errors due to payload size.
+ * Aggressive compression to ensure payload stays well under the 1MB limit.
  */
-const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
+const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promise<string> => {
     return new Promise((resolve) => {
         const img = new window.Image();
         img.onload = () => {
@@ -45,9 +45,14 @@ const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promis
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
-            ctx?.drawImage(img, 0, 0, width, height);
-            // Compress to JPEG at 0.8 quality to significantly reduce payload size
-            resolve(canvas.toDataURL('image/jpeg', 0.8));
+            if (ctx) {
+                // Use a white background for JPEGs
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+            }
+            // Compress to JPEG at 0.6 quality for safe transport
+            resolve(canvas.toDataURL('image/jpeg', 0.6));
         };
         img.src = dataUrl;
     });
@@ -100,6 +105,7 @@ export default function MarketIndicatorPage() {
                 const optimizedImage = await resizeImage(dataUrl);
                 setOriginalImage(optimizedImage);
                 setResult(null);
+                setAiError('');
             };
             reader.readAsDataURL(file);
         }
@@ -118,6 +124,7 @@ export default function MarketIndicatorPage() {
                 const optimizedImage = await resizeImage(dataUrl);
                 setOriginalImage(optimizedImage);
                 setResult(null);
+                setAiError('');
             }
         }
     };
@@ -130,13 +137,21 @@ export default function MarketIndicatorPage() {
 
         setLoading(true);
         setAiError('');
+        setResult(null);
         try {
             const response = await getMarketIndicator({ photoDataUri: originalImage });
+            
+            // Check for internal flow error
+            if (response.buyStrategy.entry === "Analysis Error") {
+                setAiError(response.overallVerdict || "The AI failed to identify clear price levels in this image. Please ensure the Y-axis and current price are visible.");
+                return;
+            }
+
             setResult(response);
             toast({ title: "Chart Analysis Complete", description: "Step-by-step strategy identified." });
         } catch (error: any) {
             console.error("Analysis Error:", error);
-            setAiError(error.message || "An unexpected error occurred during visual analysis.");
+            setAiError(error.message || "An unexpected error occurred during visual analysis. The image might be too complex or the service is busy.");
         } finally {
             setLoading(false);
         }
@@ -223,7 +238,7 @@ export default function MarketIndicatorPage() {
                 <CardContent className="space-y-8">
                     {aiError && (
                         <Alert variant="destructive">
-                            <AlertTitle>Analysis Error</AlertTitle>
+                            <AlertTitle>Analysis Issue</AlertTitle>
                             <AlertDescription>{aiError}</AlertDescription>
                         </Alert>
                     )}
@@ -241,7 +256,7 @@ export default function MarketIndicatorPage() {
                                             variant="secondary" 
                                             size="icon" 
                                             className="absolute top-2 right-2 rounded-full h-8 w-8"
-                                            onClick={() => {setOriginalImage(null); setResult(null);}}
+                                            onClick={() => {setOriginalImage(null); setResult(null); setAiError('');}}
                                          >
                                              <Info className="h-4 w-4" />
                                          </Button>
@@ -260,32 +275,32 @@ export default function MarketIndicatorPage() {
                             </div>
                             <div className="flex gap-2">
                                  <Button onClick={handleCapture} disabled={originalImage !== null || !isCameraReady} className="w-full h-12 rounded-xl" variant="secondary">
-                                    <Camera className="mr-2 h-4 w-4" /> Capture Screenshot
+                                    <Camera className="mr-2 h-4 w-4" /> Capture
                                 </Button>
                                 <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full h-12 rounded-xl border-primary/20">
-                                    <Upload className="mr-2 h-4 w-4" /> Upload Image
+                                    <Upload className="mr-2 h-4 w-4" /> Upload
                                 </Button>
                                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
                             </div>
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Wand2 className="mr-2 h-5 w-5" />}
-                                {loading ? 'Analyzing Chart Patterns...' : 'Generate Step-by-Step Strategy'}
+                                {loading ? 'Analyzing Session Levels...' : 'Generate Step-by-Step Strategy'}
                             </Button>
                         </div>
 
                         <div className="space-y-4">
-                            {!result && !loading && (
+                            {!result && !loading && !aiError && (
                                 <div className="h-full min-h-[300px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
                                     <Sparkles className="h-12 w-12 text-primary/20 mb-4" />
                                     <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Waiting for Visualization</h3>
-                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Upload a 5min or 15min chart screenshot to unlock time-wise quant actions.</p>
+                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Upload a 5min or 15min chart screenshot. The AI will read the Y-axis levels to calculate your setup.</p>
                                 </div>
                             )}
 
                             {loading && (
                                 <div className="h-full min-h-[300px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
                                     <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
-                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Running Neural Trend Mapping...</p>
+                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Scanning Visual Context...</p>
                                 </div>
                             )}
 
