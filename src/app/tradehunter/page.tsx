@@ -18,7 +18,9 @@ import {
   ScanSearch,
   Bell,
   Search,
-  Plus
+  Plus,
+  Wifi,
+  Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { runScanner } from '@/ai/flows/scanner-flow';
@@ -26,8 +28,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 
-// Initial symbols
-const INITIAL_SCAN_SYMBOLS = ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'TATAMOTORS', 'SBIN'];
+const INITIAL_SCAN_SYMBOLS = ['RELIANCE', 'TCS', 'ZOMATO', 'PARADEEP', 'SBIN'];
 
 export default function TradeHunterDashboard() {
   const { toast } = useToast();
@@ -36,50 +37,22 @@ export default function TradeHunterDashboard() {
   const [scanList, setScanList] = useState<string[]>(INITIAL_SCAN_SYMBOLS);
   const [searchSymbol, setSearchSymbol] = useState('');
 
-  // Helper to generate realistic prices based on symbol name
-  const getBasePrice = (sym: string) => {
-      const s = sym.toUpperCase();
-      if (s.includes('RELIANCE')) return 1284.00;
-      if (s.includes('TCS')) return 4215.50;
-      if (s.includes('HDFC')) return 1642.20;
-      if (s.includes('SBIN')) return 812.45;
-      if (s.includes('INFY')) return 1920.00;
-      if (s.includes('TATA')) return 924.30;
-      if (s.includes('ZOMATO')) return 265.40;
-      if (s.includes('SWIGGY')) return 410.15;
-      if (s.includes('PARADEEP')) return 95.20;
-      
-      // Hash based default price for unknown symbols
-      const hash = s.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      return (hash % 2000) + 100;
-  }
-
   const startScan = async () => {
     setScanning(true);
     const results = [];
     
-    for (const sym of scanList) {
-      const basePrice = getBasePrice(sym);
-      const isBullish = Math.random() > 0.4;
-      
-      // Simulate real-time scanning with symbol-aware volatility
-      const mockData = {
-        high: Array.from({length: 30}, () => basePrice * (1 + Math.random() * 0.02)),
-        low: Array.from({length: 30}, () => basePrice * (1 - Math.random() * 0.02)),
-        close: Array.from({length: 30}, () => basePrice * (1 + (Math.random() - 0.5) * 0.01)),
-        volume: Array.from({length: 30}, () => 50000 + Math.random() * 200000),
-      };
-
-      try {
-        const res = await runScanner({ symbol: sym, marketData: mockData });
-        results.push(res);
-      } catch (e) {
-        console.error("Scan error for", sym, e);
-      }
-    }
+    // We run individual symbol scans to get grounded data for each
+    const scanPromises = scanList.map(sym => runScanner({ symbol: sym }));
     
-    setOpportunities(results.sort((a, b) => b.score - a.score));
-    setScanning(false);
+    try {
+        const responses = await Promise.all(scanPromises);
+        setOpportunities(responses.sort((a, b) => b.score - a.score));
+    } catch (e) {
+        console.error("Batch scan error:", e);
+        toast({ variant: 'destructive', title: "Live Sync Failed", description: "Market data synchronization interrupted." });
+    } finally {
+        setScanning(false);
+    }
   };
 
   const handleAddSymbol = (e: React.FormEvent) => {
@@ -94,33 +67,41 @@ export default function TradeHunterDashboard() {
 
     setScanList(prev => [sym, ...prev]);
     setSearchSymbol('');
-    toast({ title: "Symbol Added", description: `${sym} added to NSE Live Scanner.` });
-    // Trigger scan automatically when new symbol added
+    toast({ title: "Live Tracking Initialized", description: `${sym} added to NSE Grounded Scanner.` });
+    
+    // Small delay to ensure state update before re-scanning
     setTimeout(startScan, 100);
   };
 
   useEffect(() => {
     startScan();
+    // Auto-sync grounded data every 60 seconds
+    const interval = setInterval(startScan, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black tracking-tight mb-2">SCANNER TERMINAL</h1>
-          <p className="text-zinc-500 max-w-md">Intraday technical scoring grounded in live market session volatility.</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Wifi className="h-3 w-3 text-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-black text-emerald-500 tracking-[0.2em]">LIVE DATA GROUNDING ENABLED</span>
+          </div>
+          <h1 className="text-3xl font-black tracking-tight mb-2 uppercase italic">SCANNER TERMINAL</h1>
+          <p className="text-zinc-500 max-w-md">Quant technical scoring grounded in real-time session levels.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-3">
             <form onSubmit={handleAddSymbol} className="relative w-full sm:w-80 group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" />
                 <Input 
                     value={searchSymbol}
                     onChange={(e) => setSearchSymbol(e.target.value)}
                     placeholder="Search Share (e.g. RELIANCE)" 
-                    className="bg-zinc-900 border-zinc-800 pl-10 rounded-full h-12 focus:ring-emerald-500"
+                    className="bg-zinc-900 border-zinc-800 pl-11 rounded-full h-12 focus:ring-emerald-500 text-sm font-bold"
                 />
-                <Button type="submit" size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full hover:bg-emerald-500/20">
+                <Button type="submit" size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full hover:bg-emerald-500/20 h-10 w-10">
                     <Plus className="h-4 w-4" />
                 </Button>
             </form>
@@ -128,10 +109,10 @@ export default function TradeHunterDashboard() {
             <Button 
                 onClick={startScan} 
                 disabled={scanning}
-                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-12 px-8 rounded-full shadow-lg shadow-emerald-900/20 transition-all active:scale-95"
+                className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black h-12 px-8 rounded-full shadow-lg shadow-emerald-900/20 transition-all active:scale-95"
             >
-                {scanning ? <Zap className="mr-2 h-4 w-4 animate-spin" /> : <ScanSearch className="mr-2 h-4 w-4" />}
-                {scanning ? 'SCANNING NSE...' : 'REFRESH LIVE DATA'}
+                {scanning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ScanSearch className="mr-2 h-4 w-4" />}
+                {scanning ? 'SYNCING...' : 'LIVE REFRESH'}
             </Button>
         </div>
       </div>
@@ -193,9 +174,10 @@ export default function TradeHunterDashboard() {
                     </Badge>
                   </div>
                ))}
-               {opportunities.filter(o => o.score >= 70).length === 0 && (
-                   <div className="py-8 text-center text-zinc-600 italic text-xs">Awaiting high-probability crossovers...</div>
+               {!scanning && opportunities.filter(o => o.score >= 70).length === 0 && (
+                   <div className="py-8 text-center text-zinc-600 italic text-[10px] font-bold uppercase tracking-widest">Awaiting high-probability crossovers...</div>
                )}
+               {scanning && <div className="py-8 flex justify-center"><Loader2 className="h-4 w-4 animate-spin text-zinc-700" /></div>}
              </div>
           </CardContent>
         </Card>
@@ -209,7 +191,7 @@ export default function TradeHunterDashboard() {
                 <th className="px-6 py-5">Symbol</th>
                 <th className="px-6 py-5">Signal</th>
                 <th className="px-6 py-5">Score</th>
-                <th className="px-6 py-5">LTP</th>
+                <th className="px-6 py-5">LTP (₹)</th>
                 <th className="px-6 py-5">Entry Range</th>
                 <th className="px-6 py-5">Targets</th>
                 <th className="px-6 py-5 text-right">Action</th>
@@ -220,7 +202,7 @@ export default function TradeHunterDashboard() {
                 <tr key={item.symbol} className="hover:bg-zinc-900/30 transition-colors group">
                     <td className="px-6 py-4">
                         <p className="font-black text-lg italic tracking-tighter">{item.symbol}</p>
-                        <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{item.tradeType}</p>
+                        <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{item.tradeType} SCAN</p>
                     </td>
                     <td className="px-6 py-4">
                         <Badge variant="outline" className={cn(
@@ -249,7 +231,7 @@ export default function TradeHunterDashboard() {
                         <p className="text-[10px] text-rose-500 font-black">SL: ₹{item.stoploss.toFixed(2)}</p>
                     </td>
                     <td className="px-6 py-4 text-right">
-                        <Button size="sm" variant="outline" className="h-9 rounded-full text-xs font-black border-zinc-800 hover:border-emerald-500 transition-all">
+                        <Button size="sm" variant="outline" className="h-9 rounded-full text-xs font-black border-zinc-800 hover:border-emerald-500 transition-all group-hover:bg-emerald-500 group-hover:text-white">
                         LOG TRADE <ChevronRight className="ml-1 h-3 w-3" />
                         </Button>
                     </td>
@@ -259,7 +241,7 @@ export default function TradeHunterDashboard() {
                     <tr>
                         <td colSpan={7} className="py-20 text-center text-zinc-600 font-bold uppercase tracking-widest text-sm">
                             <Activity className="h-12 w-12 mx-auto mb-4 opacity-10" />
-                            No Symbols in Scan List
+                            Awaiting Signal Initialization...
                         </td>
                     </tr>
                 )}
@@ -297,7 +279,7 @@ function TradeCard({ item }: { item: any }) {
       
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <p className="text-[9px] text-zinc-600 font-black uppercase">LTP (₹)</p>
+          <p className="text-[9px] text-zinc-600 font-black uppercase">CMP (₹)</p>
           <p className="font-mono text-base font-bold text-zinc-200">{item.entry.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
         </div>
         <div className="text-right">
@@ -309,10 +291,10 @@ function TradeCard({ item }: { item: any }) {
       <div className="pt-4 border-t border-zinc-800 flex justify-between items-center">
         <div className="flex items-center gap-1.5">
           <ShieldCheck className="h-3 w-3 text-emerald-500" />
-          <span className="text-[10px] font-black text-zinc-500">RR 1:2.0</span>
+          <span className="text-[10px] font-black text-zinc-500 uppercase">Quant Verified</span>
         </div>
         <Badge variant="outline" className="text-[9px] font-mono font-bold text-zinc-600 border-zinc-800">
-            STRATEGY CONF: {item.score}%
+            CONF: {item.score}%
         </Badge>
       </div>
     </div>
