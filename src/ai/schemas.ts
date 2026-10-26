@@ -234,6 +234,8 @@ export type ExecutionStep = {
 export type MarketIndicatorOutput = {
   symbol: string;
   currentSentiment: 'Bullish' | 'Bearish' | 'Neutral';
+  openingStatus: 'Up Opening' | 'Down Opening' | 'Flat';
+  openingGapPercent?: string;
   buyStrategy: {
     entry: string;
     stopLoss: string;

@@ -8,9 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, Loader2, Landmark, Camera, Upload, 
-  Sparkles, Target, ShieldAlert, Clock, Info, Wand2, Search,
-  RefreshCw, History, CheckCircle2, TrendingUp, AlertCircle,
-  ArrowRightLeft, FileSearch, BarChart4
+  Sparkles, Target, ShieldAlert, Clock, Info, Search,
+  RefreshCw, History, CheckCircle2, AlertCircle,
+  ArrowRightLeft, FileSearch, BarChart4, ArrowUpCircle, ArrowDownCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -22,7 +22,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
+const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promise<string> => {
     return new Promise((resolve) => {
         const img = new window.Image();
         img.onload = () => {
@@ -72,7 +72,6 @@ export default function MarketIndicatorPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Load previous analysis and image from local storage
         const savedAnalysis = localStorage.getItem('last_market_analysis');
         const savedImage = localStorage.getItem('last_market_image');
         
@@ -152,13 +151,12 @@ export default function MarketIndicatorPage() {
             
             setResult(response);
             
-            // Save current to previous storage for NEXT time
             localStorage.setItem('last_market_analysis', JSON.stringify(response));
             localStorage.setItem('last_market_image', originalImage);
             
             toast({ 
-                title: response.isPatternRepeating ? "Pattern Replay Detected!" : "Analysis Complete", 
-                description: response.isPatternRepeating ? "High similarity to previous session. Follow strategy." : "Intraday roadmap generated." 
+                title: response.openingStatus, 
+                description: response.isPatternRepeating ? "Pattern Replay Detected!" : "Intraday roadmap generated." 
             });
             
         } catch (error: any) {
@@ -235,15 +233,15 @@ export default function MarketIndicatorPage() {
                     </Link>
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
-                            <Badge variant="outline" className="text-amber-500 border-amber-500/20 bg-amber-500/5">
-                                <Sparkles className="h-3 w-3 mr-1" /> VISUAL PATTERN COMPARISON
+                            <Badge variant="outline" className="text-amber-500 border-amber-500/20 bg-amber-500/5 uppercase tracking-tighter font-black">
+                                <Sparkles className="h-3 w-3 mr-1" /> OPENING GAP DETECTOR ACTIVE
                             </Badge>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Landmark className="h-8 w-8 text-primary" />
                             AI Visual Market Strategist
                         </CardTitle>
-                        <CardDescription>Upload today's chart and compare it with the previous session for pattern validation.</CardDescription>
+                        <CardDescription>Upload today's chart and compare it with previous sessions to detect Gaps and Pattern Repeats.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-8">
@@ -280,7 +278,6 @@ export default function MarketIndicatorPage() {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* NEW CHART AREA */}
                                 <div className="space-y-2">
                                     <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
                                         <Target className="h-3 w-3 text-primary" /> Today's Chart Movement
@@ -306,10 +303,9 @@ export default function MarketIndicatorPage() {
                                     </div>
                                 </div>
 
-                                {/* PREVIOUS CHART AREA */}
                                 <div className="space-y-2">
                                     <p className="text-[10px] font-black uppercase text-zinc-400 flex items-center gap-2 px-1">
-                                        <History className="h-3 w-3 text-zinc-500" /> Previous Session Movement
+                                        <History className="h-3 w-3 text-zinc-500" /> Previous Session Context
                                     </p>
                                     <div className='relative w-full aspect-square bg-zinc-900 rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 shadow-inner group'>
                                         {previousImage ? (
@@ -322,7 +318,7 @@ export default function MarketIndicatorPage() {
                                         ) : (
                                             <div className="text-center p-4">
                                                 <BarChart4 className="h-8 w-8 text-zinc-800 mx-auto mb-2" />
-                                                <p className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest">No previous session data</p>
+                                                <p className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest text-center">No previous session<br/>data recorded</p>
                                             </div>
                                         )}
                                     </div>
@@ -341,7 +337,7 @@ export default function MarketIndicatorPage() {
 
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <RefreshCw className="mr-2 h-5 w-5" />}
-                                {loading ? 'Running Comparative Analysis...' : 'Sync Today with Tomorrow'}
+                                {loading ? 'Detecting Opening Movement...' : 'Check Opening & Strategy'}
                             </Button>
                         </div>
 
@@ -350,9 +346,9 @@ export default function MarketIndicatorPage() {
                             {!result && !loading && !aiError && (
                                 <div className="h-full min-h-[400px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
                                     <ArrowRightLeft className="h-12 w-12 text-primary/20 mb-4" />
-                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Comparative Interface Active</h3>
+                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Opening Detector Active</h3>
                                     <p className="text-[10px] text-muted-foreground mt-2 max-w-[250px]">
-                                        Take a screenshot of tomorrow's chart. The AI will cross-reference it with today's visual data to identify repeating high-probability setups.
+                                        Upload tomorrow's morning chart. I will cross-reference it with your history to detect Gap Ups/Downs and pattern repeats.
                                     </p>
                                 </div>
                             )}
@@ -364,30 +360,39 @@ export default function MarketIndicatorPage() {
                                         <FileSearch className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
                                     </div>
                                     <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse text-center">
-                                        Detecting Pattern Similarity...<br/>
-                                        <span className='text-[9px] font-bold opacity-50'>Comparing Session Deltas</span>
+                                        Analyzing Opening Candles...<br/>
+                                        <span className='text-[9px] font-bold opacity-50'>Calculating Gap Variance</span>
                                     </p>
                                 </div>
                             )}
 
                             {result && (
                                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                                     {/* Similarity Alert */}
-                                     {result.isPatternRepeating && (
-                                         <Alert className='border-emerald-500/20 bg-emerald-500/10 shadow-lg'>
-                                             <CheckCircle2 className='h-4 w-4 text-emerald-500' />
-                                             <AlertTitle className='text-emerald-500 font-black'>HIGH PROBABILITY PATTERN REPLAY</AlertTitle>
-                                             <AlertDescription className='text-xs'>
-                                                 Current chart movement is <strong>{result.similarityScore}% identical</strong> to your previous session. 
-                                                 The technical setup is repeating perfectly. **Execute previously verified strategy.**
-                                             </AlertDescription>
-                                         </Alert>
-                                     )}
+                                     {/* Opening Status Badge */}
+                                     <div className={cn(
+                                         "p-6 rounded-2xl border-2 flex items-center justify-between",
+                                         result.openingStatus === 'Up Opening' ? "bg-emerald-500/10 border-emerald-500/20" : 
+                                         result.openingStatus === 'Down Opening' ? "bg-rose-500/10 border-rose-500/20" : 
+                                         "bg-zinc-500/10 border-zinc-500/20"
+                                     )}>
+                                         <div className="flex items-center gap-4">
+                                             {result.openingStatus === 'Up Opening' ? <ArrowUpCircle className="h-8 w-8 text-emerald-500" /> : <ArrowDownCircle className="h-8 w-8 text-rose-500" />}
+                                             <div>
+                                                 <h3 className="font-black text-xl uppercase italic tracking-tighter">
+                                                     {result.openingStatus} {result.openingGapPercent && `(${result.openingGapPercent})`}
+                                                 </h3>
+                                                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Visual Session Delta Detected</p>
+                                             </div>
+                                         </div>
+                                         {result.isPatternRepeating && (
+                                              <Badge className="bg-primary text-[10px] font-black py-1 px-3">REPLAY DETECTED</Badge>
+                                         )}
+                                     </div>
 
                                      <Tabs defaultValue="today" className="w-full">
                                          <TabsList className="grid w-full grid-cols-2 mb-4 h-12 bg-zinc-900/50 p-1">
-                                             <TabsTrigger value="today" className="font-black text-[10px] uppercase">Today's Roadmap</TabsTrigger>
-                                             <TabsTrigger value="previous" className="font-black text-[10px] uppercase" disabled={!previousAnalysis}>Previous Context</TabsTrigger>
+                                             <TabsTrigger value="today" className="font-black text-[10px] uppercase">Execution Plan</TabsTrigger>
+                                             <TabsTrigger value="previous" className="font-black text-[10px] uppercase" disabled={!previousAnalysis}>Prior Session</TabsTrigger>
                                          </TabsList>
                                          
                                          <TabsContent value="today" className="space-y-6">
@@ -445,14 +450,13 @@ export default function MarketIndicatorPage() {
                 </CardContent>
                 <CardFooter className="justify-between border-t py-4 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                     <div className='flex items-center gap-4'>
-                        <span className='flex items-center gap-1'><RefreshCw className='h-3 w-3'/> Grounded Sync v2.5</span>
+                        <span className='flex items-center gap-1'><RefreshCw className='h-3 w-3'/> Grounded Sync v2.6</span>
                         <span className='opacity-30'>|</span>
-                        <span>SESSION COMPARATOR ACTIVE</span>
+                        <span>GAP DETECTOR ENABLED</span>
                     </div>
-                    <span>CALIBRATED: {result?.analysisDate || 'IDLE'}</span>
+                    <span>SYNCED: {result?.analysisDate || 'IDLE'}</span>
                 </CardFooter>
             </Card>
         </div>
     );
 }
-
