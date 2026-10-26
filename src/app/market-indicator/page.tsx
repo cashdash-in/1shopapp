@@ -1,13 +1,15 @@
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, Loader2, Landmark, Camera, Upload, 
   Sparkles, ArrowUpRight, ArrowDownRight, Target, 
-  ShieldAlert, Clock, Info, CheckCircle2, Wand2
+  ShieldAlert, Clock, Info, CheckCircle2, Wand2, Search
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -18,11 +20,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 
-/**
- * Utility to resize and compress images before sending to server actions.
- * Aggressive compression to ensure payload stays well under the 1MB limit.
- */
-const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promise<string> => {
+const resizeImage = (dataUrl: string, maxWidth = 1024, maxHeight = 1024): Promise<string> => {
     return new Promise((resolve) => {
         const img = new window.Image();
         img.onload = () => {
@@ -46,13 +44,11 @@ const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promis
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             if (ctx) {
-                // Use a white background for JPEGs
                 ctx.fillStyle = "#FFFFFF";
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
             }
-            // Compress to JPEG at 0.6 quality for safe transport
-            resolve(canvas.toDataURL('image/jpeg', 0.6));
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
         };
         img.src = dataUrl;
     });
@@ -61,8 +57,9 @@ const resizeImage = (dataUrl: string, maxWidth = 1000, maxHeight = 1000): Promis
 export default function MarketIndicatorPage() {
     const { toast } = useToast();
     const [originalImage, setOriginalImage] = useState<string | null>(null);
+    const [symbolHint, setSymbolHint] = useState('');
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState<MarketIndicatorOutput | null>(null);
+    const [result, setResult] = useState<any>(null);
     const [aiError, setAiError] = useState('');
     
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -79,7 +76,6 @@ export default function MarketIndicatorPage() {
             }
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             setHasCameraPermission(true);
-    
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
               videoRef.current.onloadedmetadata = () => setIsCameraReady(true);
@@ -101,8 +97,7 @@ export default function MarketIndicatorPage() {
         if (file) {
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const dataUrl = e.target?.result as string;
-                const optimizedImage = await resizeImage(dataUrl);
+                const optimizedImage = await resizeImage(e.target?.result as string);
                 setOriginalImage(optimizedImage);
                 setResult(null);
                 setAiError('');
@@ -120,8 +115,7 @@ export default function MarketIndicatorPage() {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-                const dataUrl = canvas.toDataURL('image/png');
-                const optimizedImage = await resizeImage(dataUrl);
+                const optimizedImage = await resizeImage(canvas.toDataURL('image/png'));
                 setOriginalImage(optimizedImage);
                 setResult(null);
                 setAiError('');
@@ -139,25 +133,25 @@ export default function MarketIndicatorPage() {
         setAiError('');
         setResult(null);
         try {
-            const response = await getMarketIndicator({ photoDataUri: originalImage });
+            const response = await getMarketIndicator({ 
+              photoDataUri: originalImage,
+              symbolHint: symbolHint.trim() || undefined
+            });
             
-            // Check for internal flow error
             if (response.buyStrategy.entry === "Analysis Error") {
-                setAiError(response.overallVerdict || "The AI failed to identify clear price levels in this image. Please ensure the Y-axis and current price are visible.");
-                return;
+                setAiError(response.overallVerdict);
+            } else {
+                setResult(response);
+                toast({ title: "Analysis Complete", description: "Trading setup identified from visual context." });
             }
-
-            setResult(response);
-            toast({ title: "Chart Analysis Complete", description: "Step-by-step strategy identified." });
         } catch (error: any) {
-            console.error("Analysis Error:", error);
-            setAiError(error.message || "An unexpected error occurred during visual analysis. The image might be too complex or the service is busy.");
+            setAiError("Connection error. Please check your internet or try a smaller screenshot.");
         } finally {
             setLoading(false);
         }
     };
 
-    const StrategyCard = ({ type, data }: { type: 'BUY' | 'SHORT', data: MarketIndicatorOutput['buyStrategy'] | MarketIndicatorOutput['shortStrategy'] }) => {
+    const StrategyCard = ({ type, data }: { type: 'BUY' | 'SHORT', data: any }) => {
         const isBuy = type === 'BUY';
         return (
             <Card className={cn(
@@ -170,14 +164,14 @@ export default function MarketIndicatorPage() {
                             {type} SETUP
                         </CardTitle>
                         <Badge variant="outline" className={isBuy ? "border-green-500/50 text-green-500" : "border-red-500/50 text-red-500"}>
-                            EXECUTE PLAN
+                            INTRADAY PLAN
                         </Badge>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-2">
                         <div className="p-3 rounded-lg bg-background border flex flex-col gap-1">
-                            <span className="text-[10px] font-black text-muted-foreground uppercase">Entry Price</span>
+                            <span className="text-[10px] font-black text-muted-foreground uppercase">Entry</span>
                             <span className="font-mono font-bold text-primary">{data.entry}</span>
                         </div>
                         <div className="p-3 rounded-lg bg-background border flex flex-col gap-1">
@@ -195,10 +189,10 @@ export default function MarketIndicatorPage() {
                     </div>
                     <div className="space-y-2">
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                            <Clock className="h-3 w-3" /> Time-wise Action Plan
+                            <Clock className="h-3 w-3" /> Execution Roadmap
                         </p>
                         <div className="space-y-2">
-                            {data.executionPlan.map((step, i) => (
+                            {data.executionPlan.map((step: any, i: number) => (
                                 <div key={i} className="flex gap-3 text-xs bg-background/50 p-2 rounded border border-primary/5">
                                     <span className="font-black text-primary shrink-0 w-16">{step.time}</span>
                                     <div className="flex flex-col">
@@ -245,6 +239,21 @@ export default function MarketIndicatorPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="symbolHint" className="text-xs font-black text-zinc-500 uppercase">Stock Name (Optional Hint)</Label>
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-600" />
+                                    <Input 
+                                        id="symbolHint" 
+                                        placeholder="e.g. Reliance, TCS, Paradeep" 
+                                        className="pl-8 bg-muted/50 text-xs h-10 border-primary/10"
+                                        value={symbolHint}
+                                        onChange={(e) => setSymbolHint(e.target.value)}
+                                    />
+                                </div>
+                                <p className="text-[10px] text-muted-foreground">Providing a hint helps the AI identify prices correctly if the image is blurry.</p>
+                            </div>
+
                             <div className='relative w-full aspect-video bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner'>
                                  {!originalImage && (
                                      <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
@@ -263,15 +272,6 @@ export default function MarketIndicatorPage() {
                                      </div>
                                  )}
                                  <canvas ref={canvasRef} className="hidden" />
-                                 {!originalImage && hasCameraPermission === false && (
-                                    <div className='absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-background/80'>
-                                         <Alert variant="destructive">
-                                            <Camera className='h-4 w-4'/>
-                                            <AlertTitle>Camera Required</AlertTitle>
-                                            <AlertDescription>Enable permissions or use Upload.</AlertDescription>
-                                        </Alert>
-                                    </div>
-                                 )}
                             </div>
                             <div className="flex gap-2">
                                  <Button onClick={handleCapture} disabled={originalImage !== null || !isCameraReady} className="w-full h-12 rounded-xl" variant="secondary">
@@ -292,15 +292,15 @@ export default function MarketIndicatorPage() {
                             {!result && !loading && !aiError && (
                                 <div className="h-full min-h-[300px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
                                     <Sparkles className="h-12 w-12 text-primary/20 mb-4" />
-                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Waiting for Visualization</h3>
-                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Upload a 5min or 15min chart screenshot. The AI will read the Y-axis levels to calculate your setup.</p>
+                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Awaiting Visual Data</h3>
+                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Upload a screenshot of any stock page or chart. The AI will extract price levels to build your intraday plan.</p>
                                 </div>
                             )}
 
                             {loading && (
                                 <div className="h-full min-h-[300px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
                                     <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
-                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Scanning Visual Context...</p>
+                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Syncing Visual Context...</p>
                                 </div>
                             )}
 

@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Visual Quant Analyst flow. Optimized to handle generic stock page 
@@ -30,10 +31,9 @@ const MarketIndicatorOutputSchema = z.object({
   buyStrategy: StrategySchema,
   shortStrategy: StrategySchema,
   overallVerdict: z.string().describe('A final executive summary of the chart setup.'),
-  analysisDate: z.string(),
 });
 
-export async function getMarketIndicator(input: MarketIndicatorInput): Promise<MarketIndicatorOutput> {
+export async function getMarketIndicator(input: MarketIndicatorInput): Promise<MarketIndicatorOutput & { analysisDate: string }> {
   try {
     const { output } = await ai.generate({
       model: MODEL,
@@ -41,14 +41,15 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
         { media: { url: input.photoDataUri } },
         { text: `You are a Senior Intraday Quant Analyst. Analyze this stock chart/page screenshot with 100% precision.
         
+        SYMBOL HINT (Use if visible): ${input.symbolHint || 'Search in image'}
+
         CRITICAL INSTRUCTIONS:
-        1. IDENTIFY THE SYMBOL: Look at the top header. It might be "Reliance Industries", "TCS", etc.
-        2. EXTRACT EXACT PRICE: Read the latest price tooltip or large bold number (e.g., 1,201.80).
-        3. READ THE Y-AXIS: Use the visible price scale on the right/left to ground all your suggestions. 
-        4. NO HALLUCINATIONS: If the current price is ~1200, all your targets must be near 1200. Do NOT use random 1400/1500 levels.
-        5. PROVIDE INTRADAY ACTIONS: Give a Buy Setup (Long) and a Short Setup (Bearish). 
-        6. TIME-WISE PLAN: Specify exactly WHEN to take action based on the time scale shown on the X-axis (e.g., "at 11:00 AM", "on session break").
-        7. If the image is unclear or doesn't show price levels, return reasonable estimates based on the identified symbol's recent context, but prioritize visual evidence.` },
+        1. IDENTIFY THE SYMBOL: Look for large text like "Reliance Industries", "TCS", or tickers like "NSE: RELIANCE".
+        2. EXTRACT EXACT PRICE: Read the largest bold number (e.g., 1,201.80) or the number in the blue/red tooltip on the Y-axis.
+        3. READ THE Y-AXIS: Use the visible price scale to ground all Buy/Short levels.
+        4. NO HALLUCINATIONS: If current price is ~1200, targets must be ~1210-1250. Do NOT use default values.
+        5. INTRADAY ACTIONS: Provide a Buy (Long) setup and a Short setup based on the VISUAL indicators (moving averages, support lines, etc.).
+        6. TIME PLAN: Specify exactly WHEN to act based on the X-axis (e.g., "at 11:30 AM", "at session high").` },
       ],
       output: { schema: MarketIndicatorOutputSchema }
     });
@@ -62,7 +63,6 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
 
   } catch (error) {
     console.warn("Visual Chart Analysis Error:", error);
-    // Return a specific "Error State" object that the frontend can identify
     return {
       symbol: input.symbolHint || "ANALYSIS FAILED",
       currentSentiment: 'Neutral',
@@ -72,7 +72,7 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
         target1: "N/A",
         target2: "N/A",
         executionPlan: [
-          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "The AI encountered an error. Please try with a clearer screenshot focused on the chart." }
+          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "The AI encountered an error. Please ensure the stock price and symbol are clearly visible in the screenshot." }
         ]
       },
       shortStrategy: {
@@ -81,10 +81,10 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
         target1: "N/A",
         target2: "N/A",
         executionPlan: [
-          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "The AI encountered an error. Please try with a clearer screenshot focused on the chart." }
+          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "The AI encountered an error. Please try a clearer screenshot." }
         ]
       },
-      overallVerdict: "The visual analysis failed because the image was too large or the AI service timed out. Please try uploading a smaller, cropped screenshot showing the price levels.",
+      overallVerdict: "The visual analysis failed or timed out. This often happens if the image is too blurry or the stock price is not clear. Provide a 'Stock Name' hint to improve results.",
       analysisDate: new Date().toLocaleString()
     };
   }
