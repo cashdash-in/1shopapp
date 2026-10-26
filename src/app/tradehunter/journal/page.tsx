@@ -13,6 +13,7 @@ import {
   Filter
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const mockTrades = [
   { id: '1', symbol: 'RELIANCE', entry: 1284, exit: 1310, pnl: 2600, result: 'WIN', date: '2025-08-25', rr: 2.1 },
