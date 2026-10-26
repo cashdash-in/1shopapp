@@ -10,7 +10,7 @@ import {
   Sparkles, Target, ShieldAlert, Clock, Info, Search,
   RefreshCw, History, CheckCircle2, AlertCircle,
   ArrowRightLeft, FileSearch, BarChart4, ArrowUpCircle, ArrowDownCircle,
-  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye, Coins, MousePointer2, Trash2
+  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye, Coins, MousePointer2, Activity
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -165,7 +165,7 @@ export default function MarketIndicatorPage() {
             });
             
         } catch (error: any) {
-            setAiError("Analysis issue. Try typing the current price in the 'Actual Price' box for a forced workaround.");
+            setAiError("Indicator analysis issue. Ensure RSI and MACD are visible in the screenshot.");
         } finally {
             setLoading(false);
         }
@@ -176,10 +176,7 @@ export default function MarketIndicatorPage() {
         localStorage.removeItem('last_market_image');
         setPreviousAnalysis(null);
         setPreviousImage(null);
-        toast({ 
-            title: "History Cleared", 
-            description: "Previous session context has been reset for new stock analysis." 
-        });
+        toast({ title: "Context Reset", description: "Historical data cleared." });
     };
 
     const StrategyCard = ({ type, data }: { type: 'BUY' | 'SHORT', data: any }) => {
@@ -250,14 +247,14 @@ export default function MarketIndicatorPage() {
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
                             <Badge variant="outline" className="text-amber-500 border-amber-500/20 bg-amber-500/5 uppercase tracking-tighter font-black">
-                                <Zap className="h-3 w-3 mr-1" /> HIGH-PRECISION OCR ACTIVE
+                                <Zap className="h-3 w-3 mr-1" /> RSI & MACD GUIDANCE ACTIVE
                             </Badge>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Landmark className="h-8 w-8 text-primary" />
                             Visual Market Strategist
                         </CardTitle>
-                        <CardDescription>AI-powered candlestick reading and automated roadmap generation from chart screenshots.</CardDescription>
+                        <CardDescription>AI-powered indicator reading and automated roadmap generation from chart screenshots.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-8">
@@ -265,13 +262,8 @@ export default function MarketIndicatorPage() {
                         <div className='animate-in slide-in-from-top-2 duration-300'>
                             <Alert variant="destructive">
                                 <ShieldAlert className="h-4 w-4" />
-                                <AlertTitle>Analysis Issue</AlertTitle>
-                                <AlertDescription className='flex flex-col gap-3'>
-                                    <span>{aiError}</span>
-                                    <Button variant="outline" size="sm" className='w-fit h-7 text-[10px]' onClick={handleAnalyze}>
-                                        <RefreshCw className='mr-2 h-3 w-3' /> Retry Analysis
-                                    </Button>
-                                </AlertDescription>
+                                <AlertTitle>Analysis Alert</AlertTitle>
+                                <AlertDescription>{aiError}</AlertDescription>
                             </Alert>
                         </div>
                     )}
@@ -303,7 +295,6 @@ export default function MarketIndicatorPage() {
                                         value={manualPrice}
                                         onChange={(e) => setManualPrice(e.target.value)}
                                     />
-                                    <p className='text-[8px] text-zinc-500 italic'>* WORKAROUND: Enter this for 100% precision.</p>
                                 </div>
                             </div>
 
@@ -344,7 +335,7 @@ export default function MarketIndicatorPage() {
                                                 size="icon" 
                                                 className="h-5 w-5 text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800 rounded-full transition-colors"
                                                 onClick={handleClearHistory}
-                                                title="Clear Prior Context"
+                                                title="Clear History"
                                             >
                                                 <RefreshCw className="h-3.5 w-3.5" />
                                             </Button>
@@ -354,9 +345,6 @@ export default function MarketIndicatorPage() {
                                         {previousImage ? (
                                             <div className="relative w-full h-full opacity-60 grayscale hover:grayscale-0 transition-all">
                                                 <Image src={previousImage} alt="Previous Chart" fill className="object-contain" />
-                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
-                                                    <Badge variant="outline" className="bg-black/80 border-white/20 text-[8px] font-black tracking-widest uppercase">HISTORY</Badge>
-                                                </div>
                                             </div>
                                         ) : (
                                             <div className="text-center p-4">
@@ -380,7 +368,7 @@ export default function MarketIndicatorPage() {
 
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <BrainCircuit className="mr-2 h-5 w-5" />}
-                                {loading ? 'SCANNING CHART DATA...' : 'IDENTIFY PRICE & STRATEGY'}
+                                {loading ? 'SCANNING INDICATORS...' : 'READ RSI, MACD & STRATEGY'}
                             </Button>
                         </div>
 
@@ -389,22 +377,19 @@ export default function MarketIndicatorPage() {
                             {!result && !loading && !aiError && (
                                 <div className="h-full min-h-[400px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
                                     <Eye className="h-12 w-12 text-primary/20 mb-4" />
-                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Ready for Visual Analysis</h3>
+                                    <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Ready for Visual Indicator Analysis</h3>
                                     <p className="text-[10px] text-muted-foreground mt-2 max-w-[250px]">
-                                        Upload a chart screenshot showing the current price header. If the AI misses the price, enter it manually in the <strong>LTP box</strong>.
+                                        Upload a chart showing Price, RSI, and MACD. The AI will extract exact values to guide your entry.
                                     </p>
                                 </div>
                             )}
 
                             {loading && (
                                 <div className="h-full min-h-[400px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
-                                    <div className='relative'>
-                                        <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
-                                        <Search className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
-                                    </div>
+                                    <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
                                     <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse text-center">
-                                        Performing Visual OCR...<br/>
-                                        <span className='text-[9px] font-bold opacity-50'>Calibrating Strategy to {manualPrice ? `₹${manualPrice}` : 'LTP'}</span>
+                                        Performing High-Precision Scan...<br/>
+                                        <span className='text-[9px] font-bold opacity-50'>Reading Candlesticks, RSI & MACD Panels</span>
                                     </p>
                                 </div>
                             )}
@@ -425,26 +410,34 @@ export default function MarketIndicatorPage() {
                                                     <h3 className="font-black text-2xl uppercase italic tracking-tighter">
                                                         {result.prediction.direction} SIGNAL
                                                     </h3>
-                                                    <div className='flex items-center gap-2'>
-                                                        <Coins className='h-3 w-3 text-zinc-500' />
-                                                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
-                                                            {manualPrice ? 'User Confirmed LTP:' : 'Detected LTP:'} ₹{result.detectedPrice || 'Unknown'}
-                                                        </p>
-                                                    </div>
+                                                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                                                        Price Header: ₹{result.detectedPrice || 'N/A'}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className='text-right'>
-                                                <p className='text-[10px] font-black uppercase text-muted-foreground'>Edge Score</p>
+                                                <p className='text-[10px] font-black uppercase text-muted-foreground'>Guidance Accuracy</p>
                                                 <p className='text-xl font-mono font-black text-primary'>{result.prediction.confidence}%</p>
                                             </div>
                                          </div>
-                                         <div className='space-y-2'>
-                                            <div className='flex justify-between items-center text-[9px] font-black uppercase mb-1'>
-                                                <span className='text-zinc-500'>Sentiment Strength</span>
-                                                <span className={result.prediction.direction === 'UP' ? 'text-emerald-500' : 'text-rose-500'}>{result.prediction.confidence}%</span>
+                                         <div className='space-y-4'>
+                                            {/* Indicators Badge Area */}
+                                            <div className="flex flex-wrap gap-2">
+                                                {result.detectedRsi && (
+                                                    <Badge variant="outline" className="bg-zinc-900 border-zinc-800 text-[10px] py-1 px-3">
+                                                        <Activity className="h-3 w-3 mr-2 text-emerald-500" />
+                                                        {result.detectedRsi}
+                                                    </Badge>
+                                                )}
+                                                {result.detectedMacd && (
+                                                    <Badge variant="outline" className="bg-zinc-900 border-zinc-800 text-[10px] py-1 px-3">
+                                                        <Zap className="h-3 w-3 mr-2 text-amber-500" />
+                                                        {result.detectedMacd}
+                                                    </Badge>
+                                                )}
                                             </div>
                                             <Progress value={result.prediction.confidence} className="h-1 bg-zinc-800" />
-                                            <p className='text-xs italic text-muted-foreground mt-3 leading-relaxed'>
+                                            <p className='text-xs italic text-muted-foreground leading-relaxed'>
                                                 " {result.prediction.reasoning} "
                                             </p>
                                          </div>
@@ -461,30 +454,26 @@ export default function MarketIndicatorPage() {
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div>
                                                         <h2 className="text-2xl font-black italic tracking-tight uppercase">{result.symbol}</h2>
-                                                        <p className='text-[9px] font-bold text-zinc-500 uppercase tracking-[0.2em]'>Visual Match: Verified</p>
-                                                    </div>
-                                                    <div className='flex flex-col items-end gap-1'>
-                                                        <Badge className={cn(
-                                                            "px-4 py-1",
-                                                            result.currentSentiment === 'Bullish' ? "bg-green-600" : result.currentSentiment === 'Bearish' ? "bg-red-600" : "bg-zinc-600"
-                                                        )}>
-                                                            {result.currentSentiment.toUpperCase()} BIAS
-                                                        </Badge>
-                                                        <div className='flex items-center gap-1 mt-1'>
-                                                            {result.openingStatus === 'Up Opening' ? <ArrowUpCircle className='h-3 w-3 text-emerald-500'/> : <ArrowDownCircle className='h-3 w-3 text-rose-500'/>}
-                                                            <span className='text-[8px] font-black uppercase text-zinc-400'>{result.openingStatus}</span>
+                                                        <div className="flex gap-2 mt-1">
+                                                            <Badge className={cn(
+                                                                "text-[8px] uppercase",
+                                                                result.openingStatus === 'Up Opening' ? "bg-emerald-600" : result.openingStatus === 'Down Opening' ? "bg-rose-600" : "bg-zinc-600"
+                                                            )}>
+                                                                {result.openingStatus}
+                                                            </Badge>
+                                                            {result.openingGapPercent && <span className='text-[8px] font-black text-zinc-500 uppercase'>GAP: {result.openingGapPercent}</span>}
                                                         </div>
                                                     </div>
+                                                    <Badge className={cn(
+                                                        "px-4 py-1",
+                                                        result.currentSentiment === 'Bullish' ? "bg-green-600" : result.currentSentiment === 'Bearish' ? "bg-red-600" : "bg-zinc-600"
+                                                    )}>
+                                                        {result.currentSentiment.toUpperCase()} BIAS
+                                                    </Badge>
                                                 </div>
-                                                
-                                                <div className='mt-4 pt-4 border-t border-primary/10 space-y-2'>
-                                                    <p className='text-[10px] font-black text-zinc-500 uppercase flex items-center gap-2'>
-                                                        <AlertCircle className='h-3 w-3' /> Trend Similarity Analysis
-                                                    </p>
-                                                    <p className='text-xs text-muted-foreground italic leading-relaxed'>
-                                                        "{result.comparisonVerdict || result.overallVerdict}"
-                                                    </p>
-                                                </div>
+                                                <p className='text-xs text-muted-foreground italic mt-3 border-t border-primary/10 pt-3'>
+                                                    "{result.comparisonVerdict || result.overallVerdict}"
+                                                </p>
                                              </div>
                                              <div className="grid grid-cols-1 gap-4">
                                                 <StrategyCard type="BUY" data={result.buyStrategy} />
@@ -496,8 +485,8 @@ export default function MarketIndicatorPage() {
                                              {previousAnalysis && (
                                                  <div className="space-y-4 opacity-70">
                                                      <div className="p-4 rounded-xl border border-dashed border-zinc-800">
-                                                         <p className="text-[10px] font-black uppercase text-zinc-500 mb-2">Historical Record: {previousAnalysis.symbol}</p>
-                                                         <p className='text-[9px] font-bold text-zinc-600 mb-2'>Captured LTP: ₹{previousAnalysis.detectedPrice}</p>
+                                                         <p className="text-[10px] font-black uppercase text-zinc-500 mb-1">Previous Stock: {previousAnalysis.symbol}</p>
+                                                         <p className='text-[9px] font-bold text-zinc-600 mb-2'>LTP: ₹{previousAnalysis.detectedPrice}</p>
                                                          <p className="text-xs italic text-zinc-400 leading-relaxed">"{previousAnalysis.overallVerdict}"</p>
                                                      </div>
                                                      <div className="grid grid-cols-2 gap-3">
@@ -521,11 +510,11 @@ export default function MarketIndicatorPage() {
                 </CardContent>
                 <CardFooter className="justify-between border-t py-4 text-[10px] text-zinc-500 font-black uppercase tracking-widest">
                     <div className='flex items-center gap-4'>
-                        <span className='flex items-center gap-1'><Zap className='h-3 w-3 text-emerald-500'/> CANDLE ENGINE v3.1</span>
+                        <span className='flex items-center gap-1'><Zap className='h-3 w-3 text-emerald-500'/> INDICATOR ENGINE v4.2</span>
                         <span className='opacity-30'>|</span>
-                        <span>LIVE OCR GROUNDING ENABLED</span>
+                        <span>CANDLE OCR ACTIVE</span>
                     </div>
-                    <span>TERMINAL SYNC: {result?.analysisDate || 'IDLE'}</span>
+                    <span>SYNC: {result?.analysisDate || 'IDLE'}</span>
                 </CardFooter>
             </Card>
         </div>

@@ -233,6 +233,8 @@ export type ExecutionStep = {
 export type MarketIndicatorOutput = {
   symbol: string;
   detectedPrice?: string;
+  detectedRsi?: string;
+  detectedMacd?: string;
   currentSentiment: 'Bullish' | 'Bearish' | 'Neutral';
   openingStatus: 'Up Opening' | 'Down Opening' | 'Flat';
   openingGapPercent?: string;
