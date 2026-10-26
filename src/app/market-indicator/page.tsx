@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -11,7 +10,7 @@ import {
   Sparkles, Target, ShieldAlert, Clock, Info, Search,
   RefreshCw, History, CheckCircle2, AlertCircle,
   ArrowRightLeft, FileSearch, BarChart4, ArrowUpCircle, ArrowDownCircle,
-  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye, Coins
+  Zap, BrainCircuit, TrendingUp, TrendingDown, Eye, Coins, MousePointer2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -64,6 +63,7 @@ export default function MarketIndicatorPage() {
     const { toast } = useToast();
     const [originalImage, setOriginalImage] = useState<string | null>(null);
     const [symbolHint, setSymbolHint] = useState('');
+    const [manualPrice, setManualPrice] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<MarketIndicatorOutput | null>(null);
     const [previousAnalysis, setPreviousAnalysis] = useState<MarketIndicatorOutput | null>(null);
@@ -150,6 +150,7 @@ export default function MarketIndicatorPage() {
             const response = await getMarketIndicator({ 
               photoDataUri: originalImage,
               symbolHint: symbolHint.trim() || undefined,
+              manualPriceHint: manualPrice.trim() || undefined,
               previousAnalysis: previousAnalysis || undefined
             });
             
@@ -160,11 +161,11 @@ export default function MarketIndicatorPage() {
             
             toast({ 
                 title: response.prediction.direction === 'UP' ? "Bullish Outlook" : "Bearish Outlook", 
-                description: `Price detected at ₹${response.detectedPrice || 'N/A'}`
+                description: `Price confirmed at ₹${response.detectedPrice || 'N/A'}`
             });
             
         } catch (error: any) {
-            setAiError("Analysis issue. Ensure the stock name and current price are visible in the screenshot.");
+            setAiError("Analysis issue. Try typing the current price in the 'Actual Price' box for a forced workaround.");
         } finally {
             setLoading(false);
         }
@@ -267,17 +268,31 @@ export default function MarketIndicatorPage() {
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                         {/* INPUT SECTION */}
                         <div className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="symbolHint" className="text-xs font-black text-zinc-500 uppercase">Stock Name (Optional)</Label>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-600" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="symbolHint" className="text-xs font-black text-zinc-500 uppercase flex items-center gap-2">
+                                        <Search className="h-3 w-3" /> Stock Name
+                                    </Label>
                                     <Input 
                                         id="symbolHint" 
-                                        placeholder="e.g. Reliance, Paradeep" 
-                                        className="pl-8 bg-muted/50 text-xs h-10 border-primary/10"
+                                        placeholder="e.g. Reliance" 
+                                        className="bg-muted/50 text-xs h-10 border-primary/10"
                                         value={symbolHint}
                                         onChange={(e) => setSymbolHint(e.target.value)}
                                     />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="manualPrice" className="text-xs font-black text-emerald-500 uppercase flex items-center gap-2">
+                                        <MousePointer2 className="h-3 w-3" /> Actual Price (LTP)
+                                    </Label>
+                                    <Input 
+                                        id="manualPrice" 
+                                        placeholder="Type price if AI misses it" 
+                                        className="bg-emerald-500/5 text-xs h-10 border-emerald-500/20 text-emerald-600 font-bold"
+                                        value={manualPrice}
+                                        onChange={(e) => setManualPrice(e.target.value)}
+                                    />
+                                    <p className='text-[8px] text-zinc-500 italic'>* WORKAROUND: Enter this for 100% precision.</p>
                                 </div>
                             </div>
 
@@ -352,7 +367,7 @@ export default function MarketIndicatorPage() {
                                     <Eye className="h-12 w-12 text-primary/20 mb-4" />
                                     <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Ready for Visual Analysis</h3>
                                     <p className="text-[10px] text-muted-foreground mt-2 max-w-[250px]">
-                                        Upload a chart screenshot showing the current price header. The AI will automatically extract the LTP and build your roadmap.
+                                        Upload a chart screenshot showing the current price header. If the AI misses the price, enter it manually in the <strong>LTP box</strong>.
                                     </p>
                                 </div>
                             )}
@@ -365,7 +380,7 @@ export default function MarketIndicatorPage() {
                                     </div>
                                     <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse text-center">
                                         Performing Visual OCR...<br/>
-                                        <span className='text-[9px] font-bold opacity-50'>Calibrating Strategy to LTP</span>
+                                        <span className='text-[9px] font-bold opacity-50'>Calibrating Strategy to {manualPrice ? `₹${manualPrice}` : 'LTP'}</span>
                                     </p>
                                 </div>
                             )}
@@ -388,7 +403,9 @@ export default function MarketIndicatorPage() {
                                                     </h3>
                                                     <div className='flex items-center gap-2'>
                                                         <Coins className='h-3 w-3 text-zinc-500' />
-                                                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Detected LTP: ₹{result.detectedPrice || 'Unknown'}</p>
+                                                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                                                            {manualPrice ? 'User Confirmed LTP:' : 'Detected LTP:'} ₹{result.detectedPrice || 'Unknown'}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>

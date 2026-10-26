@@ -267,5 +267,6 @@ export type MarketIndicatorOutput = {
 export type MarketIndicatorInput = {
   photoDataUri: string;
   symbolHint?: string;
+  manualPriceHint?: string;
   previousAnalysis?: MarketIndicatorOutput;
 };
