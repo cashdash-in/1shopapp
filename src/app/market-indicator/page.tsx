@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, Loader2, Landmark, Camera, Upload, 
   Sparkles, ArrowUpRight, ArrowDownRight, Target, 
-  ShieldAlert, Clock, Info, CheckCircle2, Wand2, Search
+  ShieldAlert, Clock, Info, CheckCircle2, Wand2, Search,
+  RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -48,7 +49,7 @@ const resizeImage = (dataUrl: string, maxWidth = 1024, maxHeight = 1024): Promis
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
             }
-            resolve(canvas.toDataURL('image/jpeg', 0.7));
+            resolve(canvas.toDataURL('image/jpeg', 0.6)); // Lower quality for reliability
         };
         img.src = dataUrl;
     });
@@ -145,7 +146,7 @@ export default function MarketIndicatorPage() {
                 toast({ title: "Analysis Complete", description: "Trading setup identified from visual context." });
             }
         } catch (error: any) {
-            setAiError("Connection error. Please check your internet or try a smaller screenshot.");
+            setAiError("Connection error. The image might be too large or the AI service is busy. Try adding a 'Stock Name' hint.");
         } finally {
             setLoading(false);
         }
@@ -231,10 +232,18 @@ export default function MarketIndicatorPage() {
                 </CardHeader>
                 <CardContent className="space-y-8">
                     {aiError && (
-                        <Alert variant="destructive">
-                            <AlertTitle>Analysis Issue</AlertTitle>
-                            <AlertDescription>{aiError}</AlertDescription>
-                        </Alert>
+                        <div className='animate-in slide-in-from-top-2 duration-300'>
+                            <Alert variant="destructive">
+                                <ShieldAlert className="h-4 w-4" />
+                                <AlertTitle>Analysis Issue</AlertTitle>
+                                <AlertDescription className='flex flex-col gap-3'>
+                                    <span>{aiError}</span>
+                                    <Button variant="outline" size="sm" className='w-fit h-7 text-[10px] border-destructive/20 text-destructive hover:bg-destructive/10' onClick={handleAnalyze}>
+                                        <RefreshCw className='mr-2 h-3 w-3' /> Retry Analysis
+                                    </Button>
+                                </AlertDescription>
+                            </Alert>
+                        </div>
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -251,10 +260,10 @@ export default function MarketIndicatorPage() {
                                         onChange={(e) => setSymbolHint(e.target.value)}
                                     />
                                 </div>
-                                <p className="text-[10px] text-muted-foreground">Providing a hint helps the AI identify prices correctly if the image is blurry.</p>
+                                <p className="text-[10px] text-muted-foreground">Providing a hint helps the AI identify prices correctly if the header is cropped.</p>
                             </div>
 
-                            <div className='relative w-full aspect-video bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner'>
+                            <div className='relative w-full aspect-video bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner group'>
                                  {!originalImage && (
                                      <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
                                  )}
@@ -264,7 +273,7 @@ export default function MarketIndicatorPage() {
                                          <Button 
                                             variant="secondary" 
                                             size="icon" 
-                                            className="absolute top-2 right-2 rounded-full h-8 w-8"
+                                            className="absolute top-2 right-2 rounded-full h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
                                             onClick={() => {setOriginalImage(null); setResult(null); setAiError('');}}
                                          >
                                              <Info className="h-4 w-4" />
@@ -284,7 +293,7 @@ export default function MarketIndicatorPage() {
                             </div>
                             <Button onClick={handleAnalyze} disabled={loading || !originalImage} className="w-full text-lg h-14 rounded-2xl shadow-xl bg-primary hover:scale-[1.02] transition-transform">
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Wand2 className="mr-2 h-5 w-5" />}
-                                {loading ? 'Analyzing Session Levels...' : 'Generate Step-by-Step Strategy'}
+                                {loading ? 'Synthesizing Roadmap...' : 'Generate Step-by-Step Strategy'}
                             </Button>
                         </div>
 
@@ -293,14 +302,17 @@ export default function MarketIndicatorPage() {
                                 <div className="h-full min-h-[300px] border-2 border-dashed rounded-2xl bg-muted/5 flex flex-col items-center justify-center text-center p-8">
                                     <Sparkles className="h-12 w-12 text-primary/20 mb-4" />
                                     <h3 className="font-bold text-muted-foreground uppercase tracking-widest text-xs">Awaiting Visual Data</h3>
-                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Upload a screenshot of any stock page or chart. The AI will extract price levels to build your intraday plan.</p>
+                                    <p className="text-[10px] text-muted-foreground mt-2 max-w-[200px]">Take a photo of any market chart or search result page to unlock high-precision intraday signals.</p>
                                 </div>
                             )}
 
                             {loading && (
                                 <div className="h-full min-h-[300px] flex flex-col items-center justify-center gap-4 animate-in fade-in">
-                                    <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
-                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Syncing Visual Context...</p>
+                                    <div className='relative'>
+                                        <Loader2 className="h-12 w-12 animate-spin text-primary opacity-30" />
+                                        <Wand2 className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-primary' />
+                                    </div>
+                                    <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Scanning Visual Levels...</p>
                                 </div>
                             )}
 
