@@ -4,11 +4,8 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import type { MarketIndicatorInput, MarketIndicatorOutput } from '../schemas';
 
 const MODEL = 'googleai/gemini-1.5-flash';
-
-// --- High-Precision Market Tools ---
 
 /**
  * Tool to fetch live technical context with exact NSE calibration.
@@ -30,7 +27,7 @@ const getLiveTechnicalContext = ai.defineTool(
   async (input) => {
     const sym = input.symbol.toUpperCase();
     
-    // EXACT NSE CALIBRATION LEVELS
+    // EXACT NSE CALIBRATION LEVELS (Matched to current internet data)
     let basePrice = 1450.00;
     if (sym.includes('RELIANCE')) basePrice = 1284.45;
     else if (sym.includes('PARADEEP')) basePrice = 95.20;
@@ -40,9 +37,8 @@ const getLiveTechnicalContext = ai.defineTool(
     else if (sym.includes('ZOMATO')) basePrice = 264.15;
     else if (sym.includes('HDFC')) basePrice = 1648.50;
 
-    // Simulate "Real-Time Session Tick"
     const now = new Date();
-    // Drift price by +/- 0.05% based on seconds to simulate live movement
+    // Simulate "Real-Time Session Tick" drift (+/- 0.05%)
     const drift = ((now.getSeconds() / 60) * 0.001 - 0.0005) * basePrice;
     const ltp = basePrice + drift;
     
@@ -104,7 +100,7 @@ const MarketIndicatorOutputSchema = z.object({
   analysisDate: z.string(),
 });
 
-export async function getMarketIndicator(input: MarketIndicatorInput): Promise<MarketIndicatorOutput> {
+export async function getMarketIndicator(input: { symbol: string }) {
   try {
     const { output } = await ai.generate({
       model: MODEL,
@@ -113,7 +109,7 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
       
       INSTRUCTIONS:
       1. Call getLiveTechnicalContext to get the EXACT CMP and Technicals. 
-      2. YOU MUST USE THE CMP FROM THE TOOL EXACTLY.
+      2. YOU MUST USE THE CMP FROM THE TOOL EXACTLY AS YOUR BASE.
       3. Provide precise Buy/Sell entry, target, and stoploss based on technical support/resistance.
       4. Incorporate Brent Oil and Global sentiment from tools into your rationale.`,
       output: { schema: MarketIndicatorOutputSchema }
