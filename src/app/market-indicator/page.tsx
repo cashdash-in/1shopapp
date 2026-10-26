@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const resizeImage = (dataUrl: string, maxWidth = 1024, maxHeight = 1024): Promise<string> => {
+const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
     return new Promise((resolve) => {
         const img = new window.Image();
         img.onload = () => {
@@ -49,7 +49,8 @@ const resizeImage = (dataUrl: string, maxWidth = 1024, maxHeight = 1024): Promis
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
             }
-            resolve(canvas.toDataURL('image/jpeg', 0.6)); // Lower quality for reliability
+            // Higher quality (0.9) to ensure prices are readable
+            resolve(canvas.toDataURL('image/jpeg', 0.9)); 
         };
         img.src = dataUrl;
     });
@@ -139,12 +140,9 @@ export default function MarketIndicatorPage() {
               symbolHint: symbolHint.trim() || undefined
             });
             
-            if (response.buyStrategy.entry === "Analysis Error") {
-                setAiError(response.overallVerdict);
-            } else {
-                setResult(response);
-                toast({ title: "Analysis Complete", description: "Trading setup identified from visual context." });
-            }
+            setResult(response);
+            toast({ title: "Analysis Complete", description: "Trading setup identified from visual context." });
+            
         } catch (error: any) {
             setAiError("Connection error. The image might be too large or the AI service is busy. Try adding a 'Stock Name' hint.");
         } finally {
@@ -260,7 +258,7 @@ export default function MarketIndicatorPage() {
                                         onChange={(e) => setSymbolHint(e.target.value)}
                                     />
                                 </div>
-                                <p className="text-[10px] text-muted-foreground">Providing a hint helps the AI identify prices correctly if the header is cropped.</p>
+                                <p className="text-[10px] text-muted-foreground">Providing a hint helps the AI identify prices correctly if the header is cropped or blocked.</p>
                             </div>
 
                             <div className='relative w-full aspect-video bg-muted rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-primary/20 shadow-inner group'>
