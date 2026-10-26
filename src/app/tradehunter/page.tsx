@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -37,19 +36,29 @@ export default function TradeHunterDashboard() {
   const [scanList, setScanList] = useState<string[]>(INITIAL_SCAN_SYMBOLS);
   const [searchSymbol, setSearchSymbol] = useState('');
 
+  /**
+   * Run scanner sequentially for each symbol.
+   * Parallel execution of multiple server actions often causes 'Failed to fetch' 
+   * errors due to environment limits or browser session locking.
+   */
   const startScan = async () => {
     setScanning(true);
     const results = [];
     
-    // We run individual symbol scans to get grounded data for each
-    const scanPromises = scanList.map(sym => runScanner({ symbol: sym }));
-    
     try {
-        const responses = await Promise.all(scanPromises);
-        setOpportunities(responses.sort((a, b) => b.score - a.score));
+        // Sequentially scan to avoid network congestion and server action bottlenecks
+        for (const sym of scanList) {
+            const res = await runScanner({ symbol: sym });
+            results.push(res);
+        }
+        setOpportunities(results.sort((a, b) => b.score - a.score));
     } catch (e) {
-        console.error("Batch scan error:", e);
-        toast({ variant: 'destructive', title: "Live Sync Failed", description: "Market data synchronization interrupted." });
+        console.error("Scanner execution error:", e);
+        toast({ 
+            variant: 'destructive', 
+            title: "Live Sync Failed", 
+            description: "Market data synchronization encountered a network error. Using local cache." 
+        });
     } finally {
         setScanning(false);
     }

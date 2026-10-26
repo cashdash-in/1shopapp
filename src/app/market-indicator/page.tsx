@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -18,6 +17,41 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+
+/**
+ * Utility to resize and compress images before sending to server actions.
+ * Prevents 'Request Entity Too Large' or 'Failed to fetch' errors due to payload size.
+ */
+const resizeImage = (dataUrl: string, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
+    return new Promise((resolve) => {
+        const img = new window.Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0, width, height);
+            // Compress to JPEG at 0.8 quality to significantly reduce payload size
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = dataUrl;
+    });
+};
 
 export default function MarketIndicatorPage() {
     const { toast } = useToast();
@@ -61,15 +95,17 @@ export default function MarketIndicatorPage() {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                setOriginalImage(e.target?.result as string);
+            reader.onload = async (e) => {
+                const dataUrl = e.target?.result as string;
+                const optimizedImage = await resizeImage(dataUrl);
+                setOriginalImage(optimizedImage);
                 setResult(null);
             };
             reader.readAsDataURL(file);
         }
     };
     
-    const handleCapture = () => {
+    const handleCapture = async () => {
         if (videoRef.current && canvasRef.current && isCameraReady) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
@@ -78,7 +114,9 @@ export default function MarketIndicatorPage() {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-                setOriginalImage(canvas.toDataURL('image/png'));
+                const dataUrl = canvas.toDataURL('image/png');
+                const optimizedImage = await resizeImage(dataUrl);
+                setOriginalImage(optimizedImage);
                 setResult(null);
             }
         }
@@ -97,7 +135,8 @@ export default function MarketIndicatorPage() {
             setResult(response);
             toast({ title: "Chart Analysis Complete", description: "Step-by-step strategy identified." });
         } catch (error: any) {
-            setAiError(error.message);
+            console.error("Analysis Error:", error);
+            setAiError(error.message || "An unexpected error occurred during visual analysis.");
         } finally {
             setLoading(false);
         }

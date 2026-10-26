@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Visual Quant Analyst flow. Analyzes stock chart screenshots 
@@ -44,9 +43,9 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
         
         CRITICAL INSTRUCTIONS:
         1. Read the Y-AXIS and latest PRICE TOOLTIP carefully. Use the EXACT numbers visible in the image.
-        2. If the price is around 130-140, do NOT suggest entry at 1200. Every number MUST be derived from the visual scale of this specific image.
-        3. Identify the symbol and session timeframe (look for market open/close times on the X-axis).
-        4. Provide exact time-wise actions for both a BUY (Long) setup and a SHORT SELL setup.
+        2. Identify the current candlestick pattern (e.g., Bullish Engulfing, Pin Bar, Breakout).
+        3. If the price is around 130-140, do NOT suggest entry at 1200. Every number MUST be derived from the visual scale of this specific image.
+        4. Provide exact time-wise actions for both a BUY (Long) setup and a SHORT SELL setup based on the current session timeframe.
         5. For each strategy, give precise Entry, Stop-Loss, and two Profit Targets based on the visual support/resistance levels seen in the candlesticks.
         6. Detail the "Time-wise execution plan" - specify exactly when (time or event) to enter and exit.
         7. Maintain a professional, clinical quant tone.` },
@@ -62,29 +61,29 @@ export async function getMarketIndicator(input: MarketIndicatorInput): Promise<M
 
   } catch (error) {
     console.warn("Visual Chart Analysis Error:", error);
-    // Generic fallback that uses the user's symbol hint if available, but avoids hardcoded "Reliance" levels
+    // Robust fallback that uses the user's symbol hint if available
     return {
       symbol: input.symbolHint || "CHART ANALYSIS",
       currentSentiment: 'Neutral',
       buyStrategy: {
-        entry: "Determining...",
-        stopLoss: "Determining...",
-        target1: "Determining...",
-        target2: "Determining...",
+        entry: "Analysis Error",
+        stopLoss: "N/A",
+        target1: "N/A",
+        target2: "N/A",
         executionPlan: [
-          { time: "Market Open", action: "Identify Support", priceLevel: "See Chart", logic: "Waiting for visual confirmation." }
+          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "Visual analysis request failed. Please check your network and ensure the image is clear." }
         ]
       },
       shortStrategy: {
-        entry: "Determining...",
-        stopLoss: "Determining...",
-        target1: "Determining...",
-        target2: "Determining...",
+        entry: "Analysis Error",
+        stopLoss: "N/A",
+        target1: "N/A",
+        target2: "N/A",
         executionPlan: [
-          { time: "Market Open", action: "Identify Resistance", priceLevel: "See Chart", logic: "Waiting for visual confirmation." }
+          { time: "Session", action: "Retry Analysis", priceLevel: "N/A", logic: "Visual analysis request failed. Please check your network and ensure the image is clear." }
         ]
       },
-      overallVerdict: "AI Vision analysis encountered an error. Please ensure the screenshot is clear and shows price levels on the Y-axis.",
+      overallVerdict: "Visual analysis encountered a network or payload error. Please ensure your image is smaller and clearly shows price levels on the Y-axis.",
       analysisDate: new Date().toLocaleString()
     };
   }
