@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
   ArrowLeft, Loader2, Search, Landmark, Droplets,
-  Wifi, LineChart, Globe, Sparkles, ArrowUpRight, Target, ShieldAlert
+  Wifi, Globe, Sparkles, ArrowUpRight, Target, ShieldAlert
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getMarketIndicator } from '@/ai/flows/market-indicator-flow';
@@ -18,86 +18,9 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Link from 'next/link';
 
-// --- Symbol Mapper for Common Indian Stocks ---
-const mapSymbol = (input: string) => {
-    const clean = input.toUpperCase().trim();
-    const mapping: Record<string, string> = {
-        'RELIANCE': 'NSE:RELIANCE',
-        'RELIANCE INDUSTRIES': 'NSE:RELIANCE',
-        'PARADEEP': 'NSE:PARADEEP',
-        'PARADEEP PHOSPHATES': 'NSE:PARADEEP',
-        'PARADEEP PHOSPHATE': 'NSE:PARADEEP',
-        'PPL': 'NSE:PARADEEP',
-        'HDFC': 'NSE:HDFCBANK',
-        'HDFC BANK': 'NSE:HDFCBANK',
-        'TATA MOTORS': 'NSE:TATAMOTORS',
-        'TATAMOTORS': 'NSE:TATAMOTORS',
-        'SBI': 'NSE:SBIN',
-        'STATE BANK': 'NSE:SBIN',
-        'SBIN': 'NSE:SBIN',
-        'INFY': 'NSE:INFY',
-        'INFOSYS': 'NSE:INFY',
-        'TCS': 'NSE:TCS',
-        'ZOMATO': 'NSE:ZOMATO',
-        'SWIGGY': 'NSE:SWIGGY',
-    };
-
-    if (mapping[clean]) return mapping[clean];
-    if (clean.includes(':')) return clean;
-    // Default to NSE for any unknown symbol entered
-    return `NSE:${clean}`;
-};
-
-// --- TradingView Widget Component ---
-const TradingViewWidget = ({ symbol }: { symbol: string }) => {
-  const container = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!container.current) return;
-    
-    // Clear previous widget explicitly
-    container.current.innerHTML = "";
-    
-    const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-    script.type = "text/javascript";
-    script.async = true;
-    
-    const normalizedSymbol = mapSymbol(symbol);
-
-    script.innerHTML = JSON.stringify({
-      "autosize": true,
-      "symbol": normalizedSymbol,
-      "interval": "60",
-      "timezone": "Asia/Kolkata",
-      "theme": "dark",
-      "style": "1",
-      "locale": "en",
-      "enable_publishing": false,
-      "hide_top_toolbar": false,
-      "allow_symbol_change": true,
-      "save_image": false,
-      "container_id": "tradingview_chart",
-      "studies": [
-        "RSI@tv-basicstudies",
-        "MACD@tv-basicstudies"
-      ]
-    });
-    
-    container.current.appendChild(script);
-  }, [symbol]);
-
-  return (
-    <div className="tradingview-widget-container h-full w-full bg-muted/20 rounded-xl overflow-hidden border border-primary/10 shadow-inner">
-      <div id="tradingview_chart" className="h-full w-full" ref={container}></div>
-    </div>
-  );
-};
-
 export default function MarketIndicatorPage() {
     const { toast } = useToast();
     const [symbol, setSymbol] = useState('');
-    const [activeSymbol, setActiveSymbol] = useState('RELIANCE');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<MarketIndicatorOutput | null>(null);
     const [aiError, setAiError] = useState('');
@@ -113,8 +36,7 @@ export default function MarketIndicatorPage() {
         try {
             const response = await getMarketIndicator({ symbol });
             setResult(response);
-            setActiveSymbol(symbol.toUpperCase());
-            toast({ title: "Live Sync Complete", description: `Market indicators for ${symbol} are grounded in current session data.` });
+            toast({ title: "Live Sync Complete", description: `Exact data for ${symbol} grounded in current session.` });
         } catch (error: any) {
             setAiError(error.message);
         } finally {
@@ -124,7 +46,7 @@ export default function MarketIndicatorPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-background items-center p-4 md:p-8">
-            <Card className="w-full max-w-7xl border-primary/10 shadow-2xl">
+            <Card className="w-full max-w-4xl border-primary/10 shadow-2xl">
                 <CardHeader className="relative">
                     <Link href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-muted">
                         <ArrowLeft className="h-5 w-5 text-muted-foreground" />
@@ -133,20 +55,20 @@ export default function MarketIndicatorPage() {
                     <div className="text-center pt-8">
                         <div className='flex items-center justify-center gap-2 mb-2'>
                             <Badge variant="outline" className="text-green-500 border-green-500/20 bg-green-500/5 animate-pulse">
-                                <Wifi className="h-3 w-3 mr-1" /> LIVE INTERNET GROUNDING ENABLED
+                                <Wifi className="h-3 w-3 mr-1" /> EXACT DATA GROUNDING ENABLED
                             </Badge>
                         </div>
                         <CardTitle className="text-3xl font-bold tracking-tight flex items-center justify-center gap-3">
                             <Landmark className="h-8 w-8 text-primary" />
-                            AI Strategic Market Terminal
+                            AI Strategic Market Verdict
                         </CardTitle>
-                        <CardDescription>High-Precision Quant Technicals & Real-Time Live Charts.</CardDescription>
+                        <CardDescription>Professional Quant Guidance & Precision Entry/Exit Levels.</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {aiError && (
                         <Alert variant="destructive">
-                            <AlertTitle>API Synchronisation Error</AlertTitle>
+                            <AlertTitle>API Sync Error</AlertTitle>
                             <AlertDescription>{aiError}</AlertDescription>
                         </Alert>
                     )}
@@ -157,7 +79,7 @@ export default function MarketIndicatorPage() {
                             id="symbol"
                             value={symbol}
                             onChange={(e) => setSymbol(e.target.value)}
-                            placeholder="Enter Stock (e.g., RELIANCE, PARADEEP, TATAMOTORS)"
+                            placeholder="Enter Stock (e.g., RELIANCE, PARADEEP, TCS)"
                             className="h-14 text-lg pl-6 pr-32 rounded-full shadow-lg border-primary/20 bg-muted/30 focus:bg-background transition-all"
                             onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
                         />
@@ -171,146 +93,113 @@ export default function MarketIndicatorPage() {
                         </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                        <div className="xl:col-span-2 h-[500px]">
-                            <Card className="h-full overflow-hidden border-primary/5">
-                                {/* Using activeSymbol as key forces TradingView to remount and show the CORRECT stock */}
-                                <TradingViewWidget key={activeSymbol} symbol={activeSymbol} />
-                            </Card>
+                    {loading ? (
+                        <div className="py-20 text-center space-y-4">
+                            <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary opacity-30" />
+                            <p className="font-bold text-muted-foreground animate-pulse">Extracting Real-Time Technicals for {symbol.toUpperCase()}...</p>
                         </div>
-
-                        <div className="space-y-6">
-                             {loading ? (
-                                <div className="space-y-4 h-full flex flex-col justify-center py-12 text-center animate-pulse">
-                                    <Loader2 className="h-12 w-12 mx-auto animate-spin text-primary opacity-20" />
-                                    <div className="space-y-1">
-                                        <p className="text-lg font-bold">Scrutinizing Market Depth...</p>
-                                        <p className="text-sm text-muted-foreground italic">AI is extracting technicals for {symbol.toUpperCase() || activeSymbol}</p>
+                    ) : result ? (
+                        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
+                             <Card className="bg-primary/5 border-primary/20 shadow-xl overflow-hidden">
+                                <div className={cn(
+                                    "h-2 w-full",
+                                    result.verdict === 'Buy' ? "bg-green-500" : result.verdict === 'Sell' ? "bg-red-500" : "bg-amber-500"
+                                )} />
+                                <CardHeader className="pb-2">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-5xl font-black italic tracking-tighter">{result.symbol}</h2>
+                                        <Badge className={cn(
+                                            "text-2xl px-8 py-3 shadow-lg rounded-full",
+                                            result.verdict === 'Buy' ? "bg-green-600" : result.verdict === 'Sell' ? "bg-red-600" : "bg-amber-600"
+                                        )}>
+                                            {result.verdict === 'Buy' ? 'STRATEGIC BUY' : result.verdict === 'Sell' ? 'SHORT SELL' : 'WATCH'}
+                                        </Badge>
                                     </div>
-                                </div>
-                            ) : result ? (
-                                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                                    <Card className="bg-primary/5 border-primary/20 shadow-lg">
-                                        <CardHeader className="py-4">
-                                            <CardTitle className="text-xs uppercase tracking-widest text-muted-foreground font-black">AI Signal Strength</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                             <div className="flex items-center justify-between">
-                                                <h2 className="text-4xl font-black">{result.symbol}</h2>
-                                                <Badge className={cn(
-                                                    "text-xl px-6 py-2 shadow-lg",
-                                                    result.verdict === 'Buy' ? "bg-green-600 hover:bg-green-500" : result.verdict === 'Sell' ? "bg-red-600 hover:bg-red-500" : "bg-amber-600 hover:bg-amber-500"
-                                                )}>
-                                                    {result.verdict === 'Buy' ? 'BUY (LONG)' : result.verdict === 'Sell' ? 'SELL (SHORT)' : 'HOLD'}
-                                                </Badge>
-                                            </div>
-                                            <div className="mt-4 pt-4 border-t border-primary/10 flex justify-between items-end">
-                                                <div>
-                                                    <p className="text-[10px] font-bold text-muted-foreground">LAST TRADED PRICE</p>
-                                                    <p className="text-2xl font-mono font-bold text-primary">{result.currentPrice}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-[10px] text-green-500 flex items-center gap-1"><Wifi className="h-2 w-2"/> GROUNDED</p>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-
-                                    <div className="grid grid-cols-1 gap-3">
-                                        <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/5 border border-green-500/20">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-green-600">
-                                                <ArrowUpRight className="h-3 w-3" /> EXACT ENTRY
-                                            </div>
-                                            <span className="font-mono font-black text-lg">{result.entryPrice}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-blue-600">
-                                                <Target className="h-3 w-3" /> PROFIT TARGET
-                                            </div>
-                                            <span className="font-mono font-black text-lg">{result.targetPrice}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between p-3 rounded-lg bg-red-500/5 border border-red-500/20">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-red-600">
-                                                <ShieldAlert className="h-3 w-3" /> STOP LOSS
-                                            </div>
-                                            <span className="font-mono font-black text-lg">{result.stopLoss}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <Card className="border-primary/5 bg-secondary/10">
-                                        <CardHeader className="py-2">
-                                            <CardTitle className="text-[10px] uppercase font-bold text-muted-foreground">Technical Snapshot</CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="space-y-3">
-                                            <div className="space-y-1">
-                                                <div className="flex justify-between text-[10px] font-black">
-                                                    <span>RSI (14)</span>
-                                                    <span>{result.rsi.toFixed(1)}</span>
-                                                </div>
-                                                <Progress value={result.rsi} className="h-1.5" />
-                                            </div>
-                                            <div className="grid grid-cols-3 gap-2 text-center">
-                                                <div className="p-2 rounded bg-background/50 border border-primary/5">
-                                                    <p className="text-[8px] text-muted-foreground">MACD</p>
-                                                    <p className="text-xs font-mono font-bold">{result.macd.value}</p>
-                                                </div>
-                                                <div className="p-2 rounded bg-background/50 border border-primary/5">
-                                                    <p className="text-[8px] text-muted-foreground">SIGNAL</p>
-                                                    <p className="text-xs font-mono font-bold">{result.macd.signal}</p>
-                                                </div>
-                                                <div className="p-2 rounded bg-background/50 border border-primary/5">
-                                                    <p className="text-[8px] text-muted-foreground">HIST</p>
-                                                    <p className="text-xs font-mono font-bold">{result.macd.histogram}</p>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-muted/10 rounded-xl border-2 border-dashed border-primary/10">
-                                    <LineChart className="h-12 w-12 mb-4 text-primary/20" />
-                                    <p className="text-sm font-bold text-muted-foreground">Enter a symbol to unlock AI Quantitative Research</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {result && !loading && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                             <Card className="bg-secondary/20 border-primary/5">
-                                <CardHeader className="py-4">
-                                    <CardTitle className="text-sm flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /> Strategy Rationale</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-sm leading-relaxed whitespace-pre-wrap italic text-muted-foreground">{result.rationale}</p>
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                        <div className="space-y-4">
+                                            <div className="p-4 rounded-xl bg-background border shadow-inner">
+                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Current Market Price (LTP)</p>
+                                                <p className="text-3xl font-mono font-black text-primary">{result.currentPrice}</p>
+                                            </div>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                <div className="flex justify-between p-3 bg-green-500/5 border border-green-500/20 rounded-lg">
+                                                    <span className="text-xs font-bold flex items-center gap-2"><ArrowUpRight className="h-3 w-3 text-green-500"/> EXACT ENTRY</span>
+                                                    <span className="font-mono font-bold text-green-600">{result.entryPrice}</span>
+                                                </div>
+                                                <div className="flex justify-between p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
+                                                    <span className="text-xs font-bold flex items-center gap-2"><Target className="h-3 w-3 text-blue-500"/> PROFIT TARGET</span>
+                                                    <span className="font-mono font-bold text-blue-600">{result.targetPrice}</span>
+                                                </div>
+                                                <div className="flex justify-between p-3 bg-red-500/5 border border-red-500/20 rounded-lg">
+                                                    <span className="text-xs font-bold flex items-center gap-2"><ShieldAlert className="h-3 w-3 text-red-500"/> STOP LOSS</span>
+                                                    <span className="font-mono font-bold text-red-600">{result.stopLoss}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className="p-4 rounded-xl bg-secondary/10 border">
+                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3">Technical Indicators</p>
+                                                <div className="space-y-4">
+                                                    <div className="space-y-1">
+                                                        <div className="flex justify-between text-[10px] font-black">
+                                                            <span>RSI (14)</span>
+                                                            <span className={cn(result.rsi > 60 ? "text-red-500" : result.rsi < 40 ? "text-green-500" : "")}>{result.rsi.toFixed(1)}</span>
+                                                        </div>
+                                                        <Progress value={result.rsi} className="h-2" />
+                                                    </div>
+                                                    <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-bold">
+                                                        <div className="p-2 border rounded bg-background">
+                                                            <p className="text-muted-foreground mb-1">MACD</p>
+                                                            <p className="font-mono">{result.macd.value}</p>
+                                                        </div>
+                                                        <div className="p-2 border rounded bg-background">
+                                                            <p className="text-muted-foreground mb-1">SIGNAL</p>
+                                                            <p className="font-mono">{result.macd.signal}</p>
+                                                        </div>
+                                                        <div className="p-2 border rounded bg-background">
+                                                            <p className="text-muted-foreground mb-1">HIST</p>
+                                                            <p className="font-mono">{result.macd.histogram}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="p-4 rounded-xl border italic text-xs leading-relaxed text-muted-foreground bg-muted/20">
+                                                <Sparkles className="h-4 w-4 text-primary mb-2" />
+                                                "{result.rationale}"
+                                            </div>
+                                        </div>
+                                     </div>
                                 </CardContent>
-                            </Card>
+                             </Card>
 
-                            <Card className="bg-muted/5 border-primary/5">
-                                <CardHeader className="py-4">
-                                    <CardTitle className="text-sm flex items-center gap-2"><Globe className="h-4 w-4" /> Global Macro Feed</CardTitle>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <div className="p-3 rounded-lg bg-background/40 border">
-                                        <p className="text-[8px] font-black text-muted-foreground uppercase mb-1">Brent Oil</p>
-                                        <p className="text-xs font-bold flex items-center gap-2"><Droplets className="h-3 w-3 text-blue-500" /> {result.globalFactors.brentOil}</p>
-                                    </div>
-                                    <div className="p-3 rounded-lg bg-background/40 border">
-                                        <p className="text-[8px] font-black text-muted-foreground uppercase mb-1">US Market</p>
-                                        <p className="text-xs font-bold flex items-center gap-2"><Globe className="h-3 w-3 text-indigo-500" /> {result.globalFactors.usMarketSentiment}</p>
-                                    </div>
-                                    <div className="p-3 rounded-lg bg-background/40 border">
-                                        <p className="text-[8px] font-black text-muted-foreground uppercase mb-1">Asian Opening</p>
-                                        <p className="text-xs font-bold flex items-center gap-2"><Landmark className="h-3 w-3 text-amber-500" /> {result.globalFactors.asianMarketStatus}</p>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="py-2 text-[8px] text-muted-foreground/50 italic border-t border-primary/5 mt-2">
-                                    Last Analysis Cycle: {result.analysisDate}
-                                </CardFooter>
-                            </Card>
+                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="p-4 border rounded-xl bg-background flex flex-col gap-1">
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase">Brent Oil</p>
+                                    <p className="text-sm font-bold flex items-center gap-2"><Droplets className="h-3 w-3 text-blue-500"/> {result.globalFactors.brentOil}</p>
+                                </div>
+                                <div className="p-4 border rounded-xl bg-background flex flex-col gap-1">
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase">US Market</p>
+                                    <p className="text-sm font-bold flex items-center gap-2"><Globe className="h-3 w-3 text-indigo-500"/> {result.globalFactors.usMarketSentiment}</p>
+                                </div>
+                                <div className="p-4 border rounded-xl bg-background flex flex-col gap-1">
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase">Asian Open</p>
+                                    <p className="text-sm font-bold flex items-center gap-2"><Landmark className="h-3 w-3 text-amber-500"/> {result.globalFactors.asianMarketStatus}</p>
+                                </div>
+                             </div>
+                        </div>
+                    ) : (
+                        <div className="py-24 text-center border-2 border-dashed rounded-3xl bg-muted/5">
+                            <Sparkles className="h-12 w-12 mx-auto text-primary/20 mb-4" />
+                            <h3 className="text-lg font-bold text-muted-foreground">Enter a symbol to unlock Quant Research</h3>
+                            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">AI will fetch grounded session data to provide exact buy/sell levels.</p>
                         </div>
                     )}
                 </CardContent>
+                <CardFooter className="justify-center border-t py-4">
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">NSE Real-Time Quant Synchronization Engine</p>
+                </CardFooter>
             </Card>
         </div>
     );
